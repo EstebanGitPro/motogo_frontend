@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+# Leer el mensaje del archivo que Git nos pasa
+message=$(cat "$1")
+
+echo "DEBUG: Mensaje del commit: $message"
+
+# Expresión regular para mensajes de commit en español
+commit_pattern="^(feat|fix|docs|style|refactor|test|chore|build|ci|perf|revert):.*"
+
+# Tipos de commit y sus significados:
+# corr: corrección de errores (fix)
+# carac: nueva característica (feat)
+# doc: cambios en documentación (doc)
+# tarea: tareas rutinarias, mantenimiento (chore)
+# refac: reescritura/refactorización de código (refactor)
+# prueba: añadir o modificar pruebas (test)
+# estilo: cambios de formato, espacios, etc (style)
+# rend: mejoras de rendimiento (perf)
+# comp: cambios en la compilación (build)
+# ci: cambios en integración continua (ci)
+# rev: revertir cambios anteriores (revert)
+
+
+if ! echo "$message" | grep -Eiq "$commit_pattern"; then
+    echo "❌ Error: El mensaje del commit no sigue el formato requerido"
+    echo "Formato esperado: <tipo>: <descripción>"
+    echo "Tipos permitidos: feat, fix, docs, style, refactor, test, chore, build, ci, perf, revert"
+    echo "Ejemplo: feat: implementar login con Google"
+    exit 1
+fi
+
+echo "✅ Formato del mensaje de commit válido"
+exit 0
+

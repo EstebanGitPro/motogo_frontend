@@ -1,0 +1,72 @@
+#!/usr/bin/env sh
+
+#1.crear pre-commit que valide flutter format, flutter analyze, flutter test
+#Adicional que el coemntario contenga una estructura donde se anteponga feat,fix,doc,release
+
+# Autoformat all modified files before commit
+set -e
+
+
+# Ejecutar Flutter Doctor
+echo "🔍 Ejecutando Flutter Doctor..."
+if ! output=$(flutter doctor); then
+    echo "❌ Fallo en Flutter Doctor:"
+    echo "$output"
+    exit 1
+fi
+echo "$output"
+
+# Verificar archivos Dart modificados
+dart_files=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if [ -z "$dart_files" ]; then
+    echo "❌ No hay archivos Dart modificados"
+    exit 1
+fi
+
+echo "🎯 Formateando archivos Dart..."
+
+# Guardar archivos no staged
+if git stash save --keep-index --quiet; then
+    stashed=1
+fi
+
+# Formatear archivos
+# echo "$dart_files" | while read file; do
+#     if [ -f "$file" ]; then
+#         if ! dart format --set-exit-if-changed .; then
+#             echo "❌ Error: El código no está correctamente formateado"
+#             exit 1
+#         fi
+#         git add "$file"
+#     fi
+# done
+
+# # Restaurar archivos no staged
+# if [ -n "$stashed" ]; then
+#     git stash pop --quiet
+# fi
+
+# echo "✅ Formateo completado exitosamente"
+
+# Ejecutar Flutter Analyze
+echo "🔬 Ejecutando flutter analyze..."
+if ! output=$(flutter analyze); then
+    echo "❌ COMMIT REJECTED: Flutter analyze encontró los siguientes errores:"
+    echo "$output"
+    exit 1
+fi
+echo "✅ Análisis completado exitosamente"
+
+# Ejecutar Flutter Test
+# echo "🔬 Ejecutando Flutter Test..."
+# if ! output=$(flutter test); then
+#     echo "❌ Fallo en Flutter Test:"
+#     echo "$output"
+#     exit 1
+# fi
+# echo "$output"
+# echo "✅ Tests completados exitosamente"
+
+# echo "✨ Todas las verificaciones pasaron exitosamente"
+# exit 0

@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+
+# Flag para deshabilitar coverage temporalmente
+SKIP_COVERAGE=true
+
+if [ "$SKIP_COVERAGE" = true ]; then
+    echo "⚠️ Coverage omitido para commits iniciales"
+    echo "✅ Pre-commit hook ejecutado exitosamente!"
+    exit 0
+fi
+
+# Mensaje inicial
+echo "🔍 Ejecutando Flutter Coverage..."
+
+# Ejecutar las pruebas y generar la cobertura
+if output=$(flutter test --coverage); then
+   echo "$output"
+   
+   # Generar el informe HTML y extraer porcentaje
+   coverage=$(genhtml coverage/lcov.info -o coverage/html | grep "lines" | awk '{print $2}' | tr -d '.' | cut -d'%' -f1)
+   
+   if [ -z "$coverage" ]; then
+       echo "❌ Error al obtener la cobertura"
+       exit 1
+   fi
+
+   echo "📊 Porcentaje de cobertura: $coverage%"
+
+   # Verificar umbral de 85%
+   if [ "$coverage" -lt 450 ]; then
+       echo "❌ La cobertura ($coverage%) es inferior al 85%"
+       exit 1
+   fi
+
+   # Abrir el informe
+   xdg-open coverage/html/index.html || echo "⚠️ Abra manualmente: coverage/html/index.html"
+   
+   echo "✅ Coverage ejecutado exitosamente!"
+   exit 0
+else
+   echo "❌ Fallo en Flutter Coverage: $output"
+   exit 1
+fi

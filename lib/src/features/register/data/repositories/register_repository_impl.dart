@@ -24,7 +24,7 @@ class RegisterRepositoryImp implements RegisterRepository {
     String role,
   ) async {
     try {
-      final personModel = await _registerDataSource.registerPerson(
+      final result = await _registerDataSource.registerPerson(
         identityNumber,
         firstName,
         lastName,
@@ -34,7 +34,12 @@ class RegisterRepositoryImp implements RegisterRepository {
         password,
         role,
       );
-      return Right(personModel);
+      
+      return result.fold(
+        (error) => Left(error),
+        (personModel) => Right(personModel),
+      );
+      
     } on EmailAlreadyExistsException {
       return Left(
         ErrorModel(message: 'El email ya está registrado', isError: true),

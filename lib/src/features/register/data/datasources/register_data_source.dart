@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/register/data/models/person_model.dart';
-import 'package:motogo_frontend/src/features/register/exceptions/register_exceptions.dart';
+import 'package:either_dart/either.dart';
+
 
 class RegisterDataSource {
-  Future<PersonModel> registerPerson(
+  Future<Either<ErrorModel, PersonModel>> registerPerson(
     String identityNumber,
     String firstName,
     String lastName,
@@ -35,35 +36,10 @@ class RegisterDataSource {
 
     if (response.statusCode == 201) {
       final responseData = json.decode(response.body);
-      return PersonModel.fromMap(responseData);
+      return Right(PersonModel.fromMap(responseData));
     } else {
-      try {
-        final errorData = json.decode(response.body);
-
-        ErrorModel errorModel;
-        if (errorData is Map<String, dynamic>) {
-          errorModel = ErrorModel.fromJson(errorData);
-        } else if (errorData is String) {
-          errorModel = ErrorModel(message: errorData, isError: true);
-        } else {
-          errorModel = ErrorModel(
-            message: 'Error del servidor: ${errorData.toString()}',
-            isError: true,
-          );
-        }
-
-        if (errorModel.message.contains('email')) {
-          throw const EmailAlreadyExistsException();
-        } else if (errorModel.message.contains('identity_number')) {
-          throw const IdentityNumberExistsException();
-        } else {
-          throw RegisterValidationException(errorModel.message);
-        }
-      } catch (e) {
-        throw RegisterValidationException(
-          'Error del servidor: ${response.body}',
-        );
-      }
+      final errorData = json.decode(response.body);
+      return Left(ErrorModel.fromJson(errorData));
     }
   }
 }

@@ -29,4 +29,11 @@ class LoginFailure extends LoginState {
   List<Object> get props => [error];
 }
 
-class LoginNeedsVerification extends LoginState {}
+class LoginNeedsVerification extends LoginState {
+  final String? message;
+
+  const LoginNeedsVerification({this.message});
+
+  @override
+  List<Object> get props => [message ?? ''];
+}

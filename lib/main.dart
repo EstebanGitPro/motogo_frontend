@@ -24,6 +24,11 @@ void main() {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'MotoGo',
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+          useMaterial3: true,
+        ),
         initialRoute: '/',
         routes: {
           '/': (context) => const UserTypeSelectionPage(),

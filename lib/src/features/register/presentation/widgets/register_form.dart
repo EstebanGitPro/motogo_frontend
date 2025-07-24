@@ -1,0 +1,587 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/register/presentation/bloc/register_bloc.dart';
+import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
+
+class RegisterForm extends StatefulWidget {
+  final String role;
+  final String title;
+  final String subtitle;
+  final String buttonText;
+  final Color primaryColor;
+  final IconData icon;
+  final Widget? extraContent;
+  final VoidCallback? onSwitchToLogin;
+
+  const RegisterForm({
+    super.key,
+    required this.role,
+    required this.title,
+    required this.subtitle,
+    required this.buttonText,
+    required this.primaryColor,
+    required this.icon,
+    this.extraContent,
+    this.onSwitchToLogin,
+  });
+
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _identityController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _secondLastNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  String get role => widget.role;
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    _identityController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _secondLastNameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  String? _validateIdentity(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (int.tryParse(value!) == null) {
+      return 'Ingresa un número de identificación válido';
+    }
+    if (value.length < 7) return 'Mínimo 7 dígitos';
+    return null;
+  }
+
+  String? _validateName(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (value!.length < 2) return 'Mínimo 2 caracteres';
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
+      return 'Ingresa un correo válido';
+    }
+    return null;
+  }
+
+  String? _validatePhone(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (!RegExp(r'^[+]?[0-9]{10,13}$').hasMatch(value!)) {
+      return 'Ingresa un número de teléfono válido';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (value!.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+      return 'Debe contener mayúscula, minúscula y número';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value?.isEmpty ?? true) return 'Este campo es requerido';
+    if (value != _passwordController.text) {
+      return 'Las contraseñas no coinciden';
+    }
+    return null;
+  }
+
+  void _handleRegister() {
+    if (_formKey.currentState!.validate()) {
+      context.read<RegisterBloc>().add(
+        RegisterSubmitted(
+          identityNumber: _identityController.text,
+          firstName: _firstNameController.text,
+          lastName: _lastNameController.text,
+          secondLastName: _secondLastNameController.text.isEmpty
+              ? null
+              : _secondLastNameController.text,
+          email: _emailController.text,
+          phoneNumber: _phoneController.text,
+          emailVerified: false,
+          phoneNumberVerified: false,
+          password: _passwordController.text,
+          role: role,
+        ),
+      );
+    }
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+    IconData? prefixIcon,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+  }) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      validator: validator,
+      style: TextStyle(fontSize: isMobile ? 16 : 18),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: Colors.grey[600],
+          fontSize: isMobile ? 16 : 18,
+        ),
+        prefixIcon: prefixIcon != null
+            ? Icon(prefixIcon, color: Colors.grey[600], size: 22)
+            : null,
+        suffixIcon: suffixIcon,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: widget.primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.grey[50],
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: isMobile ? 16 : 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordToggle(bool obscure, VoidCallback onPressed) {
+    return IconButton(
+      icon: Icon(
+        obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+        color: Colors.grey[600],
+      ),
+      onPressed: onPressed,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isMobile = screenSize.width < 600;
+    final isLargeScreen = screenSize.width > 800;
+
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isLargeScreen
+                ? 600
+                : (screenSize.width > 600 ? 500 : double.infinity),
+          ),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 5 : 32,
+              vertical: isMobile ? 12 : 24,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withAlpha(25),
+                    spreadRadius: 2,
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(isMobile ? 24 : 32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: isMobile ? 60 : 70,
+                              height: isMobile ? 60 : 70,
+                              decoration: BoxDecoration(
+                                color: widget.primaryColor.withAlpha(38),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Icon(
+                                widget.icon,
+                                color: widget.primaryColor,
+                                size: isMobile ? 30 : 35,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              widget.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                    fontSize: isMobile ? 24 : 28,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.subtitle,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: isMobile ? 16 : 18,
+                                  ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      if (isLargeScreen)
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _identityController,
+                                    label: 'Número de identificación',
+                                    keyboardType: TextInputType.number,
+                                    prefixIcon: Icons.badge_outlined,
+                                    validator: _validateIdentity,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _firstNameController,
+                                    label: 'Nombres',
+                                    prefixIcon: Icons.person_outline,
+                                    validator: _validateName,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _lastNameController,
+                                    label: 'Primer apellido',
+                                    prefixIcon: Icons.person_outline,
+                                    validator: _validateName,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _secondLastNameController,
+                                    label: 'Segundo apellido (Opcional)',
+                                    prefixIcon: Icons.person_outline,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _emailController,
+                                    label: 'Correo electrónico',
+                                    keyboardType: TextInputType.emailAddress,
+                                    prefixIcon: Icons.email_outlined,
+                                    validator: _validateEmail,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _phoneController,
+                                    label: 'Número de teléfono',
+                                    keyboardType: TextInputType.phone,
+                                    prefixIcon: Icons.phone_outlined,
+                                    validator: _validatePhone,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _passwordController,
+                                    label: 'Contraseña',
+                                    obscureText: _obscurePassword,
+                                    prefixIcon: Icons.lock_outline,
+                                    suffixIcon: _buildPasswordToggle(
+                                      _obscurePassword,
+                                      () => setState(
+                                        () => _obscurePassword =
+                                            !_obscurePassword,
+                                      ),
+                                    ),
+                                    validator: _validatePassword,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: _buildTextField(
+                                    controller: _confirmPasswordController,
+                                    label: 'Confirmar contraseña',
+                                    obscureText: _obscureConfirmPassword,
+                                    prefixIcon: Icons.lock_outline,
+                                    suffixIcon: _buildPasswordToggle(
+                                      _obscureConfirmPassword,
+                                      () => setState(
+                                        () => _obscureConfirmPassword =
+                                            !_obscureConfirmPassword,
+                                      ),
+                                    ),
+                                    validator: _validateConfirmPassword,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            _buildTextField(
+                              controller: _identityController,
+                              label: 'Número de identificación',
+                              keyboardType: TextInputType.number,
+                              prefixIcon: Icons.badge_outlined,
+                              validator: _validateIdentity,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _firstNameController,
+                              label: 'Nombres',
+                              prefixIcon: Icons.person_outline,
+                              validator: _validateName,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _lastNameController,
+                              label: 'Primer apellido',
+                              prefixIcon: Icons.person_outline,
+                              validator: _validateName,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _secondLastNameController,
+                              label: 'Segundo apellido (Opcional)',
+                              prefixIcon: Icons.person_outline,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _emailController,
+                              label: 'Correo electrónico',
+                              keyboardType: TextInputType.emailAddress,
+                              prefixIcon: Icons.email_outlined,
+                              validator: _validateEmail,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _phoneController,
+                              label: 'Número de teléfono',
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: Icons.phone_outlined,
+                              validator: _validatePhone,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _passwordController,
+                              label: 'Contraseña',
+                              obscureText: _obscurePassword,
+                              prefixIcon: Icons.lock_outline,
+                              suffixIcon: _buildPasswordToggle(
+                                _obscurePassword,
+                                () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
+                              ),
+                              validator: _validatePassword,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _confirmPasswordController,
+                              label: 'Confirmar contraseña',
+                              obscureText: _obscureConfirmPassword,
+                              prefixIcon: Icons.lock_outline,
+                              suffixIcon: _buildPasswordToggle(
+                                _obscureConfirmPassword,
+                                () => setState(
+                                  () => _obscureConfirmPassword =
+                                      !_obscureConfirmPassword,
+                                ),
+                              ),
+                              validator: _validateConfirmPassword,
+                            ),
+                          ],
+                        ),
+                      if (widget.extraContent != null) ...[
+                        const SizedBox(height: 24),
+                        widget.extraContent!,
+                      ],
+                      const SizedBox(height: 32),
+                      BlocBuilder<RegisterBloc, RegisterState>(
+                        builder: (context, state) {
+                          final isLoading = state is RegisterLoading;
+                          return SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: isLoading ? null : _handleRegister,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: widget.primaryColor,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: isMobile ? 16 : 18,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 2,
+                                shadowColor:
+                                    widget.primaryColor.withAlpha(75),
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          widget.icon,
+                                          size: isMobile ? 20 : 22,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          widget.buttonText,
+                                          style: TextStyle(
+                                            fontSize: isMobile ? 16 : 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 32),
+                      Center(
+                        child: BlocBuilder<LoginBloc, LoginState>(
+                          builder: (context, state) {
+                            return Wrap(
+                              alignment: WrapAlignment.center,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                Text(
+                                  '¿Ya tienes una cuenta? ',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: isMobile ? 14 : 16,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: state is LoginInProgress
+                                      ? null
+                                      : widget.onSwitchToLogin ??
+                                          () {
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    const UserTypeSelectionPage(),
+                                              ),
+                                              (route) => false,
+                                            );
+                                          },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: isMobile ? 4 : 8,
+                                      vertical: isMobile ? 0 : 4,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'Iniciar sesión',
+                                    style: TextStyle(
+                                      color: widget.primaryColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: isMobile ? 14 : 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

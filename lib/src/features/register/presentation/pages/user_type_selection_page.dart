@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
-import 'package:motogo_frontend/src/features/register/presentation/widgets/custom_button.dart';
 
 class UserTypeSelectionPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -11,6 +10,7 @@ class UserTypeSelectionPage extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     final isTablet = screenSize.width > 600;
     final isMobile = screenSize.width < 600;
+    final isLargeTablet = screenSize.width > 800;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -24,154 +24,162 @@ class UserTypeSelectionPage extends StatelessWidget {
                   child: Center(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: isTablet ? 600 : double.infinity,
+                        maxWidth: isTablet
+                            ? (isLargeTablet ? 800 : 600)
+                            : double.infinity,
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 16.0 : 24.0,
-                          vertical: isMobile ? 16.0 : 24.0,
+                          horizontal: isMobile ? 20.0 : 32.0,
+                          vertical: isMobile ? 20.0 : 32.0,
                         ),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            
-                            SizedBox(height: isMobile ? 16 : 20),
-
-                          
+                            // Logo container
                             Container(
-                              height: isMobile ? 60 : 70,
-                              width: isMobile ? 70 : 80,
+                              height: isMobile ? 80 : (isTablet ? 100 : 120),
+                              width: isMobile ? 80 : (isTablet ? 100 : 120),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(24),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Theme.of(
+                                      context,
+                                    ).primaryColor.withAlpha(75),
+                                    spreadRadius: 2,
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
                               child: Icon(
                                 Icons.motorcycle,
                                 color: Colors.white,
-                                size: isMobile ? 30 : 40,
+                                size: isMobile ? 40 : (isTablet ? 50 : 60),
                               ),
                             ),
 
-                            SizedBox(height: isMobile ? 16 : 20),
+                            SizedBox(height: isMobile ? 24 : 32),
 
-                           
+                            // App name
                             Text(
                               'MotoGo',
-                              style: Theme.of(context).textTheme.headlineMedium
+                              style: Theme.of(context).textTheme.headlineLarge
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).primaryColor,
-                                    fontSize: isMobile ? 28 : null,
+                                    fontSize: isMobile
+                                        ? 32
+                                        : (isTablet ? 40 : 48),
+                                    letterSpacing: -0.5,
                                   ),
                             ),
 
-                            SizedBox(height: isMobile ? 8 : 12),
+                            SizedBox(height: isMobile ? 16 : 24),
 
+                            // Main title
                             Text(
                               '¿Cómo quieres usar MotoGo?',
-                              style: Theme.of(context).textTheme.titleLarge
+                              style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: isMobile ? 20 : null,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black87,
+                                    fontSize: isMobile
+                                        ? 24
+                                        : (isTablet ? 28 : 32),
                                   ),
                               textAlign: TextAlign.center,
                             ),
 
-                            SizedBox(height: isMobile ? 6 : 8),
+                            SizedBox(height: isMobile ? 12 : 16),
 
-                
                             Padding(
                               padding: EdgeInsets.symmetric(
-                                horizontal: isMobile ? 8.0 : 16.0,
+                                horizontal: isMobile ? 16.0 : 24.0,
                               ),
                               child: Text(
                                 'Selecciona el tipo de cuenta que mejor se adapte a tus necesidades',
-                                style: Theme.of(context).textTheme.bodyMedium
+                                style: Theme.of(context).textTheme.bodyLarge
                                     ?.copyWith(
                                       color: Colors.grey[600],
-                                      fontSize: isMobile ? 14 : null,
+                                      fontSize: isMobile ? 16 : 18,
+                                      height: 1.4,
                                     ),
                                 textAlign: TextAlign.center,
                               ),
                             ),
 
-                            SizedBox(height: isMobile ? 24 : 40),
+                            SizedBox(height: isMobile ? 40 : 56),
 
-      
-                            if (isTablet && screenSize.width > 800)
-                            
+                            if (isLargeTablet)
                               Row(
                                 children: [
                                   Expanded(
-                                    child: UserTypeButton(
+                                    child: _buildUserTypeCard(
+                                      context: context,
                                       title: 'Soy Motociclista',
                                       subtitle: 'Busco servicios para mi moto',
                                       icon: Icons.motorcycle,
-                                      iconColor: Colors.blue,
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/register/user',
-                                        );
-                                      },
+                                      iconColor: Colors.blue[600]!,
+                                      onTap: () => Navigator.pushNamed(
+                                        context,
+                                        '/register/user',
+                                      ),
                                       isCompact: false,
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 24),
                                   Expanded(
-                                    child: UserTypeButton(
+                                    child: _buildUserTypeCard(
+                                      context: context,
                                       title: 'Represento una Sede',
                                       subtitle: 'Ofrezco servicios técnicos',
                                       icon: Icons.store,
-                                      iconColor: Colors.green,
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                          context,
-                                          '/register/representative',
-                                        );
-                                      },
+                                      iconColor: Colors.orange[600]!,
+                                      onTap: () => Navigator.pushNamed(
+                                        context,
+                                        '/register/representative',
+                                      ),
                                       isCompact: false,
                                     ),
                                   ),
                                 ],
                               )
                             else
-                              
                               Column(
                                 children: [
-                                  UserTypeButton(
+                                  _buildUserTypeCard(
+                                    context: context,
                                     title: 'Soy Motociclista',
                                     subtitle: 'Busco servicios para mi moto',
                                     icon: Icons.motorcycle,
-                                    iconColor: Colors.blue,
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/register/user',
-                                      );
-                                    },
+                                    iconColor: Colors.blue[600]!,
+                                    onTap: () => Navigator.pushNamed(
+                                      context,
+                                      '/register/user',
+                                    ),
                                     isCompact: isMobile,
                                   ),
-                                  SizedBox(height: isMobile ? 12 : 16),
-                                  UserTypeButton(
+                                  SizedBox(height: isMobile ? 16 : 20),
+                                  _buildUserTypeCard(
+                                    context: context,
                                     title: 'Represento una Sede',
                                     subtitle: 'Ofrezco servicios técnicos',
                                     icon: Icons.store,
-                                    iconColor: Colors.green,
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        '/register/representative',
-                                      );
-                                    },
+                                    iconColor: Colors.orange[600]!,
+                                    onTap: () => Navigator.pushNamed(
+                                      context,
+                                      '/register/representative',
+                                    ),
                                     isCompact: isMobile,
                                   ),
                                 ],
                               ),
 
-                          
-                            SizedBox(height: isMobile ? 24 : 40),
+                            SizedBox(height: isMobile ? 40 : 56),
 
-                
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -179,7 +187,8 @@ class UserTypeSelectionPage extends StatelessWidget {
                                 Text(
                                   '¿Ya tienes una cuenta?',
                                   style: TextStyle(
-                                    fontSize: isMobile ? 14 : null,
+                                    fontSize: isMobile ? 16 : 18,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
                                 TextButton(
@@ -192,17 +201,24 @@ class UserTypeSelectionPage extends StatelessWidget {
                                       (route) => false,
                                     );
                                   },
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                  ),
                                   child: Text(
                                     'Iniciar sesión',
                                     style: TextStyle(
-                                      fontSize: isMobile ? 14 : null,
+                                      color: Colors.blue[600],
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
 
-                            SizedBox(height: isMobile ? 16 : 20),
+                            SizedBox(height: isMobile ? 20 : 24),
                           ],
                         ),
                       ),
@@ -216,6 +232,87 @@ class UserTypeSelectionPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildUserTypeCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required VoidCallback onTap,
+    required bool isCompact,
+  }) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[200]!, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withAlpha(30),
+            spreadRadius: 2,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: EdgeInsets.all(isCompact ? 24 : 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon container
+                Container(
+                  width: isCompact ? 60 : 80,
+                  height: isCompact ? 60 : 80,
+                  decoration: BoxDecoration(
+                    color: iconColor.withAlpha(38),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: isCompact ? 30 : 40,
+                    color: iconColor,
+                  ),
+                ),
+                SizedBox(height: isCompact ? 16 : 24),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isCompact ? 18 : 22,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: isCompact ? 8 : 12),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.grey[600],
+                    fontSize: isCompact ? 14 : 16,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: isCompact ? 16 : 20),
+                // Arrow indicator
+                Icon(
+                  Icons.arrow_forward,
+                  color: iconColor,
+                  size: isCompact ? 20 : 24,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
-
-

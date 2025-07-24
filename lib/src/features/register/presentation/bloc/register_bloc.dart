@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register/domain/entities/person_entity.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'package:motogo_frontend/src/features/register/domain/usecases/register_usecase.dart';
+
 part 'register_event.dart';
 part 'register_state.dart';
 
@@ -42,10 +43,18 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       );
 
       result.fold(
-        (error) => emit(RegisterFailure(
+        (error) => emit(
+          RegisterFailure(
             errorModel: ErrorModel(
-                message: ErrorMessageMapper.mapServerError(error.message)))),
-        (person) => emit(RegisterSuccess(result: person)),
+              message: ErrorMessageMapper.mapServerError(error.message),
+            ),
+          ),
+        ),
+        // CORRECCIÓN: Pasar el email del evento, no una cadena vacía
+        (person) => emit(RegisterSuccess(
+          result: person, 
+          email: event.email, // ← Aquí estaba el error
+        )),
       );
     } catch (error) {
       emit(

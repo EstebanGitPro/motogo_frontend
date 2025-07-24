@@ -12,12 +12,16 @@ class RegisterInitial extends RegisterState {}
 class RegisterLoading extends RegisterState {}
 
 class RegisterSuccess extends RegisterState {
+  final String email;
   final PersonEntity result;
 
-  const RegisterSuccess({required this.result});
+  const RegisterSuccess({
+    required this.email,
+    required this.result,
+  });
 
   @override
-  List<Object> get props => [result];
+  List<Object> get props => [email, result];
 }
 
 class RegisterFailure extends RegisterState {

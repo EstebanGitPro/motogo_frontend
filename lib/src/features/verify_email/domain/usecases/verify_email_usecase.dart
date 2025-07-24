@@ -1,5 +1,5 @@
 import 'package:either_dart/either.dart';
-import 'package:motogo_frontend/src/core/domain/repositories/email_verification_repository.dart';
+import 'package:motogo_frontend/src/features/verify_email/domain/repositories/email_verification_repository.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 
 class VerifyEmailUseCase {

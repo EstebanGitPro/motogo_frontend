@@ -50,6 +50,10 @@ class ErrorMessageMapper {
         return ValidationMessages.invalidCredentials;
       case 403:
         return ValidationMessages.emailNotVerified;
+      case 409:
+        return ValidationMessages.userAlreadyExists;
+      case 424:
+        return ValidationMessages.failedDependency;
       case 422:
         return serverMessage != null 
             ? mapServerError(serverMessage) 

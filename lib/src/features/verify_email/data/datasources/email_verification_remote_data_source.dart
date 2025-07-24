@@ -13,7 +13,7 @@ class EmailVerificationRemoteDataSourceImpl
   Future<Either<ErrorModel, bool>> verifyEmail(String email) async {
     try {
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8085/v1/email/status?email=$email'),
+        Uri.parse('http://10.0.2.2:8085/v1/motogo/email/status?email=$email'),
         headers: {'Content-Type': 'application/json'},
       );
 

@@ -1,8 +1,8 @@
 import 'package:kiwi/kiwi.dart';
-import 'package:motogo_frontend/src/core/data/datasources/email_verification_remote_data_source.dart';
-import 'package:motogo_frontend/src/core/data/repositories/email_verification_repository_impl.dart';
-import 'package:motogo_frontend/src/core/domain/repositories/email_verification_repository.dart';
-import 'package:motogo_frontend/src/core/domain/usecases/verify_email_usecase.dart';
+import 'package:motogo_frontend/src/features/verify_email/data/datasources/email_verification_remote_data_source.dart';
+import 'package:motogo_frontend/src/features/verify_email/data/repositories/email_verification_repository_impl.dart';
+import 'package:motogo_frontend/src/features/verify_email/domain/repositories/email_verification_repository.dart';
+import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/features/login/data/datasources/login_data_source.dart';
 import 'package:motogo_frontend/src/features/login/data/repositories/login_repository_impl.dart';
 import 'package:motogo_frontend/src/features/login/domain/repositories/login_repository.dart';

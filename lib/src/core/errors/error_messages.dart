@@ -17,6 +17,9 @@ class ValidationMessages {
   static const String serverError = 'Error del servidor. Intenta más tarde';
   static const String timeoutError = 'La solicitud tardó demasiado. Intenta nuevamente';
   static const String genericError = 'Ocurrió un error inesperado';
+  static const String userAlreadyExists = 'El usuario ya se encuentra registrado';
+  static const String failedDependency = 'Ocurrió un error, por favor intenta más tarde';
+  static const String connectionFailed = 'No se pudo establecer conexión con el servidor';
   
 
   static const String loginSuccess = 'Inicio de sesión exitoso';

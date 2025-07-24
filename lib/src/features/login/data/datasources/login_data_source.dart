@@ -13,7 +13,7 @@ class LoginDataSource {
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8085/v1/auth/login'),
+        Uri.parse('http://10.0.2.2:8085/v1/motogo/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       ).timeout(const Duration(seconds: 30));

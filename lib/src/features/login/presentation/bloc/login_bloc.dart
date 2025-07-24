@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:motogo_frontend/src/core/domain/usecases/verify_email_usecase.dart';
+import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 
 import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';

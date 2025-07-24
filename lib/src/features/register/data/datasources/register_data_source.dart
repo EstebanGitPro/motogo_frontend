@@ -23,7 +23,7 @@ class RegisterDataSource {
     try {
       final response = await http
           .post(
-            Uri.parse('http://10.0.2.2:8085/v1/user'),
+            Uri.parse('http://10.0.2.2:8085/v1/motogo/users'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
               'identity_number': identityNumber,
@@ -46,10 +46,13 @@ class RegisterDataSource {
       } else {
         final errorData = json.decode(response.body);
         final serverMessage = errorData['message'] as String?;
-        final errorMessage =
-            ErrorMessageMapper.mapHttpError(response.statusCode, serverMessage);
-        return Left(ErrorModel(
-            message: errorMessage, errorCode: errorData['error_code']));
+        final errorMessage = ErrorMessageMapper.mapHttpError(
+          response.statusCode,
+          serverMessage,
+        );
+        return Left(
+          ErrorModel(message: errorMessage, errorCode: errorData['error_code']),
+        );
       }
     } on SocketException {
       return Left(ErrorModel(message: ValidationMessages.networkError));

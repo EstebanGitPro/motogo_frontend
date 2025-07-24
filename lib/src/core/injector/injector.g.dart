@@ -11,19 +11,13 @@ class _$InjectorApp extends InjectorApp {
   void _configureCoreFactories() {
     final KiwiContainer container = KiwiContainer();
     container
-      ..registerFactory<EmailVerificationRepository>(
-        (c) => EmailVerificationRepositoryImpl(
-          remoteDataSource: c.resolve<EmailVerificationRemoteDataSource>(),
-        ),
-      )
+      ..registerFactory<EmailVerificationRepository>((c) =>
+          EmailVerificationRepositoryImpl(
+              remoteDataSource: c.resolve<EmailVerificationRemoteDataSource>()))
       ..registerFactory<EmailVerificationRemoteDataSource>(
-        (c) => EmailVerificationRemoteDataSourceImpl(),
-      )
-      ..registerFactory(
-        (c) => VerifyEmailUseCase(
-          repository: c.resolve<EmailVerificationRepository>(),
-        ),
-      );
+          (c) => EmailVerificationRemoteDataSourceImpl())
+      ..registerFactory((c) => VerifyEmailUseCase(
+          repository: c.resolve<EmailVerificationRepository>()));
   }
 
   @override
@@ -31,13 +25,11 @@ class _$InjectorApp extends InjectorApp {
     final KiwiContainer container = KiwiContainer();
     container
       ..registerFactory<RegisterRepository>(
-        (c) => RegisterRepositoryImp(c.resolve<RegisterDataSource>()),
-      )
+          (c) => RegisterRepositoryImp(c.resolve<RegisterDataSource>()))
       ..registerFactory((c) => RegisterUseCase(c.resolve<RegisterRepository>()))
       ..registerFactory((c) => RegisterDataSource())
       ..registerFactory<LoginRepository>(
-        (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()),
-      )
+          (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()))
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
       ..registerFactory((c) => LoginDataSource());
   }

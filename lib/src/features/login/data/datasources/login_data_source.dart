@@ -1,26 +1,35 @@
 import 'package:either_dart/either.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:motogo_frontend/src/features/login/data/models/person_model.dart';
+import 'package:motogo_frontend/src/features/login/data/models/person_login_model.dart';
 
 class LoginDataSource {
+  final _secureStorage = const FlutterSecureStorage();
+
   Future<Either<ErrorModel, PersonModel>> loginPerson(
     String email,
     String password,
   ) async {
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:8085/v1/motogo/auth/login'),
+        Uri.parse('https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email, 'password': password}),
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        return Right(PersonModel.fromMap(data));
+        final person = PersonModel.fromMap(data);
+
+        // Guardar el token y el ID del usuario
+        await _secureStorage.write(key: 'token', value: person.token);
+        await _secureStorage.write(key: 'user_id', value: person.id);
+
+        return Right(person);
       } else {
         return Left(_handleHttpError(response));
       }

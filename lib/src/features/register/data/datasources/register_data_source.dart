@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/features/register/data/models/person_model.dart';
+import 'package:motogo_frontend/src/features/register/data/models/person_register_model.dart';
 
 class RegisterDataSource {
   Future<Either<ErrorModel, PersonModel>> registerPerson(

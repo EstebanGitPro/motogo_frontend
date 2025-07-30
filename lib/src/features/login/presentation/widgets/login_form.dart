@@ -156,8 +156,8 @@ class LoginForm extends StatelessWidget {
                             if (formKey.currentState!.validate()) {
                               context.read<LoginBloc>().add(
                                 LoginSubmitted(
-                                  emailController.text.trim(),
-                                  passwordController.text,
+                                  email: emailController.text,
+                                  password: passwordController.text,
                                 ),
                               );
                             }

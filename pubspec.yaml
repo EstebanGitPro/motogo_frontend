@@ -44,6 +44,7 @@ dependencies:
   either_dart: ^1.0.0
   auto_injector: ^2.1.1
   dart_either: ^2.0.0
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:

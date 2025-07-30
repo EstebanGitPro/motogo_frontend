@@ -31,6 +31,15 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory<LoginRepository>(
           (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()))
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
-      ..registerFactory((c) => LoginDataSource());
+      ..registerFactory((c) => LoginDataSource())
+      ..registerFactory<EditProfileRepository>((c) =>
+          EditProfileRepositoryImpl(c.resolve<EditProfileRemoteDataSource>()))
+      ..registerFactory(
+          (c) => GetPersonUsecase(c.resolve<EditProfileRepository>()))
+      ..registerFactory(
+          (c) => UpdatePersonUsecase(c.resolve<EditProfileRepository>()))
+      ..registerSingleton((c) => Client())
+      ..registerFactory<EditProfileRemoteDataSource>(
+          (c) => EditProfileRemoteDataSourceImpl(c.resolve<Client>()));
   }
 }

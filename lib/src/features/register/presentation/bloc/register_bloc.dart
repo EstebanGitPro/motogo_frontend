@@ -50,10 +50,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             ),
           ),
         ),
-        // CORRECCIÓN: Pasar el email del evento, no una cadena vacía
+      
         (person) => emit(RegisterSuccess(
           result: person, 
-          email: event.email, // ← Aquí estaba el error
+          email: event.email, 
         )),
       );
     } catch (error) {

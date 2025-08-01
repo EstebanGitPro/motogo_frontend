@@ -25,7 +25,7 @@ class LoginDataSource {
         final data = json.decode(response.body);
         final person = PersonModel.fromMap(data);
 
-        // Guardar el token y el ID del usuario
+       
         await _secureStorage.write(key: 'token', value: person.token);
         await _secureStorage.write(key: 'user_id', value: person.id);
 

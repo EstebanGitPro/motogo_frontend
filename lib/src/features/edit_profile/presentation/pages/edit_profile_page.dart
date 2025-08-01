@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/action_buttons.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/editable_field.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/profile_header.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/read_only_field.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/verification_badge.dart';
 
 class EditMyProfilePage extends StatelessWidget {
   const EditMyProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Usar el BlocProvider que ya existe en el árbol de widgets
+    
     return BlocBuilder<EditProfileBloc, EditProfileState>(
       builder: (context, state) {
-        // Inicializar el bloc si es necesario
+       
         if (state.status == EditProfileStatus.initial) {
           context.read<EditProfileBloc>().add(const EditProfileLoaded());
         }
@@ -41,7 +38,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
   final _formKey = GlobalKey<FormState>();
 
-  // Para trackear los valores originales y detectar cambios
+  
   String _originalFirstName = '';
   String _originalLastName = '';
   String _originalSecondLastName = '';
@@ -61,7 +58,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
     _secondLastNameController = TextEditingController();
     _phoneController = TextEditingController();
 
-    // Agregar listeners para detectar cambios
+  
     _firstNameController.addListener(_onFieldChanged);
     _lastNameController.addListener(_onFieldChanged);
     _secondLastNameController.addListener(_onFieldChanged);
@@ -69,7 +66,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
   }
 
   void _onFieldChanged() {
-    setState(() {}); // Para actualizar la UI cuando hay cambios
+    setState(() {}); 
   }
 
   void _updateControllersWithPersonData(person) {
@@ -79,7 +76,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
       _secondLastNameController.text = person.secondLastName ?? '';
       _phoneController.text = person.phoneNumber ?? '';
 
-      // Guardar valores originales
+    
       _originalFirstName = person.firstName ?? '';
       _originalLastName = person.lastName ?? '';
       _originalSecondLastName = person.secondLastName ?? '';
@@ -98,6 +95,40 @@ class _EditProfileViewState extends State<_EditProfileView> {
         _phoneController.text.trim() != _originalPhone;
   }
 
+  void _handleBackButton() async {
+    if (_hasChanges) {
+      final shouldDiscard = await _showDiscardChangesDialog();
+      if (shouldDiscard == true && mounted) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<bool?> _showDiscardChangesDialog() {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cambios sin guardar'),
+        content: const Text(
+          'Tienes cambios sin guardar. ¿Deseas salir sin guardar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Continuar editando'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Salir sin guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -109,191 +140,335 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<EditProfileBloc, EditProfileState>(
-      listener: (context, state) {
-        if (state.status == EditProfileStatus.success && _hasChanges) {
-          // Mostrar mensaje de éxito
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                state.isFromCache
-                    ? 'Datos cargados desde caché'
-                    : 'Perfil actualizado exitosamente',
-              ),
-              backgroundColor: state.isFromCache ? Colors.orange : Colors.green,
-            ),
-          );
-
-          // Actualizar valores originales después de guardar
-          if (!state.isFromCache) {
-            _originalFirstName = _firstNameController.text.trim();
-            _originalLastName = _lastNameController.text.trim();
-            _originalSecondLastName = _secondLastNameController.text.trim();
-            _originalPhone = _phoneController.text.trim();
-          }
-        }
-
-        if (state.status == EditProfileStatus.failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error ?? 'Error desconocido'),
-              backgroundColor: Colors.red,
-            ),
-          );
+    return PopScope(
+      canPop: false, 
+      onPopInvokedWithResult: (didPop, result) async {
+        if (!didPop) {
+          _handleBackButton();
         }
       },
-      child: BlocBuilder<EditProfileBloc, EditProfileState>(
-        builder: (context, state) {
-          final status = state.status;
-          final person = state.person;
-
-          if (status == EditProfileStatus.loading && person == null) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+      child: BlocListener<EditProfileBloc, EditProfileState>(
+        listener: (context, state) {
+          if (state.status == EditProfileStatus.success && _hasChanges) {
+          
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  state.isFromCache
+                      ? 'Datos cargados desde caché'
+                      : 'Perfil actualizado exitosamente',
+                ),
+                backgroundColor: state.isFromCache ? Colors.orange : Colors.green,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             );
+
+            if (!state.isFromCache) {
+              _originalFirstName = _firstNameController.text.trim();
+              _originalLastName = _lastNameController.text.trim();
+              _originalSecondLastName = _secondLastNameController.text.trim();
+              _originalPhone = _phoneController.text.trim();
+            }
           }
 
-          if (person == null) {
+          if (state.status == EditProfileStatus.failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.error ?? 'Error desconocido'),
+                backgroundColor: Colors.red,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
+        },
+        child: BlocBuilder<EditProfileBloc, EditProfileState>(
+          builder: (context, state) {
+            final status = state.status;
+            final person = state.person;
+
+            if (status == EditProfileStatus.loading && person == null) {
+              return Scaffold(
+                backgroundColor: Colors.grey[50],
+                appBar: AppBar(
+                  title: const Text('Editar mis datos'),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: _handleBackButton,
+                  ),
+                ),
+                body: const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Cargando datos del perfil...'),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            if (person == null) {
+              return Scaffold(
+                backgroundColor: Colors.grey[50],
+                appBar: AppBar(
+                  title: const Text('Editar mis datos'),
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: _handleBackButton,
+                  ),
+                ),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        state.error ?? 'Error desconocido',
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => context.read<EditProfileBloc>().add(
+                          const EditProfileLoaded(forceRefresh: true),
+                        ),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+
+            _updateControllersWithPersonData(person);
+
             return Scaffold(
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              backgroundColor: Colors.grey[50],
+              appBar: AppBar(
+                title: Row(
                   children: [
-                    Text(state.error ?? 'Error desconocido'),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
+                    const Text('Editar mis datos'),
+                    if (_hasChanges) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withAlpha(2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.orange.withAlpha(5),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cambios pendientes',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: _handleBackButton,
+                ),
+                actions: [
+                 
+                  if (state.isFromCache)
+                    IconButton(
+                      icon: const Icon(Icons.refresh, color: Colors.orange),
+                      tooltip: 'Actualizar desde servidor',
                       onPressed: () => context.read<EditProfileBloc>().add(
                         const EditProfileLoaded(forceRefresh: true),
                       ),
-                      child: const Text('Reintentar'),
                     ),
-                  ],
-                ),
+                ],
               ),
-            );
-          }
+              body: SafeArea(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                
+                            Column(
+                              children: [
+                                Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primary.withAlpha(1),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Icon(
+                                    Icons.person_outline,
+                                    size: 40,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Editar mis datos',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  state.isFromCache
+                                      ? 'Datos desde caché - toca el ícono de actualizar para obtener la versión más reciente'
+                                      : 'Actualiza tu información personal',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
 
-          // Actualizar controladores con datos de la persona
-          _updateControllersWithPersonData(person);
+                            ReadOnlyField(
+                              label: 'Número de identificación',
+                              value: person.identityNumber,
+                              prefixIcon: Icons.badge_outlined,
+                            ),
+                            const SizedBox(height: 20),
 
-          return Scaffold(
-            backgroundColor: Colors.grey[50],
-            appBar: AppBar(
-              title: const Text('Editar mis datos'),
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
-              elevation: 0,
-              actions: [
-                // Indicador de caché
-                if (state.isFromCache)
-                  IconButton(
-                    icon: const Icon(Icons.refresh, color: Colors.orange),
-                    tooltip: 'Actualizar desde servidor',
-                    onPressed: () => context.read<EditProfileBloc>().add(
-                      const EditProfileLoaded(forceRefresh: true),
-                    ),
-                  ),
-              ],
-            ),
-            body: SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          ProfileHeader(
-                            title: 'Editar mis datos',
-                            subtitle: state.isFromCache
-                                ? 'Datos desde caché - toca el ícono de actualizar para obtener la versión más reciente'
-                                : 'Actualiza tu información personal',
-                            roleDisplayName: '',
-                            primaryColor: Theme.of(context).colorScheme.primary,
-                            icon: Icons.person_outline,
-                          ),
-                          const SizedBox(height: 32),
+                            EditableField(
+                              controller: _firstNameController,
+                              label: 'Nombres',
+                              prefixIcon: Icons.person_outline,
+                              validator: (v) => v?.trim().isEmpty == true
+                                  ? 'Campo requerido'
+                                  : null,
+                              primaryColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(height: 16),
 
-                          ReadOnlyField(
-                            label: 'Número de identificación',
-                            value: person.identityNumber,
-                            prefixIcon: Icons.badge_outlined,
-                          ),
-                          const SizedBox(height: 20),
+                            EditableField(
+                              controller: _lastNameController,
+                              label: 'Primer apellido',
+                              prefixIcon: Icons.person_outline,
+                              validator: (v) => v?.trim().isEmpty == true
+                                  ? 'Campo requerido'
+                                  : null,
+                              primaryColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(height: 16),
 
-                          EditableField(
-                            controller: _firstNameController,
-                            label: 'Nombres',
-                            prefixIcon: Icons.person_outline,
-                            validator: (v) => v?.trim().isEmpty == true
-                                ? 'Campo requerido'
-                                : null,
-                            primaryColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 16),
+                            EditableField(
+                              controller: _secondLastNameController,
+                              label: 'Segundo apellido (opcional)',
+                              prefixIcon: Icons.person_outline,
+                              primaryColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(height: 16),
 
-                          EditableField(
-                            controller: _lastNameController,
-                            label: 'Primer apellido',
-                            prefixIcon: Icons.person_outline,
-                            validator: (v) => v?.trim().isEmpty == true
-                                ? 'Campo requerido'
-                                : null,
-                            primaryColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 16),
+                            ReadOnlyField(
+                              label: 'Correo electrónico',
+                              value: person.email,
+                              prefixIcon: Icons.email_outlined,
+                            ),
+                            const SizedBox(height: 16),
 
-                          EditableField(
-                            controller: _secondLastNameController,
-                            label: 'Segundo apellido (opcional)',
-                            prefixIcon: Icons.person_outline,
-                            primaryColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 16),
+                            EditableField(
+                              controller: _phoneController,
+                              label: 'Número de teléfono',
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: Icons.phone_outlined,
+                              validator: (v) => v?.trim().isEmpty == true
+                                  ? 'Campo requerido'
+                                  : null,
+                              primaryColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(height: 32),
 
-                          ReadOnlyField(
-                            label: 'Correo electrónico',
-                            value: person.email,
-                            prefixIcon: Icons.email_outlined,
-                            suffixIcon: VerificationBadge(person.emailVerified),
-                          ),
-                          const SizedBox(height: 16),
-
-                          EditableField(
-                            controller: _phoneController,
-                            label: 'Número de teléfono',
-                            keyboardType: TextInputType.phone,
-                            prefixIcon: Icons.phone_outlined,
-                            validator: (v) => v?.trim().isEmpty == true
-                                ? 'Campo requerido'
-                                : null,
-                            primaryColor: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(height: 8),
-                          VerificationBadge(person.phoneNumberVerified),
-                          const SizedBox(height: 32),
-
-                          ActionButtons(
-                            hasChanges: _hasChanges,
-                            isLoading: status == EditProfileStatus.loading,
-                            onSave: () {
-                              if (_hasChanges) {
-                                _onSave(person);
-                              }
-                            },
-                            onCancel: () => _onCancel(context),
-                          ),
-                        ],
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: _hasChanges && status != EditProfileStatus.loading
+                                    ? () => _onSave(person)
+                                    : null,
+                                icon: status == EditProfileStatus.loading
+                                    ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(Icons.save),
+                                label: Text(
+                                  status == EditProfileStatus.loading
+                                      ? 'Guardando...'
+                                      : 'Guardar cambios',
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            
+                            if (!_hasChanges) ...[
+                              const SizedBox(height: 16),
+                              Text(
+                                'No hay cambios para guardar',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -311,38 +486,5 @@ class _EditProfileViewState extends State<_EditProfileView> {
     );
 
     context.read<EditProfileBloc>().add(EditProfileSaved(updated));
-  }
-
-  void _onCancel(BuildContext context) async {
-    if (_hasChanges) {
-      final shouldDiscard = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Descartar cambios'),
-          content: const Text(
-            '¿Estás seguro de que quieres descartar los cambios?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Descartar'),
-            ),
-          ],
-        ),
-      );
-
-      if (shouldDiscard == true) {
-        if (!context.mounted) {
-          return;
-        }
-        Navigator.of(context).pop();
-      }
-    } else {
-      Navigator.of(context).pop();
-    }
   }
 }

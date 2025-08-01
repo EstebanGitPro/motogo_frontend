@@ -4,7 +4,7 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/login/presentation/pages/hello.dart';
+import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/bloc/register_bloc.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/register_representative_page.dart';
@@ -38,11 +38,10 @@ void main() {
         routes: {
           '/': (context) => const UserTypeSelectionPage(),
           '/login': (context) => const LoginPage(),
-          '/home': (context) => const HolaApi(),
+          '/home': (context) => const HomePage(),
           '/register/user': (context) => const RegisterUserPage(),
           '/register/representative': (context) =>
               const RegisterRepresentativePage(),
-
           '/edit-my-profile': (context) => const EditMyProfilePage(),
         },
       ),

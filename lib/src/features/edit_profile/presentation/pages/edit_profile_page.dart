@@ -9,10 +9,8 @@ class EditMyProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return BlocBuilder<EditProfileBloc, EditProfileState>(
       builder: (context, state) {
-       
         if (state.status == EditProfileStatus.initial) {
           context.read<EditProfileBloc>().add(const EditProfileLoaded());
         }
@@ -38,7 +36,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
   final _formKey = GlobalKey<FormState>();
 
-  
   String _originalFirstName = '';
   String _originalLastName = '';
   String _originalSecondLastName = '';
@@ -58,7 +55,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
     _secondLastNameController = TextEditingController();
     _phoneController = TextEditingController();
 
-  
     _firstNameController.addListener(_onFieldChanged);
     _lastNameController.addListener(_onFieldChanged);
     _secondLastNameController.addListener(_onFieldChanged);
@@ -66,7 +62,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
   }
 
   void _onFieldChanged() {
-    setState(() {}); 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      setState(() {});
+    });
   }
 
   void _updateControllersWithPersonData(person) {
@@ -76,7 +74,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
       _secondLastNameController.text = person.secondLastName ?? '';
       _phoneController.text = person.phoneNumber ?? '';
 
-    
       _originalFirstName = person.firstName ?? '';
       _originalLastName = person.lastName ?? '';
       _originalSecondLastName = person.secondLastName ?? '';
@@ -141,7 +138,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, 
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
           _handleBackButton();
@@ -150,7 +147,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
       child: BlocListener<EditProfileBloc, EditProfileState>(
         listener: (context, state) {
           if (state.status == EditProfileStatus.success && _hasChanges) {
-          
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
@@ -158,7 +154,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
                       ? 'Datos cargados desde caché'
                       : 'Perfil actualizado exitosamente',
                 ),
-                backgroundColor: state.isFromCache ? Colors.orange : Colors.green,
+                backgroundColor: state.isFromCache
+                    ? Colors.orange
+                    : Colors.green,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -278,9 +276,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
                         decoration: BoxDecoration(
                           color: Colors.orange.withAlpha(2),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.orange.withAlpha(5),
-                          ),
+                          border: Border.all(color: Colors.orange.withAlpha(5)),
                         ),
                         child: const Text(
                           'Cambios pendientes',
@@ -302,7 +298,6 @@ class _EditProfileViewState extends State<_EditProfileView> {
                   onPressed: _handleBackButton,
                 ),
                 actions: [
-                 
                   if (state.isFromCache)
                     IconButton(
                       icon: const Icon(Icons.refresh, color: Colors.orange),
@@ -323,20 +318,23 @@ class _EditProfileViewState extends State<_EditProfileView> {
                         key: _formKey,
                         child: Column(
                           children: [
-                
                             Column(
                               children: [
                                 Container(
                                   width: 80,
                                   height: 80,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary.withAlpha(1),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withAlpha(1),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Icon(
                                     Icons.person_outline,
                                     size: 40,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -377,7 +375,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
                               validator: (v) => v?.trim().isEmpty == true
                                   ? 'Campo requerido'
                                   : null,
-                              primaryColor: Theme.of(context).colorScheme.primary,
+                              primaryColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                             ),
                             const SizedBox(height: 16),
 
@@ -388,7 +388,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
                               validator: (v) => v?.trim().isEmpty == true
                                   ? 'Campo requerido'
                                   : null,
-                              primaryColor: Theme.of(context).colorScheme.primary,
+                              primaryColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                             ),
                             const SizedBox(height: 16),
 
@@ -396,7 +398,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
                               controller: _secondLastNameController,
                               label: 'Segundo apellido (opcional)',
                               prefixIcon: Icons.person_outline,
-                              primaryColor: Theme.of(context).colorScheme.primary,
+                              primaryColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                             ),
                             const SizedBox(height: 16),
 
@@ -415,14 +419,18 @@ class _EditProfileViewState extends State<_EditProfileView> {
                               validator: (v) => v?.trim().isEmpty == true
                                   ? 'Campo requerido'
                                   : null,
-                              primaryColor: Theme.of(context).colorScheme.primary,
+                              primaryColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
                             ),
                             const SizedBox(height: 32),
 
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton.icon(
-                                onPressed: _hasChanges && status != EditProfileStatus.loading
+                                onPressed:
+                                    _hasChanges &&
+                                        status != EditProfileStatus.loading
                                     ? () => _onSave(person)
                                     : null,
                                 icon: status == EditProfileStatus.loading
@@ -431,7 +439,10 @@ class _EditProfileViewState extends State<_EditProfileView> {
                                         height: 16,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
                                         ),
                                       )
                                     : const Icon(Icons.save),
@@ -441,14 +452,16 @@ class _EditProfileViewState extends State<_EditProfileView> {
                                       : 'Guardar cambios',
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
                             ),
-                            
+
                             if (!_hasChanges) ...[
                               const SizedBox(height: 16),
                               Text(

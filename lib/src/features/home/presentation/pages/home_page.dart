@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
+import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -29,11 +31,7 @@ class HomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Icon(
-                    Icons.account_circle,
-                    size: 60,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.account_circle, size: 60, color: Colors.white),
                   SizedBox(height: 8),
                   Text(
                     'Menú Principal',
@@ -48,12 +46,9 @@ class HomePage extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.home, color: Colors.blue),
-              title: const Text(
-                'Inicio',
-                style: TextStyle(fontSize: 16),
-              ),
+              title: const Text('Inicio', style: TextStyle(fontSize: 16)),
               onTap: () {
-                Navigator.pop(context); // Cierra el drawer
+                Navigator.pop(context);
               },
             ),
             const Divider(),
@@ -64,8 +59,7 @@ class HomePage extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
               ),
               onTap: () {
-                Navigator.pop(context); // Cierra el drawer primero
-                // Usa push normal en lugar de pushAndRemoveUntil
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -75,23 +69,19 @@ class HomePage extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings, color: Colors.blue),
+              leading: const Icon(Icons.logout, color: Colors.blue),
               title: const Text(
-                'Configuración',
+                'Cerrar Sesión',
                 style: TextStyle(fontSize: 16),
               ),
               onTap: () {
-                Navigator.pop(context);
-                // Aquí puedes agregar navegación a configuración
+                _showLogoutDialog(context);
               },
             ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.info, color: Colors.blue),
-              title: const Text(
-                'Acerca de',
-                style: TextStyle(fontSize: 16),
-              ),
+              title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
               onTap: () {
                 Navigator.pop(context);
                 // Aquí puedes agregar navegación a información
@@ -112,11 +102,7 @@ class HomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.home,
-                size: 100,
-                color: Colors.blue,
-              ),
+              Icon(Icons.home, size: 100, color: Colors.blue),
               SizedBox(height: 20),
               Text(
                 'Bienvenido a tu aplicación',
@@ -129,15 +115,54 @@ class HomePage extends StatelessWidget {
               SizedBox(height: 10),
               Text(
                 'Usa el menú para navegar',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) {
+            if (state is LoginLoggedOut) {
+              Navigator.of(
+                context,
+              ).pushNamedAndRemoveUntil('/login', (route) => false);
+            }
+          },
+          builder: (context, state) {
+            return AlertDialog(
+              title: Text('Cerrar Sesión'),
+              content: Text('¿Estás seguro de que quieres cerrar sesión?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.read<LoginBloc>().add(LoginLogout());
+                    if (context.read<LoginBloc>().state is LoginLoggedOut) {
+                      Navigator.of(
+                        context,
+                      ).pushNamedAndRemoveUntil('/login', (route) => false);
+                    }
+                  },
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: Text('Cerrar Sesión'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

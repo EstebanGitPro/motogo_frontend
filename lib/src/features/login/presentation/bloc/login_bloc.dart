@@ -52,24 +52,28 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Future<void> _onLogout(LoginLogout event, Emitter<LoginState> emit) async {
-    await _clearUserData();
-    emit(LoginInitial());
+    try {
+      emit(LoginInProgress());
+      await _clearUserData();
+      emit(LoginLoggedOut());
+    } catch (e) {
+      emit(
+        LoginFailure(error: ErrorModel(message: 'Error al cerrar sesión: $e')),
+      );
+    }
   }
 
-  // ✅ Método para guardar datos del usuario después del login
   Future<void> _saveUserData(PersonEntity user) async {
     try {
       final secureStorage = FlutterSecureStorage();
       await secureStorage.write(key: 'auth_token', value: user.token);
 
-      // Guardar ID del usuario
       await secureStorage.write(key: 'user_id', value: user.id);
     } catch (e) {
       debugPrint('Error saving user data: $e');
     }
   }
 
-  // ✅ Método para limpiar datos del usuario
   Future<void> _clearUserData() async {
     final secureStorage = FlutterSecureStorage();
     await secureStorage.delete(key: 'auth_token');

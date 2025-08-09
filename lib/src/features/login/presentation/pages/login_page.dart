@@ -103,6 +103,13 @@ class _LoginPageState extends State<LoginPage> {
               (route) => false,
             );
           }
+          if (state is LoginLoggedOut) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+              (route) => false,
+            );
+          }
         },
         builder: (context, state) {
           if (state is LoginInProgress) {

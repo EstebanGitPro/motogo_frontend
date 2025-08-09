@@ -37,3 +37,5 @@ class LoginNeedsVerification extends LoginState {
   @override
   List<Object> get props => [message ?? ''];
 }
+
+class LoginLoggedOut extends LoginState {}

@@ -21,22 +21,25 @@ class RegisterDataSource {
     String role,
   ) async {
     try {
+      var body = {
+        'identity_number': identityNumber,
+        'first_name': firstName,
+        'last_name': lastName,
+        'email': email,
+        'phone_number': phoneNumber,
+        'email_verified': false,
+        'phone_number_verified': false,
+        'password': password,
+        'role': role,
+      };
+      if (secondLastName != null) {
+        body['second_last_name'] = secondLastName;
+      }
       final response = await http
           .post(
             Uri.parse('http://10.0.2.2:8085/v1/motogo/users'),
             headers: {'Content-Type': 'application/json'},
-            body: json.encode({
-              'identity_number': identityNumber,
-              'first_name': firstName,
-              'last_name': lastName,
-              'second_last_name': secondLastName,
-              'email': email,
-              'phone_number': phoneNumber,
-              'email_verified': false,
-              'phone_number_verified': false,
-              'password': password,
-              'role': role,
-            }),
+            body: json.encode(body),
           )
           .timeout(const Duration(seconds: 15));
 

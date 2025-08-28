@@ -45,6 +45,7 @@ dependencies:
   auto_injector: ^2.1.1
   dart_either: ^2.0.0
   flutter_secure_storage: ^9.2.4
+  pinput: ^5.0.1
 
 dev_dependencies:
   flutter_test:

@@ -1,37 +1,36 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:either_dart/either.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:motogo_frontend/src/features/login/data/models/person_login_model.dart';
 
-class LoginDataSource {
-  final _secureStorage = const FlutterSecureStorage();
+class EmailRecoveryVerificationDataSource {
+  final http.Client client;
+  final String baseUrl = 'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo';
 
-  Future<Either<ErrorModel, PersonModel>> loginPerson(
-    String email,
-    String password,
-  ) async {
+  EmailRecoveryVerificationDataSource(this.client);
+
+  Future<Either<ErrorModel, bool>> verifyEmail(String email) async {
     try {
-      final response = await http
+      final uri = Uri.parse('$baseUrl/auth/password-recovery/send');
+      final response = await client
           .post(
-            Uri.parse(
-              'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login',
-            ),
+            uri,
             headers: {'Content-Type': 'application/json'},
-            body: json.encode({'email': email, 'password': password}),
+            body: json.encode({'email': email}),
           )
           .timeout(const Duration(seconds: 10));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final person = PersonModel.fromMap(data);
+      if (response.statusCode != 200) {
+        return Left(_handleHttpError(response));
+      }
 
-        await _secureStorage.write(key: 'token', value: person.token);
-        await _secureStorage.write(key: 'user_id', value: person.id);
-        return Right(person);
+      final decoded = json.decode(response.body);
+      final status = decoded['status'] as String?;
+
+      if (status == 'success') {
+        return Right(true);
       } else {
         return Left(_handleHttpError(response));
       }
@@ -46,13 +45,10 @@ class LoginDataSource {
     } on FormatException {
       return Left(_createErrorModel('Respuesta inválida del servidor'));
     } catch (e) {
-      String errorMessage;
-      if (e.toString().contains('timeout')) {
-        errorMessage = ErrorMessageMapper.mapHttpError(408);
-      } else {
-        errorMessage = ErrorMessageMapper.mapHttpError(0, e.toString());
-      }
-      return Left(_createErrorModel(errorMessage));
+      final message = e.toString().contains('timeout')
+          ? ErrorMessageMapper.mapHttpError(408)
+          : ErrorMessageMapper.mapHttpError(0, e.toString());
+      return Left(_createErrorModel(message));
     }
   }
 

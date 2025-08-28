@@ -8,16 +8,10 @@ class LoginUseCase {
 
   LoginUseCase(this.repository);
 
-  Future<Either<ErrorModel, PersonEntity>> call(
-    {required String email, required String password}) async {
-    if (email.isEmpty || password.isEmpty) {
-      return Left(ErrorModel(message: 'Los campos no pueden estar vacios'));
-    }
-    try {
-      return await repository.login(email, password);
-    } catch (e) {
-      return Left(ErrorModel(message: e.toString()));
-    }
+  Future<Either<ErrorModel, PersonEntity>> call({
+    required String email,
+    required String password,
+  }) async {
+    return await repository.login(email, password);
   }
 }
-

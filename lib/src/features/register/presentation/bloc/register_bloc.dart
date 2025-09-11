@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/features/register/domain/entities/person_ent
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'package:motogo_frontend/src/features/register/domain/usecases/register_usecase.dart';
 
+
 part 'register_event.dart';
 part 'register_state.dart';
 

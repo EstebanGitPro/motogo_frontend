@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
 
 class LoginForm extends StatelessWidget {
@@ -137,7 +138,37 @@ class LoginForm extends StatelessWidget {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
+                  
+                  // Forgot password link
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: state is LoginInProgress
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const EmailRecoveryVerificationPage(),
+                                ),
+                              );
+                            },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue[600],
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      ),
+                      child: const Text(
+                        '¿Olvidaste tu contraseña?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[600],

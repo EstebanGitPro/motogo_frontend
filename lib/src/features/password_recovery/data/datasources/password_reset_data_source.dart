@@ -1,37 +1,31 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:either_dart/either.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
-import 'dart:convert';
-import 'dart:io';
-import 'package:motogo_frontend/src/features/login/data/models/person_login_model.dart';
 
-class LoginDataSource {
-  final _secureStorage = const FlutterSecureStorage();
+class PasswordResetDataSourceImpl {
+  final http.Client client;
+  final String baseUrl = 'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo';
 
-  Future<Either<ErrorModel, PersonModel>> loginPerson(
-    String email,
-    String password,
+  PasswordResetDataSourceImpl(this.client);
+
+  Future<Either<ErrorModel, void>> resetPassword(
+    String code,
+    String newPassword,
   ) async {
     try {
-      final response = await http
+      final response = await client
           .post(
-            Uri.parse(
-              'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login',
-            ),
+            Uri.parse('$baseUrl/auth/password-recovery/reset'),
             headers: {'Content-Type': 'application/json'},
-            body: json.encode({'email': email, 'password': password}),
+            body: json.encode({'code': code, 'new_password': newPassword}),
           )
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final person = PersonModel.fromMap(data);
-
-        await _secureStorage.write(key: 'token', value: person.token);
-        await _secureStorage.write(key: 'user_id', value: person.id);
-        return Right(person);
+        return const Right(null);
       } else {
         return Left(_handleHttpError(response));
       }

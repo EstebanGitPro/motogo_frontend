@@ -19,7 +19,6 @@ class PasswordResetPage extends StatefulWidget {
 
 class _PasswordResetPageState extends State<PasswordResetPage> {
   void _onPasswordSubmit(String password, String confirmPassword) {
-    // El código de verificación se pasa desde el estado anterior o se mantiene en caché en el BLoC
     context.read<PasswordRecoveryBloc>().add(
       ResetPasswordSubmitted(
         code: widget.verificationCode,
@@ -51,20 +50,25 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
       ),
       body: BlocListener<PasswordRecoveryBloc, PasswordResetState>(
         listener: (context, state) {
+        
+          ScaffoldMessenger.of(context).clearSnackBars();
+          
           if (state is PasswordResetSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('¡Contraseña actualizada correctamente!'),
                 backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
               ),
             );
-            // Navegar de vuelta al login
+         
             Navigator.of(context).popUntil((route) => route.isFirst);
           } else if (state is PasswordResetFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
               ),
             );
           }
@@ -92,7 +96,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                             children: [
                               const Spacer(),
 
-                              // Icon
                               Container(
                                 height: isMobile ? 80 : 100,
                                 width: isMobile ? 80 : 100,
@@ -109,7 +112,6 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
                               SizedBox(height: isMobile ? 24 : 32),
 
-                              // Title
                               Text(
                                 'Crear nueva contraseña',
                                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -122,7 +124,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
                               SizedBox(height: isMobile ? 12 : 16),
 
-                              // Subtitle
+                          
                               Text(
                                 'Tu nueva contraseña debe ser diferente a las anteriores',
                                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
@@ -134,7 +136,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
                               SizedBox(height: isMobile ? 32 : 40),
 
-                              // Email info (opcional, para mostrar para qué cuenta se está cambiando)
+                        
                               Container(
                                 width: double.infinity,
                                 margin: EdgeInsets.symmetric(
@@ -172,7 +174,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
                               SizedBox(height: isMobile ? 32 : 40),
 
-                              // Password reset widget
+                    
                               BlocBuilder<PasswordRecoveryBloc, PasswordResetState>(
                                 builder: (context, state) {
                                   final isLoading = state is PasswordResetLoading;
@@ -186,7 +188,7 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
 
                               const Spacer(),
 
-                              // Security note
+                
                               Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 8 : 16,

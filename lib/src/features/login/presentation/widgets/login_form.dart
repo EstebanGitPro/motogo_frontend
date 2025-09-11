@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
+import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
@@ -41,37 +43,11 @@ class LoginForm extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  TextFormField(
+                  CustomInputWidget(
                     controller: emailController,
+                    labelText: 'Email',
+                    prefixIcon: const Icon(Icons.email_outlined),
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: const Icon(
-                        Icons.email_outlined,
-                        color: Colors.grey,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                          color: Colors.blue[600]!,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa tu email';
@@ -86,51 +62,11 @@ class LoginForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  TextFormField(
+                  CustomInputWidget(
                     controller: passwordController,
+                    labelText: 'Contraseña',
+                    prefixIcon: const Icon(Icons.lock_outline),
                     obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: 'Contraseña',
-                      prefixIcon: const Icon(
-                        Icons.lock_outline,
-                        color: Colors.grey,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                          color: Colors.blue[600]!,
-                          width: 2,
-                        ),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                          color: Colors.red,
-                          width: 1.5,
-                        ),
-                      ),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(
-                          color: Colors.red,
-                          width: 2,
-                        ),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa tu contraseña';
@@ -140,7 +76,7 @@ class LoginForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   
-                  // Forgot password link
+                 
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -169,46 +105,19 @@ class LoginForm extends StatelessWidget {
                   ),
                   
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[600],
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 2,
-                      shadowColor: Colors.blue[600]!.withAlpha(75),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: state is LoginInProgress
-                        ? null
-                        : () {
-                            if (formKey.currentState!.validate()) {
-                              context.read<LoginBloc>().add(
-                                LoginSubmitted(
-                                  email: emailController.text,
-                                  password: passwordController.text,
-                                ),
-                              );
-                            }
-                          },
-                    child: state is LoginInProgress
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            'Iniciar sesión',
-                            style: TextStyle(
-                              color: const Color.fromARGB(255, 246, 246, 246),
-                              fontWeight: FontWeight.bold,
-                            ),
+                  CustomButtonWidget(
+                    title: 'Iniciar sesión',
+                    isLoading: state is LoginInProgress,
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        context.read<LoginBloc>().add(
+                          LoginSubmitted(
+                            email: emailController.text,
+                            password: passwordController.text,
                           ),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
                   Row(

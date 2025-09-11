@@ -33,7 +33,7 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
       body: BlocListener<EmailRecoveryVerificationBloc, EmailRecoveryVerificationState>(
         listener: (context, state) {
           if (state is EmailRecoveryVerificationSuccess) {
-            // Navigate to code verification page
+          
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -65,12 +65,14 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
                             children: [
                               const Spacer(),
 
-                              // Icon
+                       
                               Container(
                                 height: isMobile ? 80 : 100,
                                 width: isMobile ? 80 : 100,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).primaryColor.withAlpha(20),
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withAlpha(20),
                                   borderRadius: BorderRadius.circular(50),
                                 ),
                                 child: Icon(
@@ -82,43 +84,45 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               SizedBox(height: isMobile ? 24 : 32),
 
-                              // Title
+                      
                               Text(
                                 'Recuperar contraseña',
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: isMobile ? 22 : 28,
-                                  color: Colors.black87,
-                                ),
+                                style: Theme.of(context).textTheme.headlineSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: isMobile ? 22 : 28,
+                                      color: Colors.black87,
+                                    ),
                                 textAlign: TextAlign.center,
                               ),
 
                               SizedBox(height: isMobile ? 12 : 16),
 
-                              // Subtitle
+                      
                               Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 8 : 16,
                                 ),
                                 child: Text(
                                   'Ingresa tu correo electrónico y te enviaremos un código de verificación para restablecer tu contraseña.',
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontSize: isMobile ? 16 : 18,
-                                    color: Colors.grey[700],
-                                    height: 1.5,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(
+                                        fontSize: isMobile ? 16 : 18,
+                                        color: Colors.grey[700],
+                                        height: 1.5,
+                                      ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
 
                               SizedBox(height: isMobile ? 32 : 40),
 
-                              // Use the existing EmailVerificationWidget
+                    
                               const EmailVerificationWidget(),
 
                               SizedBox(height: isMobile ? 24 : 32),
 
-                              // Back to login button
+                      
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -134,18 +138,19 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               const Spacer(),
 
-                              // Help text
+                      
                               Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 8 : 16,
                                 ),
                                 child: Text(
                                   '¿Tienes problemas? Contacta con nuestro equipo de soporte.',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontSize: isMobile ? 12 : 13,
-                                    color: Colors.grey[500],
-                                    height: 1.4,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        fontSize: isMobile ? 12 : 13,
+                                        color: Colors.grey[500],
+                                        height: 1.4,
+                                      ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),

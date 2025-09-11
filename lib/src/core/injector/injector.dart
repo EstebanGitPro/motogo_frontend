@@ -68,7 +68,7 @@ abstract class InjectorApp {
   @Register.factory(VerifyEmailUseCase)
   void _configureCoreFactories();
 
-  // Features
+ 
   @Register.factory(RegisterRepository, from: RegisterRepositoryImp)
   @Register.factory(RegisterUseCase)
   @Register.factory(RegisterDataSource)

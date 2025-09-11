@@ -3,10 +3,11 @@
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 
 class ErrorMessageMapper {
-  
+  /// Mapea errores del servidor/backend a mensajes localizados
   static String mapServerError(String serverMessage) {
     final lowerMessage = serverMessage.toLowerCase();
     
+    // Mapeo específico basado en los errores de tu backend Go
     if (lowerMessage.contains('email not verified') || 
         lowerMessage.contains('correo no verificado')) {
       return ValidationMessages.emailNotVerified;

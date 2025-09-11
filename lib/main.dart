@@ -10,12 +10,6 @@ import 'package:motogo_frontend/src/features/register/presentation/bloc/register
 import 'package:motogo_frontend/src/features/register/presentation/pages/register_representative_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/register_user_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/code_validation_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/password_recovery_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/code_verification_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/password_reset_page.dart';
 
 void main() {
   InjectorApp.setup();
@@ -31,9 +25,6 @@ void main() {
         BlocProvider(create: (_) => RegisterBloc()),
         BlocProvider(create: (_) => LoginBloc()),
         BlocProvider(create: (_) => EditProfileBloc()),
-        BlocProvider(create: (_) => EmailRecoveryVerificationBloc()),
-        BlocProvider(create: (_) => CodeValidationBloc()),
-        BlocProvider(create: (_) => PasswordRecoveryBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -52,9 +43,6 @@ void main() {
           '/register/representative': (context) =>
               const RegisterRepresentativePage(),
           '/edit-my-profile': (context) => const EditMyProfilePage(),
-          '/password-recovery/email': (context) => const EmailRecoveryVerificationPage(),
-          '/password-recovery/code': (context) => const CodeVerificationPage(email: ''),
-          '/password-recovery/reset': (context) => const PasswordResetPage(email: '', verificationCode: ''),
         },
       ),
     ),

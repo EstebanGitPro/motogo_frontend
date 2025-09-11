@@ -15,34 +15,28 @@ class LoginDataSource {
     String password,
   ) async {
     try {
-      final response = await http
-          .post(
-            Uri.parse(
-              'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login',
-            ),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode({'email': email, 'password': password}),
-          )
-          .timeout(const Duration(seconds: 10));
+      final response = await http.post(
+        Uri.parse('https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'password': password}),
+      ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final person = PersonModel.fromMap(data);
 
+       
         await _secureStorage.write(key: 'token', value: person.token);
         await _secureStorage.write(key: 'user_id', value: person.id);
+
         return Right(person);
       } else {
         return Left(_handleHttpError(response));
       }
     } on SocketException {
-      return Left(
-        _createErrorModel(ErrorMessageMapper.mapHttpError(0, 'network_error')),
-      );
+      return Left(_createErrorModel(ErrorMessageMapper.mapHttpError(0, 'network_error')));
     } on HttpException {
-      return Left(
-        _createErrorModel(ErrorMessageMapper.mapHttpError(0, 'server_error')),
-      );
+      return Left(_createErrorModel(ErrorMessageMapper.mapHttpError(0, 'server_error')));
     } on FormatException {
       return Left(_createErrorModel('Respuesta inválida del servidor'));
     } catch (e) {
@@ -58,19 +52,19 @@ class LoginDataSource {
 
   ErrorModel _handleHttpError(http.Response response) {
     String? serverMessage;
-
+    
     try {
       final errorData = json.decode(response.body);
       serverMessage = errorData['message']?.toString();
     } catch (e) {
       serverMessage = null;
     }
-
+    
     final mappedMessage = ErrorMessageMapper.mapHttpError(
-      response.statusCode,
-      serverMessage,
+      response.statusCode, 
+      serverMessage
     );
-
+    
     return ErrorModel(
       message: mappedMessage,
       errorCode: response.statusCode.toString(),
@@ -78,6 +72,11 @@ class LoginDataSource {
   }
 
   ErrorModel _createErrorModel(String message, [String? errorCode]) {
-    return ErrorModel(message: message, errorCode: errorCode);
+    return ErrorModel(
+      message: message,
+      errorCode: errorCode,
+    );
   }
+
+
 }

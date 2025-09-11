@@ -1,4 +1,3 @@
-// src/core/widgets/auth_wrapper.dart
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';

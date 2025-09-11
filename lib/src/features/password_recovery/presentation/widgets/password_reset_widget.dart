@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
+import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 
 class PasswordResetWidget extends StatefulWidget {
   final Function(String password, String confirmPassword) onPasswordSubmit;
@@ -93,103 +95,54 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Password field
-          TextFormField(
+        
+          CustomInputWidget(
             controller: _passwordController,
+            labelText: 'Nueva contraseña',
+            hintText: 'Ingresa tu nueva contraseña',
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscurePassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
+            ),
             obscureText: _obscurePassword,
             validator: _validatePassword,
-            decoration: InputDecoration(
-              labelText: 'Nueva contraseña',
-              hintText: 'Ingresa tu nueva contraseña',
-              prefixIcon: const Icon(Icons.lock_outline),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor,
-                  width: 2,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 2),
-              ),
-            ),
           ),
 
           SizedBox(height: isMobile ? 16 : 20),
 
-          // Confirm password field
-          TextFormField(
+        
+          CustomInputWidget(
             controller: _confirmPasswordController,
+            labelText: 'Confirmar contraseña',
+            hintText: 'Confirma tu nueva contraseña',
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureConfirmPassword
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                });
+              },
+            ),
             obscureText: _obscureConfirmPassword,
             validator: _validateConfirmPassword,
-            decoration: InputDecoration(
-              labelText: 'Confirmar contraseña',
-              hintText: 'Confirma tu nueva contraseña',
-              prefixIcon: const Icon(Icons.lock_outline),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureConfirmPassword
-                      ? Icons.visibility_off_outlined
-                      : Icons.visibility_outlined,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                  });
-                },
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey[300]!),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: Theme.of(context).primaryColor,
-                  width: 2,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 2),
-              ),
-            ),
           ),
 
           SizedBox(height: isMobile ? 24 : 32),
 
-          // Password requirements
           Container(
             padding: EdgeInsets.all(isMobile ? 16 : 20),
             decoration: BoxDecoration(
@@ -219,41 +172,10 @@ class _PasswordResetWidgetState extends State<PasswordResetWidget> {
 
           SizedBox(height: isMobile ? 32 : 40),
 
-          // Submit button
-          SizedBox(
-            width: double.infinity,
-            height: isMobile ? 50 : 56,
-            child: ElevatedButton(
-              onPressed: widget.isLoading ? null : _submitPassword,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: Colors.grey[300],
-                disabledForegroundColor: Colors.grey[600],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: widget.isLoading
-                  ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.white,
-                        ),
-                      ),
-                    )
-                  : Text(
-                      'Actualizar contraseña',
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-            ),
+          CustomButtonWidget(
+            title: 'Actualizar contraseña',
+            isLoading: widget.isLoading,
+            onPressed: _submitPassword,
           ),
         ],
       ),

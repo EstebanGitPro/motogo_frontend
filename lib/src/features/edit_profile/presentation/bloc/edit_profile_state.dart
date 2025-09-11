@@ -24,7 +24,7 @@ class EditProfileState extends Equatable {
     return EditProfileState(
       status: status ?? this.status,
       person: person ?? this.person,
-      error: error, // No usar ?? aquí para permitir limpiar el error
+      error: error, 
       isFromCache: isFromCache ?? this.isFromCache,
     );
   }

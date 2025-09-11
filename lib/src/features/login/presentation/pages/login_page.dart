@@ -74,12 +74,16 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(title: const Text('Iniciar sesión')),
       body: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
+          // Limpiar SnackBars anteriores
+          ScaffoldMessenger.of(context).clearSnackBars();
+          
           if (state is LoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 3),
               ),
             );
           } else if (state is LoginNeedsVerification) {

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:motogo_frontend/src/features/register/domain/entities/person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
 
 class PersonModel extends PersonEntity {
   PersonModel({

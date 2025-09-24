@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/widgets/login_form.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/verification_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onSwitchToRegister;

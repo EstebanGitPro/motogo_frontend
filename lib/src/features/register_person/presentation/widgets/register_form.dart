@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/register/presentation/bloc/register_bloc.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
 class RegisterForm extends StatefulWidget {
   final String role;
@@ -111,8 +111,8 @@ class _RegisterFormState extends State<RegisterForm> {
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
-      context.read<RegisterBloc>().add(
-        RegisterSubmitted(
+      context.read<RegisterPersonBloc>().add(
+        RegisterPersonSubmitted(
           identityNumber: _identityController.text,
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
@@ -471,9 +471,9 @@ class _RegisterFormState extends State<RegisterForm> {
                         widget.extraContent!,
                       ],
                       const SizedBox(height: 32),
-                      BlocBuilder<RegisterBloc, RegisterState>(
+                      BlocBuilder<RegisterPersonBloc, RegisterPersonState>(
                         builder: (context, state) {
-                          final isLoading = state is RegisterLoading;
+                          final isLoading = state is RegisterPersonLoading;
                           return SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(

@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/features/register/presentation/bloc/register_bloc.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/verification_page.dart';
-import 'package:motogo_frontend/src/features/register/presentation/widgets/register_form.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/widgets/register_form.dart';
 
 class RegisterUserPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -35,16 +35,16 @@ class RegisterUserPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: BlocListener<RegisterBloc, RegisterState>(
+      body: BlocListener<RegisterPersonBloc, RegisterPersonState>(
         listener: (context, state) {
-          if (state is RegisterSuccess) {
+          if (state is RegisterPersonSuccess) {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => VerificationPage(email: state.email),
               ),
             );
-          } else if (state is RegisterFailure) {
+          } else if (state is RegisterPersonFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorModel.message),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
 enum AuthMode { login, register }
 

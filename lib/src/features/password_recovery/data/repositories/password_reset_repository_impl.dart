@@ -4,7 +4,7 @@ import 'package:motogo_frontend/src/features/password_recovery/data/datasources/
 import 'package:motogo_frontend/src/features/password_recovery/domain/repositories/password_reset_repository.dart';
 
 class PasswordResetRepositoryImpl implements PasswordResetRepository {
-  final PasswordResetDataSourceImpl dataSource;
+  final PasswordResetDataSource dataSource;
 
   PasswordResetRepositoryImpl(this.dataSource);
 

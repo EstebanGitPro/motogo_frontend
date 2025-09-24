@@ -24,10 +24,11 @@ class _$InjectorApp extends InjectorApp {
   void _configureAuthFactories() {
     final KiwiContainer container = KiwiContainer();
     container
-      ..registerFactory<RegisterRepository>(
-          (c) => RegisterRepositoryImp(c.resolve<RegisterDataSource>()))
-      ..registerFactory((c) => RegisterUseCase(c.resolve<RegisterRepository>()))
-      ..registerFactory((c) => RegisterDataSource())
+      ..registerFactory<RegisterPersonRepository>((c) =>
+          RegisterPersonRepositoryImp(c.resolve<RegisterPersonDataSource>()))
+      ..registerFactory(
+          (c) => RegisterPersonUseCase(c.resolve<RegisterPersonRepository>()))
+      ..registerFactory((c) => RegisterPersonDataSource())
       ..registerFactory<LoginRepository>(
           (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()))
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
@@ -54,10 +55,9 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory(
           (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()))
       ..registerFactory<PasswordResetRepository>((c) =>
-          PasswordResetRepositoryImpl(c.resolve<PasswordResetDataSourceImpl>()))
+          PasswordResetRepositoryImpl(c.resolve<PasswordResetDataSource>()))
       ..registerFactory(
           (c) => PasswordResetUseCase(c.resolve<PasswordResetRepository>()))
-      ..registerFactory(
-          (c) => PasswordResetDataSourceImpl(c.resolve<Client>()));
+      ..registerFactory((c) => PasswordResetDataSource(c.resolve<Client>()));
   }
 }

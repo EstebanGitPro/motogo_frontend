@@ -1,11 +1,11 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/features/register/domain/entities/person_entity.dart';
-import 'package:motogo_frontend/src/features/register/domain/repositories/register_repository.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/repositories/register_person_repository.dart';
 
-class RegisterUseCase {
-  final RegisterRepository registerRepository;
-  RegisterUseCase(this.registerRepository);
+class RegisterPersonUseCase {
+  final RegisterPersonRepository registerPersonRepository;
+  RegisterPersonUseCase(this.registerPersonRepository);
 
   Future<Either<ErrorModel, PersonEntity>> call(
     String identityNumber,
@@ -17,7 +17,7 @@ class RegisterUseCase {
     String password,
     String role,
   ) async {
-    return await registerRepository.savePerson(
+    return await registerPersonRepository.savePerson(
       identityNumber,
       firstName,
       lastName,

@@ -5,11 +5,11 @@ import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 
-class PasswordResetDataSourceImpl {
+class PasswordResetDataSource {
   final http.Client client;
   final String baseUrl = 'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo';
 
-  PasswordResetDataSourceImpl(this.client);
+  PasswordResetDataSource(this.client);
 
   Future<Either<ErrorModel, void>> resetPassword(
     String code,

@@ -3,20 +3,20 @@ import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/register/domain/entities/person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
-import 'package:motogo_frontend/src/features/register/domain/usecases/register_usecase.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 
 
-part 'register_event.dart';
-part 'register_state.dart';
+part 'register_person_event.dart';
+part 'register_person-state.dart';
 
-class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(RegisterInitial()) {
-    final registerUseCase = InjectorApp.resolve<RegisterUseCase>();
+class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> {
+  RegisterPersonBloc() : super(RegisterPersonInitial()) {
+    final registerUseCase = InjectorApp.resolve<RegisterPersonUseCase>();
     final verifyEmailUseCase = InjectorApp.resolve<VerifyEmailUseCase>();
 
-    on<RegisterSubmitted>(
+    on<RegisterPersonSubmitted>(
       (event, emit) => _onRegisterSubmitted(event, emit, registerUseCase),
     );
 
@@ -26,11 +26,11 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   }
 
   Future<void> _onRegisterSubmitted(
-    RegisterSubmitted event,
-    Emitter<RegisterState> emit,
-    RegisterUseCase registerUseCase,
+    RegisterPersonSubmitted event,
+    Emitter<RegisterPersonState> emit,
+    RegisterPersonUseCase registerUseCase,
   ) async {
-    emit(RegisterLoading());
+    emit(RegisterPersonLoading());
     try {
       final result = await registerUseCase(
         event.identityNumber,
@@ -45,21 +45,21 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
       result.fold(
         (error) => emit(
-          RegisterFailure(
+          RegisterPersonFailure(
             errorModel: ErrorModel(
               message: ErrorMessageMapper.mapServerError(error.message),
             ),
           ),
         ),
       
-        (person) => emit(RegisterSuccess(
+        (person) => emit(RegisterPersonSuccess(
           result: person, 
           email: event.email, 
         )),
       );
     } catch (error) {
       emit(
-        RegisterFailure(
+        RegisterPersonFailure(
           errorModel: ErrorModel(message: error.toString(), isError: true),
         ),
       );
@@ -68,10 +68,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
   Future<void> _onStartVerification(
     StartVerification event,
-    Emitter<RegisterState> emit,
+    Emitter<RegisterPersonState> emit,
     VerifyEmailUseCase verifyEmailUseCase,
   ) async {
-    emit(VerificationInProgress());
+    emit(VerificationPersonInProgress());
 
     const maxAttempts = 12;
     int attempts = 0;
@@ -80,7 +80,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       await for (final _ in Stream.periodic(const Duration(seconds: 5))) {
         if (attempts >= maxAttempts) {
           emit(
-            VerificationFailure(
+            VerificationPersonFailure(
               errorModel: ErrorModel(
                 message: 'Verification timed out.',
                 isError: true,
@@ -96,7 +96,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
           result.fold(
             (error) => emit(
-              VerificationFailure(
+              VerificationPersonFailure(
                 errorModel: ErrorModel(
                   message: error.toString(),
                   isError: true,
@@ -105,17 +105,17 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             ),
             (isVerified) {
               if (isVerified) {
-                emit(VerificationSuccess());
+                emit(VerificationPersonSuccess());
               }
             },
           );
 
-          if (state is VerificationSuccess) {
+          if (state is VerificationPersonSuccess) {
             return;
           }
         } catch (error) {
           emit(
-            VerificationFailure(
+            VerificationPersonFailure(
               errorModel: ErrorModel(message: error.toString(), isError: true),
             ),
           );
@@ -124,7 +124,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       }
     } catch (error) {
       emit(
-        VerificationFailure(
+        VerificationPersonFailure(
           errorModel: ErrorModel(message: error.toString(), isError: true),
         ),
       );

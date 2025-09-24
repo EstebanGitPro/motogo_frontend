@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
-import 'package:motogo_frontend/src/features/register/presentation/bloc/register_bloc.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 
 class VerificationPage extends StatefulWidget {
   final String email;
@@ -16,7 +16,7 @@ class _VerificationPageState extends State<VerificationPage> {
   @override
   void initState() {
     super.initState();
-    context.read<RegisterBloc>().add(StartVerification(widget.email));
+    context.read<RegisterPersonBloc>().add(StartVerification(widget.email));
   }
 
   @override
@@ -40,9 +40,9 @@ class _VerificationPageState extends State<VerificationPage> {
         elevation: 0,
         centerTitle: true,
       ),
-      body: BlocListener<RegisterBloc, RegisterState>(
+      body: BlocListener<RegisterPersonBloc, RegisterPersonState>(
         listener: (context, state) {
-          if (state is VerificationSuccess) {
+          if (state is VerificationPersonSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -51,7 +51,7 @@ class _VerificationPageState extends State<VerificationPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('¡Email verificado correctamente!')),
             );
-          } else if (state is RegisterFailure) {
+          } else if (state is VerificationPersonFailure) {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(SnackBar(content: Text(state.errorModel.message)));

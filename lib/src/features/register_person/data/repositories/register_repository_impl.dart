@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/features/register/data/datasources/register_data_source.dart';
-import 'package:motogo_frontend/src/features/register/domain/entities/person_entity.dart';
-import 'package:motogo_frontend/src/features/register/domain/repositories/register_repository.dart';
-import 'package:motogo_frontend/src/features/register/exceptions/register_exceptions.dart';
+import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/repositories/register_person_repository.dart';
+import 'package:motogo_frontend/src/features/register_person/exceptions/register_person_exceptions.dart';
 
-class RegisterRepositoryImp implements RegisterRepository {
-  final RegisterDataSource _registerDataSource;
+class RegisterPersonRepositoryImp implements RegisterPersonRepository {
+  final RegisterPersonDataSource _registerPersonDataSource;
 
-  RegisterRepositoryImp(this._registerDataSource);
+  RegisterPersonRepositoryImp(this._registerPersonDataSource);
 
   @override
   Future<Either<ErrorModel, PersonEntity>> savePerson(
@@ -24,7 +24,7 @@ class RegisterRepositoryImp implements RegisterRepository {
     String role,
   ) async {
     try {
-      final result = await _registerDataSource.registerPerson(
+      final result = await _registerPersonDataSource.registerPerson(
         identityNumber,
         firstName,
         lastName,

@@ -4,8 +4,7 @@ import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
 import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;

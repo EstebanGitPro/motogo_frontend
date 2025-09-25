@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/validators/validators.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
@@ -59,55 +60,22 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  String? _validateIdentity(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (int.tryParse(value!) == null) {
-      return 'Ingresa un número de identificación válido';
-    }
-    if (value.length < 7) return 'Mínimo 7 dígitos';
-    return null;
-  }
+  // Validadores reutilizables
+  late final BaseValidator _identityValidator = ValidatorUtils.identity();
+  late final BaseValidator _nameValidator = ValidatorUtils.name();
+  late final BaseValidator _emailValidator = ValidatorUtils.email();
+  late final BaseValidator _phoneValidator = ValidatorUtils.phone();
+  late final BaseValidator _passwordValidator = ValidatorUtils.password();
+  
+  BaseValidator get _confirmPasswordValidator => 
+      ValidatorUtils.confirmPassword(_passwordController.text);
 
-  String? _validateName(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (value!.length < 2) return 'Mínimo 2 caracteres';
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value!)) {
-      return 'Ingresa un correo válido';
-    }
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (!RegExp(r'^[+]?[0-9]{10,13}$').hasMatch(value!)) {
-      return 'Ingresa un número de teléfono válido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (value!.length < 8) {
-      return 'La contraseña debe tener al menos 8 caracteres';
-    }
-    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
-      return 'Debe contener mayúscula, minúscula y número';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value?.isEmpty ?? true) return 'Este campo es requerido';
-    if (value != _passwordController.text) {
-      return 'Las contraseñas no coinciden';
-    }
-    return null;
-  }
+  String? _validateIdentity(String? value) => _identityValidator.validate(value);
+  String? _validateName(String? value) => _nameValidator.validate(value);
+  String? _validateEmail(String? value) => _emailValidator.validate(value);
+  String? _validatePhone(String? value) => _phoneValidator.validate(value);
+  String? _validatePassword(String? value) => _passwordValidator.validate(value);
+  String? _validateConfirmPassword(String? value) => _confirmPasswordValidator.validate(value);
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {

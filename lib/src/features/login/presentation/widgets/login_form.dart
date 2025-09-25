@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/validators/validators.dart';
 import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
 import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
@@ -48,17 +49,7 @@ class LoginForm extends StatelessWidget {
                     labelText: 'Email',
                     prefixIcon: const Icon(Icons.email_outlined),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu email';
-                      }
-                      if (!RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      ).hasMatch(value)) {
-                        return 'Ingresa un correo válido';
-                      }
-                      return null;
-                    },
+                    validator: ValidatorUtils.email().validate,
                   ),
                   const SizedBox(height: 16),
 
@@ -67,12 +58,9 @@ class LoginForm extends StatelessWidget {
                     labelText: 'Contraseña',
                     prefixIcon: const Icon(Icons.lock_outline),
                     obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu contraseña';
-                      }
-                      return null;
-                    },
+                    validator: ValidatorUtils.required(
+                      customMessage: 'Por favor ingresa tu contraseña',
+                    ).validate,
                   ),
                   const SizedBox(height: 8),
                   

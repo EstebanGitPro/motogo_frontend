@@ -1,5 +1,6 @@
 // .../register/presentation/widgets/representative_info_box.dart
 import 'package:flutter/material.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class RepresentativeInfoBox extends StatelessWidget {
   const RepresentativeInfoBox({super.key});
@@ -24,7 +25,7 @@ class RepresentativeInfoBox extends StatelessWidget {
           SizedBox(width: isMobile ? 12 : 16),
           Expanded(
             child: Text(
-              'Como representante, podrás gestionar y administrar una sede de MotoGo.',
+              getTranslateText(context: context, key: 'representative_info'),
               style: TextStyle(
                 color: Colors.orange[800],
                 fontSize: isMobile ? 14 : 16,

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/widgets/register_form.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class RegisterUserPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -21,7 +22,7 @@ class RegisterUserPage extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Registro Motociclista',
+          getTranslateText(context: context, key: 'register_motorcyclist'),
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
@@ -62,11 +63,11 @@ class RegisterUserPage extends StatelessWidget {
           }
         },
 
-        child: const RegisterForm(
+        child: RegisterForm(
           role: 'user',
-          title: 'Crear cuenta',
-          subtitle: 'Completa tus datos para comenzar a usar MotoGo',
-          buttonText: 'Crear cuenta',
+          title: getTranslateText(context: context, key: 'create_account'),
+          subtitle: getTranslateText(context: context, key: 'complete_data_motogo'),
+          buttonText: getTranslateText(context: context, key: 'create_account'),
           primaryColor: Colors.blue,
           icon: Icons.motorcycle,
         ),

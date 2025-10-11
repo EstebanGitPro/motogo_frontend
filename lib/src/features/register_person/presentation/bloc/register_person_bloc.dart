@@ -4,7 +4,6 @@ import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
-import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 
 
@@ -44,14 +43,7 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
       );
 
       result.fold(
-        (error) => emit(
-          RegisterPersonFailure(
-            errorModel: ErrorModel(
-              message: ErrorMessageMapper.mapServerError(error.message),
-            ),
-          ),
-        ),
-      
+        (error) => emit(RegisterPersonFailure(errorModel: error)),
         (person) => emit(RegisterPersonSuccess(
           result: person, 
           email: event.email, 
@@ -60,7 +52,12 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
     } catch (error) {
       emit(
         RegisterPersonFailure(
-          errorModel: ErrorModel(message: error.toString(), isError: true),
+          errorModel: ErrorModel(
+            message: 'Error inesperado',
+            description: error.toString(),
+            statusCode: 500,
+            errorCode: 'CLIENT_ERROR',
+          ),
         ),
       );
     }
@@ -82,9 +79,11 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
           emit(
             VerificationPersonFailure(
               errorModel: ErrorModel(
-                message: 'Verification timed out.',
-                isError: true,
-              ),
+            message: 'Tiempo de verificación agotado',
+            description: 'No se pudo verificar el email en el tiempo esperado',
+            statusCode: 408,
+            errorCode: 'VERIFICATION_TIMEOUT',
+          ),
             ),
           );
           return;
@@ -95,14 +94,7 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
           final result = await verifyEmailUseCase(event.email);
 
           result.fold(
-            (error) => emit(
-              VerificationPersonFailure(
-                errorModel: ErrorModel(
-                  message: error.toString(),
-                  isError: true,
-                ),
-              ),
-            ),
+            (error) => emit(VerificationPersonFailure(errorModel: error)),
             (isVerified) {
               if (isVerified) {
                 emit(VerificationPersonSuccess());

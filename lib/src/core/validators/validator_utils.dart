@@ -53,8 +53,8 @@ class ValidatorUtils {
 
   /// Crea un validador para identificación
   static BaseValidator identity({
-    int minLength = 7,
-    int maxLength = 20,
+    int minLength = 8,
+    int maxLength = 10,
     String? customMessage,
   }) {
     return IdentityValidator(

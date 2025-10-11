@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'dart:convert';
@@ -18,7 +19,7 @@ class LoginDataSource {
       final response = await http
           .post(
             Uri.parse(
-              'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo/auth/login',
+              '${Config.baseUrl}/auth/login',
             ),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({'email': email, 'password': password}),

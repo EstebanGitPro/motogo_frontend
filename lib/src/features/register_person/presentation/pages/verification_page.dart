@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class VerificationPage extends StatefulWidget {
   final String email;
@@ -29,7 +30,7 @@ class _VerificationPageState extends State<VerificationPage> {
       backgroundColor: Colors.white, 
       appBar: AppBar(
         title: Text(
-          'Verificación de cuenta',
+          getTranslateText(context: context, key: 'account_verification'),
           style: TextStyle(
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -49,7 +50,7 @@ class _VerificationPageState extends State<VerificationPage> {
               (route) => false,
             );
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('¡Email verificado correctamente!')),
+              SnackBar(content: Text(getTranslateText(context: context, key: 'email_verified_success'))),
             );
           } else if (state is VerificationPersonFailure) {
             ScaffoldMessenger.of(
@@ -99,7 +100,7 @@ class _VerificationPageState extends State<VerificationPage> {
                               SizedBox(height: isMobile ? 24 : 32),
 
                               Text(
-                                'Verifica tu correo electrónico',
+                                getTranslateText(context: context, key: 'verify_email'),
                                 style: Theme.of(context).textTheme.headlineSmall
                                     ?.copyWith(
                                       fontWeight: FontWeight.bold,
@@ -112,7 +113,7 @@ class _VerificationPageState extends State<VerificationPage> {
                               SizedBox(height: isMobile ? 12 : 16),
 
                               Text(
-                                'Se ha enviado un correo de verificación a:',
+                                getTranslateText(context: context, key: 'verification_email_sent'),
                                 style: Theme.of(context).textTheme.bodyLarge
                                     ?.copyWith(
                                       fontSize: isMobile ? 16 : 18,
@@ -156,7 +157,7 @@ class _VerificationPageState extends State<VerificationPage> {
                                   horizontal: isMobile ? 8 : 16,
                                 ),
                                 child: Text(
-                                  'Por favor, revisa tu bandeja de entrada y haz clic en el enlace de verificación.',
+                                  getTranslateText(context: context, key: 'check_inbox'),
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         fontSize: isMobile ? 14 : 16,
@@ -183,7 +184,7 @@ class _VerificationPageState extends State<VerificationPage> {
                               SizedBox(height: isMobile ? 12 : 16),
 
                               Text(
-                                'Esperando verificación...',
+                                getTranslateText(context: context, key: 'waiting_verification'),
                                 style: Theme.of(context).textTheme.bodyMedium
                                     ?.copyWith(
                                       fontSize: isMobile ? 14 : 16,
@@ -200,7 +201,7 @@ class _VerificationPageState extends State<VerificationPage> {
                                   Navigator.pop(context);
                                 },
                                 child: Text(
-                                  'Volver al registro',
+                                  getTranslateText(context: context, key: 'back_to_register'),
                                   style: TextStyle(
                                     fontSize: isMobile ? 14 : 16,
                                     color: Colors.grey[600],
@@ -215,7 +216,7 @@ class _VerificationPageState extends State<VerificationPage> {
                                   horizontal: isMobile ? 8 : 16,
                                 ),
                                 child: Text(
-                                  '¿No recibiste el correo? Revisa tu carpeta de spam o correo no deseado.',
+                                  getTranslateText(context: context, key: 'no_email_received'),
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         fontSize: isMobile ? 12 : 13,

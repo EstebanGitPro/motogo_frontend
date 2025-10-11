@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
@@ -17,46 +18,60 @@ import 'package:motogo_frontend/src/features/password_recovery/presentation/page
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/code_verification_page.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/password_reset_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  
   InjectorApp.setup();
 
-  //const _testRoute = '/';
-  //const _testRoute = '/edit-my-profile';
-  // const _testRoute = '/login';
-  // const _testRoute = '/home';
-
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => RegisterPersonBloc()),
-        BlocProvider(create: (_) => LoginBloc()),
-        BlocProvider(create: (_) => EditProfileBloc()),
-        BlocProvider(create: (_) => EmailRecoveryVerificationBloc()),
-        BlocProvider(create: (_) => CodeValidationBloc()),
-        BlocProvider(create: (_) => PasswordRecoveryBloc()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'MotoGo',
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
-        //initialRoute: _testRoute,
-        routes: {
-          '/': (context) => const UserTypeSelectionPage(),
-          '/login': (context) => const LoginPage(),
-          '/home': (context) => const HomePage(),
-          '/register/user': (context) => const RegisterUserPage(),
-          '/register/representative': (context) =>
-              const RegisterRepresentativePage(),
-          '/edit-my-profile': (context) => const EditMyProfilePage(),
-          '/password-recovery/email': (context) => const EmailRecoveryVerificationPage(),
-          '/password-recovery/code': (context) => const CodeVerificationPage(email: ''),
-          '/password-recovery/reset': (context) => const PasswordResetPage(email: '', verificationCode: ''),
-        },
+    EasyLocalization(
+      fallbackLocale: const Locale('es'),
+      supportedLocales: const [Locale('es')],
+      path: 'assets/lang',
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => RegisterPersonBloc()),
+          BlocProvider(create: (_) => LoginBloc()),
+          BlocProvider(create: (_) => EditProfileBloc()),
+          BlocProvider(create: (_) => EmailRecoveryVerificationBloc()),
+          BlocProvider(create: (_) => CodeValidationBloc()),
+          BlocProvider(create: (_) => PasswordRecoveryBloc()),
+        ],
+        child: const MyApp(),
       ),
     ),
   );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'MotoGo',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      routes: {
+        '/': (context) => const UserTypeSelectionPage(),
+        '/login': (context) => const LoginPage(),
+        '/home': (context) => const HomePage(),
+        '/register/user': (context) => const RegisterUserPage(),
+        '/register/representative': (context) =>
+            const RegisterRepresentativePage(),
+        '/edit-my-profile': (context) => const EditMyProfilePage(),
+        '/password-recovery/email': (context) => const EmailRecoveryVerificationPage(),
+        '/password-recovery/code': (context) => const CodeVerificationPage(email: ''),
+        '/password-recovery/reset': (context) => const PasswordResetPage(email: '', verificationCode: ''),
+      },
+    );
+  }
 }

@@ -5,6 +5,7 @@ import 'package:motogo_frontend/src/features/register_person/presentation/bloc/r
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/widgets/register_form.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/widgets/representative_info_box.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class RegisterRepresentativePage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -21,7 +22,7 @@ class RegisterRepresentativePage extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Registro Representante Sede',
+          getTranslateText(context: context, key: 'register_representative'),
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
@@ -76,11 +77,11 @@ class RegisterRepresentativePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    const RegisterForm(
+                    RegisterForm(
                       role: 'representative',
-                      title: 'Crear cuenta representante',
-                      subtitle: 'Completa tus datos para representar una sede en MotoGo',
-                      buttonText: 'Crear cuenta representante',
+                      title: getTranslateText(context: context, key: 'create_representative_account'),
+                      subtitle: getTranslateText(context: context, key: 'complete_data_representative'),
+                      buttonText: getTranslateText(context: context, key: 'create_representative_account'),
                       primaryColor: Colors.orange,
                       icon: Icons.store,
                       extraContent: RepresentativeInfoBox(),

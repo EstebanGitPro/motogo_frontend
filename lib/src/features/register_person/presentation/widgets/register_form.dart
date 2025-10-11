@@ -61,11 +61,11 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   // Validadores reutilizables
-  late final BaseValidator _identityValidator = ValidatorUtils.identity();
-  late final BaseValidator _nameValidator = ValidatorUtils.name();
-  late final BaseValidator _emailValidator = ValidatorUtils.email();
-  late final BaseValidator _phoneValidator = ValidatorUtils.phone();
-  late final BaseValidator _passwordValidator = ValidatorUtils.password();
+  final BaseValidator _identityValidator = ValidatorUtils.identity();
+  final BaseValidator _nameValidator = ValidatorUtils.name();
+  final BaseValidator _emailValidator = ValidatorUtils.email();
+  final BaseValidator _phoneValidator = ValidatorUtils.phone();
+  final BaseValidator _passwordValidator = ValidatorUtils.password();
   
   BaseValidator get _confirmPasswordValidator => 
       ValidatorUtils.confirmPassword(_passwordController.text);
@@ -442,6 +442,64 @@ class _RegisterFormState extends State<RegisterForm> {
                       BlocBuilder<RegisterPersonBloc, RegisterPersonState>(
                         builder: (context, state) {
                           final isLoading = state is RegisterPersonLoading;
+                          
+                          // Decidir qué mostrar del error del backend
+                          if (state is RegisterPersonFailure) {
+                            return Column(
+                              children: [
+                                // Aquí decides qué mostrar del error
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade50,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Solo muestra el mensaje principal
+                                      Text(
+                                        state.errorModel.message,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      
+                                      // Opcional: muestra descripción si existe
+                                      if (state.errorModel.description != null &&
+                                          state.errorModel.description != state.errorModel.message) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          state.errorModel.description!,
+                                          style: TextStyle(
+                                            color: Colors.red.shade700,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                      
+                                      // Opcional: muestra errores por campo
+                                      if (state.errorModel.fieldErrors != null) ...[
+                                        const SizedBox(height: 8),
+                                        ...state.errorModel.fieldErrors!.entries.map(
+                                          (entry) => Text(
+                                            '• ${entry.key}: ${entry.value}',
+                                            style: TextStyle(
+                                              color: Colors.red.shade600,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            );
+                          }
+                          
                           return SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(

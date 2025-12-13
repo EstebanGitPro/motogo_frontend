@@ -66,16 +66,19 @@ class _RegisterFormState extends State<RegisterForm> {
   final BaseValidator _emailValidator = ValidatorUtils.email();
   final BaseValidator _phoneValidator = ValidatorUtils.phone();
   final BaseValidator _passwordValidator = ValidatorUtils.password();
-  
-  BaseValidator get _confirmPasswordValidator => 
+
+  BaseValidator get _confirmPasswordValidator =>
       ValidatorUtils.confirmPassword(_passwordController.text);
 
-  String? _validateIdentity(String? value) => _identityValidator.validate(value);
+  String? _validateIdentity(String? value) =>
+      _identityValidator.validate(value);
   String? _validateName(String? value) => _nameValidator.validate(value);
   String? _validateEmail(String? value) => _emailValidator.validate(value);
   String? _validatePhone(String? value) => _phoneValidator.validate(value);
-  String? _validatePassword(String? value) => _passwordValidator.validate(value);
-  String? _validateConfirmPassword(String? value) => _confirmPasswordValidator.validate(value);
+  String? _validatePassword(String? value) =>
+      _passwordValidator.validate(value);
+  String? _validateConfirmPassword(String? value) =>
+      _confirmPasswordValidator.validate(value);
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
@@ -222,9 +225,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             const SizedBox(height: 16),
                             Text(
                               widget.title,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
+                              style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
@@ -234,9 +235,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             const SizedBox(height: 8),
                             Text(
                               widget.subtitle,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
+                              style: Theme.of(context).textTheme.bodyLarge
                                   ?.copyWith(
                                     color: Colors.grey[600],
                                     fontSize: isMobile ? 16 : 18,
@@ -442,12 +441,10 @@ class _RegisterFormState extends State<RegisterForm> {
                       BlocBuilder<RegisterPersonBloc, RegisterPersonState>(
                         builder: (context, state) {
                           final isLoading = state is RegisterPersonLoading;
-                          
-                          // Decidir qué mostrar del error del backend
-                          if (state is RegisterPersonFailure) {
-                            return Column(
-                              children: [
-                                // Aquí decides qué mostrar del error
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (state is RegisterPersonFailure) ...[
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
@@ -455,9 +452,9 @@ class _RegisterFormState extends State<RegisterForm> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      // Solo muestra el mensaje principal
                                       Text(
                                         state.errorModel.message,
                                         style: const TextStyle(
@@ -465,10 +462,10 @@ class _RegisterFormState extends State<RegisterForm> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      
-                                      // Opcional: muestra descripción si existe
-                                      if (state.errorModel.description != null &&
-                                          state.errorModel.description != state.errorModel.message) ...[
+                                      if (state.errorModel.description !=
+                                              null &&
+                                          state.errorModel.description !=
+                                              state.errorModel.message) ...[
                                         const SizedBox(height: 4),
                                         Text(
                                           state.errorModel.description!,
@@ -478,73 +475,73 @@ class _RegisterFormState extends State<RegisterForm> {
                                           ),
                                         ),
                                       ],
-                                      
-                                      // Opcional: muestra errores por campo
-                                      if (state.errorModel.fieldErrors != null) ...[
+                                      if (state.errorModel.fieldErrors !=
+                                          null) ...[
                                         const SizedBox(height: 8),
-                                        ...state.errorModel.fieldErrors!.entries.map(
-                                          (entry) => Text(
-                                            '• ${entry.key}: ${entry.value}',
-                                            style: TextStyle(
-                                              color: Colors.red.shade600,
-                                              fontSize: 12,
+                                        ...state.errorModel.fieldErrors!.entries
+                                            .map(
+                                              (entry) => Text(
+                                                '• ${entry.key}: ${entry.value}',
+                                                style: TextStyle(
+                                                  color: Colors.red.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
                                             ),
-                                          ),
-                                        ),
                                       ],
                                     ],
                                   ),
                                 ),
                                 const SizedBox(height: 16),
                               ],
-                            );
-                          }
-                          
-                          return SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: isLoading ? null : _handleRegister,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: widget.primaryColor,
-                                foregroundColor: Colors.white,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: isMobile ? 16 : 18,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: 2,
-                                shadowColor:
-                                    widget.primaryColor.withAlpha(75),
-                              ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          widget.icon,
-                                          size: isMobile ? 20 : 22,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          widget.buttonText,
-                                          style: TextStyle(
-                                            fontSize: isMobile ? 16 : 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : _handleRegister,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: widget.primaryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: isMobile ? 16 : 18,
                                     ),
-                            ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    elevation: 2,
+                                    shadowColor: widget.primaryColor.withAlpha(
+                                      75,
+                                    ),
+                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              widget.icon,
+                                              size: isMobile ? 20 : 22,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              widget.buttonText,
+                                              style: TextStyle(
+                                                fontSize: isMobile ? 16 : 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -567,16 +564,16 @@ class _RegisterFormState extends State<RegisterForm> {
                                   onPressed: state is LoginInProgress
                                       ? null
                                       : widget.onSwitchToLogin ??
-                                          () {
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) =>
-                                                    const UserTypeSelectionPage(),
-                                              ),
-                                              (route) => false,
-                                            );
-                                          },
+                                            () {
+                                              Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      const UserTypeSelectionPage(),
+                                                ),
+                                                (route) => false,
+                                              );
+                                            },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.symmetric(
                                       horizontal: isMobile ? 4 : 8,

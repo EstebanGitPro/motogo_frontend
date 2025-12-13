@@ -39,6 +39,26 @@ class RegisterUserPage extends StatelessWidget {
       body: BlocListener<RegisterPersonBloc, RegisterPersonState>(
         listener: (context, state) {
           if (state is RegisterPersonSuccess) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  getTranslateText(
+                    context: context,
+                    key: 'verification_email_sent',
+                  ),
+                ),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 16 : 32,
+                  vertical: 16,
+                ),
+              ),
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -46,6 +66,7 @@ class RegisterUserPage extends StatelessWidget {
               ),
             );
           } else if (state is RegisterPersonFailure) {
+            ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorModel.message),
@@ -66,7 +87,10 @@ class RegisterUserPage extends StatelessWidget {
         child: RegisterForm(
           role: 'user',
           title: getTranslateText(context: context, key: 'create_account'),
-          subtitle: getTranslateText(context: context, key: 'complete_data_motogo'),
+          subtitle: getTranslateText(
+            context: context,
+            key: 'complete_data_motogo',
+          ),
           buttonText: getTranslateText(context: context, key: 'create_account'),
           primaryColor: Colors.blue,
           icon: Icons.motorcycle,

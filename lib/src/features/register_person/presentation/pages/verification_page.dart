@@ -49,13 +49,30 @@ class _VerificationPageState extends State<VerificationPage> {
               MaterialPageRoute(builder: (context) => const LoginPage()),
               (route) => false,
             );
+            ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(getTranslateText(context: context, key: 'email_verified_success'))),
+              SnackBar(
+                content: Text(
+                  getTranslateText(
+                    context: context,
+                    key: 'email_verified_success',
+                  ),
+                ),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+              ),
             );
           } else if (state is VerificationPersonFailure) {
+            ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(SnackBar(content: Text(state.errorModel.message)));
+            ).showSnackBar(
+              SnackBar(
+                content: Text(state.errorModel.message),
+                backgroundColor: Colors.red[600],
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
           }
         },
         child: SafeArea(

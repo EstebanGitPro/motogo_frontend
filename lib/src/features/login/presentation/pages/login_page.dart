@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
+import 'package:motogo_frontend/src/features/login/core/constants/login_constants.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/widgets/login_form.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
@@ -31,7 +33,12 @@ class _LoginPageState extends State<LoginPage> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Verificación requerida'),
+          title: Text(
+            getTranslateText(
+              context: context,
+              key: LoginTranslationKeys.verificationRequired,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -56,11 +63,21 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
               },
-              child: const Text('Ir a verificación'),
+              child: Text(
+                getTranslateText(
+                  context: context,
+                  key: LoginTranslationKeys.goToVerification,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Entendido'),
+              child: Text(
+                getTranslateText(
+                  context: context,
+                  key: LoginTranslationKeys.understood,
+                ),
+              ),
             ),
           ],
         );
@@ -71,33 +88,45 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Iniciar sesión')),
+      // Removed AppBar - no hardcoded text on top
       body: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
           // Limpiar SnackBars anteriores
           ScaffoldMessenger.of(context).clearSnackBars();
-          
+
           if (state is LoginFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 3),
+                duration: Duration(
+                  seconds: LoginConstants.snackbarDurationSeconds,
+                ),
               ),
             );
           } else if (state is LoginNeedsVerification) {
             _showVerificationDialog(
               state.message ??
-                  'Tu email no está verificado. Revisa tu correo electrónico.',
+                  getTranslateText(
+                    context: context,
+                    key: LoginTranslationKeys.emailNotVerified,
+                  ),
             );
           } else if (state is LoginSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('¡Inicio de sesión exitoso!'),
+              SnackBar(
+                content: Text(
+                  getTranslateText(
+                    context: context,
+                    key: LoginTranslationKeys.loginSuccess,
+                  ),
+                ),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 1),
+                duration: Duration(
+                  seconds: LoginConstants.successSnackbarDurationSeconds,
+                ),
               ),
             );
 
@@ -117,13 +146,18 @@ class _LoginPageState extends State<LoginPage> {
         },
         builder: (context, state) {
           if (state is LoginInProgress) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Iniciando sesión...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    getTranslateText(
+                      context: context,
+                      key: LoginTranslationKeys.loggingIn,
+                    ),
+                  ),
                 ],
               ),
             );

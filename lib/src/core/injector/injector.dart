@@ -18,11 +18,6 @@ import 'package:motogo_frontend/src/features/password_recovery/domain/repositori
 import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/reset_password_usecase.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/validate_code_usecase.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/verify_email_usecase.dart';
-
-import 'package:motogo_frontend/src/features/verify_email/data/datasources/email_verification_remote_data_source.dart';
-import 'package:motogo_frontend/src/features/verify_email/data/repositories/email_verification_repository_impl.dart';
-import 'package:motogo_frontend/src/features/verify_email/domain/repositories/email_verification_repository.dart';
-import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/features/login/data/datasources/login_data_source.dart';
 import 'package:motogo_frontend/src/features/login/data/repositories/login_repository_impl.dart';
 import 'package:motogo_frontend/src/features/login/domain/repositories/login_repository.dart';
@@ -57,18 +52,8 @@ abstract class InjectorApp {
   }
 
   // Core
-  @Register.factory(
-    EmailVerificationRepository,
-    from: EmailVerificationRepositoryImpl,
-  )
-  @Register.factory(
-    EmailVerificationRemoteDataSource,
-    from: EmailVerificationRemoteDataSourceImpl,
-  )
-  @Register.factory(VerifyEmailUseCase)
   void _configureCoreFactories();
 
- 
   @Register.factory(RegisterPersonRepository, from: RegisterPersonRepositoryImp)
   @Register.factory(RegisterPersonUseCase)
   @Register.factory(RegisterPersonDataSource)

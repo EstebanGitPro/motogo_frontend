@@ -18,6 +18,8 @@
 
 # --- iOS ---
 /ios/Runner/GeneratedPluginRegistrant.m
+Podfile
+Podfile.lock
 
 # --- LINUX ---
 /linux/flutter/ephemeral/

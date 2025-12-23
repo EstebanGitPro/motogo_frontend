@@ -8,18 +8,7 @@ part of 'injector.dart';
 
 class _$InjectorApp extends InjectorApp {
   @override
-  void _configureCoreFactories() {
-    final KiwiContainer container = KiwiContainer();
-    container
-      ..registerFactory<EmailVerificationRepository>((c) =>
-          EmailVerificationRepositoryImpl(
-              remoteDataSource: c.resolve<EmailVerificationRemoteDataSource>()))
-      ..registerFactory<EmailVerificationRemoteDataSource>(
-          (c) => EmailVerificationRemoteDataSourceImpl())
-      ..registerFactory((c) => VerifyEmailUseCase(
-          repository: c.resolve<EmailVerificationRepository>()));
-  }
-
+  void _configureCoreFactories() {}
   @override
   void _configureAuthFactories() {
     final KiwiContainer container = KiwiContainer();

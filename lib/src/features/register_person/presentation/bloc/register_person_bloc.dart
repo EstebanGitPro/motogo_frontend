@@ -1,26 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:motogo_frontend/src/features/verify_email/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 
-
 part 'register_person_event.dart';
 part 'register_person-state.dart';
 
-class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> {
+class RegisterPersonBloc
+    extends Bloc<RegisterPersonEvent, RegisterPersonState> {
   RegisterPersonBloc() : super(RegisterPersonInitial()) {
     final registerUseCase = InjectorApp.resolve<RegisterPersonUseCase>();
-    final verifyEmailUseCase = InjectorApp.resolve<VerifyEmailUseCase>();
 
     on<RegisterPersonSubmitted>(
       (event, emit) => _onRegisterSubmitted(event, emit, registerUseCase),
-    );
-
-    on<StartVerification>(
-      (event, emit) => _onStartVerification(event, emit, verifyEmailUseCase),
     );
   }
 
@@ -44,10 +38,8 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
 
       result.fold(
         (error) => emit(RegisterPersonFailure(errorModel: error)),
-        (person) => emit(RegisterPersonSuccess(
-          result: person, 
-          email: event.email, 
-        )),
+        (person) =>
+            emit(RegisterPersonSuccess(result: person, email: event.email)),
       );
     } catch (error) {
       emit(
@@ -58,66 +50,6 @@ class RegisterPersonBloc extends Bloc<RegisterPersonEvent, RegisterPersonState> 
             statusCode: 500,
             errorCode: 'CLIENT_ERROR',
           ),
-        ),
-      );
-    }
-  }
-
-  Future<void> _onStartVerification(
-    StartVerification event,
-    Emitter<RegisterPersonState> emit,
-    VerifyEmailUseCase verifyEmailUseCase,
-  ) async {
-    emit(VerificationPersonInProgress());
-
-    const maxAttempts = 12;
-    int attempts = 0;
-
-    try {
-      await for (final _ in Stream.periodic(const Duration(seconds: 5))) {
-        if (attempts >= maxAttempts) {
-          emit(
-            VerificationPersonFailure(
-              errorModel: ErrorModel(
-            message: 'Tiempo de verificación agotado',
-            description: 'No se pudo verificar el email en el tiempo esperado',
-            statusCode: 408,
-            errorCode: 'VERIFICATION_TIMEOUT',
-          ),
-            ),
-          );
-          return;
-        }
-        attempts++;
-
-        try {
-          final result = await verifyEmailUseCase(event.email);
-
-          result.fold(
-            (error) => emit(VerificationPersonFailure(errorModel: error)),
-            (isVerified) {
-              if (isVerified) {
-                emit(VerificationPersonSuccess());
-              }
-            },
-          );
-
-          if (state is VerificationPersonSuccess) {
-            return;
-          }
-        } catch (error) {
-          emit(
-            VerificationPersonFailure(
-              errorModel: ErrorModel(message: error.toString(), isError: true),
-            ),
-          );
-          return;
-        }
-      }
-    } catch (error) {
-      emit(
-        VerificationPersonFailure(
-          errorModel: ErrorModel(message: error.toString(), isError: true),
         ),
       );
     }

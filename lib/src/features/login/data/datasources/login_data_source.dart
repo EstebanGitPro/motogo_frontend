@@ -18,21 +18,65 @@ class LoginDataSource {
     try {
       final response = await http
           .post(
-            Uri.parse(
-              '${Config.baseUrl}/auth/login',
-            ),
+            Uri.parse('${Config.baseUrl}/auth/login'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({'email': email, 'password': password}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception('timeout');
+            },
+          );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final person = PersonModel.fromMap(data);
+        final responseData = json.decode(response.body);
 
-        await _secureStorage.write(key: 'token', value: person.token);
-        await _secureStorage.write(key: 'user_id', value: person.id);
-        return Right(person);
+        if (responseData['success'] != true) {
+          return Left(
+            _createErrorModel(
+              responseData['message'] ?? 'Error en el login',
+              responseData['code'],
+            ),
+          );
+        }
+
+        // Verificar que exista el objeto 'data' (cuando success:false no viene)
+        final data = responseData['data'];
+        if (data == null) {
+          return Left(
+            _createErrorModel(
+              'Respuesta del servidor incompleta',
+              responseData['code'],
+            ),
+          );
+        }
+
+        // Extraer los tokens del objeto 'data' anidado
+        final accessToken = data['access_token'] as String?;
+        final refreshToken = data['refresh_token'] as String?;
+
+        if (accessToken == null) {
+          return Left(_createErrorModel('No se recibió el token de acceso'));
+        }
+
+        // Guardar los tokens
+        await _secureStorage.write(key: 'access_token', value: accessToken);
+        if (refreshToken != null) {
+          await _secureStorage.write(key: 'refresh_token', value: refreshToken);
+        }
+
+        // Obtener el perfil del usuario
+        final profileResult = await getProfile(accessToken);
+
+        if (profileResult.isLeft) {
+          // Si falla el perfil, limpiar tokens y retornar error
+          await _secureStorage.delete(key: 'access_token');
+          await _secureStorage.delete(key: 'refresh_token');
+          return Left(profileResult.left);
+        }
+
+        return Right(profileResult.right);
       } else {
         return Left(_handleHttpError(response));
       }
@@ -80,5 +124,84 @@ class LoginDataSource {
 
   ErrorModel _createErrorModel(String message, [String? errorCode]) {
     return ErrorModel(message: message, errorCode: errorCode);
+  }
+
+  /// Obtiene el perfil del usuario desde /auth/me
+  Future<Either<ErrorModel, PersonModel>> getProfile(String accessToken) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse('${Config.baseUrl}/auth/me'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $accessToken',
+            },
+          )
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () {
+              throw Exception('timeout');
+            },
+          );
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        // Verificar que la respuesta sea exitosa
+        if (responseData['success'] != true) {
+          return Left(
+            _createErrorModel(
+              responseData['message'] ?? 'Error al obtener perfil',
+              responseData['code'],
+            ),
+          );
+        }
+
+        // Verificar que exista el objeto 'data'
+        final data = responseData['data'];
+        if (data == null) {
+          return Left(
+            _createErrorModel(
+              'Respuesta del servidor incompleta',
+              responseData['code'],
+            ),
+          );
+        }
+
+        // Crear PersonModel con los datos reales del usuario
+        final person = PersonModel.fromMap({
+          'id': data['id']?.toString() ?? '',
+          'identity_number': data['identity_number']?.toString() ?? '',
+          'first_name': data['first_name']?.toString() ?? '',
+          'last_name': data['last_name']?.toString() ?? '',
+          'second_last_name': data['second_last_name']?.toString(),
+          'email': data['email']?.toString() ?? '',
+          'phone_number': data['phone_number']?.toString() ?? '',
+          'role': data['role']?.toString() ?? '',
+          'token': accessToken,
+        });
+
+        return Right(person);
+      } else {
+        return Left(_handleHttpError(response));
+      }
+    } on SocketException {
+      return Left(
+        _createErrorModel(ErrorMessageMapper.mapHttpError(0, 'network_error')),
+      );
+    } on HttpException {
+      return Left(
+        _createErrorModel(ErrorMessageMapper.mapHttpError(0, 'server_error')),
+      );
+    } on FormatException {
+      return Left(_createErrorModel('Respuesta inválida del servidor'));
+    } catch (e) {
+      String errorMessage;
+      if (e.toString().contains('timeout')) {
+        errorMessage = ErrorMessageMapper.mapHttpError(408);
+      } else {
+        errorMessage = ErrorMessageMapper.mapHttpError(0, e.toString());
+      }
+      return Left(_createErrorModel(errorMessage));
+    }
   }
 }

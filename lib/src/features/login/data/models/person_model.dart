@@ -10,8 +10,6 @@ class PersonModel extends PersonEntity {
     super.secondLastName,
     required super.email,
     required super.phoneNumber,
-    required super.emailVerified,
-    required super.phoneNumberVerified,
     String? password,
     required super.role,
   });
@@ -29,8 +27,6 @@ class PersonModel extends PersonEntity {
     secondLastName: json["second_last_name"],
     email: json["email"],
     phoneNumber: json["phone_number"],
-    emailVerified: json["email_verified"],
-    phoneNumberVerified: json["phone_number_verified"],
     password: json["password"],
     role: json["role"],
   );
@@ -43,8 +39,6 @@ class PersonModel extends PersonEntity {
     "second_last_name": secondLastName,
     "email": email,
     "phone_number": phoneNumber,
-    "email_verified": emailVerified,
-    "phone_number_verified": phoneNumberVerified,
     "password": password ?? '',
     "role": role,
   };

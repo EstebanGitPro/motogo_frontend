@@ -66,8 +66,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<void> _saveUserData(PersonEntity user) async {
     try {
       final secureStorage = FlutterSecureStorage();
-      await secureStorage.write(key: 'auth_token', value: user.token);
-
+      await secureStorage.write(key: 'access_token', value: user.token);
       await secureStorage.write(key: 'user_id', value: user.id);
     } catch (e) {
       debugPrint('Error saving user data: $e');
@@ -76,7 +75,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Future<void> _clearUserData() async {
     final secureStorage = FlutterSecureStorage();
-    await secureStorage.delete(key: 'auth_token');
+    await secureStorage.delete(key: 'access_token');
+    await secureStorage.delete(key: 'refresh_token');
     await secureStorage.delete(key: 'user_id');
   }
 }

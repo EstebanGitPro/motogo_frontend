@@ -6,8 +6,6 @@ class PersonEntity {
   final String? secondLastName;
   final String email;
   final String phoneNumber;
-  final bool emailVerified;
-  final bool phoneNumberVerified;
   final String? password;
   final String role;
   final String token;
@@ -20,8 +18,6 @@ class PersonEntity {
     this.secondLastName,
     required this.email,
     required this.phoneNumber,
-    required this.emailVerified,
-    required this.phoneNumberVerified,
     this.password,
     required this.role,
     required this.token,

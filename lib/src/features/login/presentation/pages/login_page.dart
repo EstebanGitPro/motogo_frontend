@@ -59,12 +59,7 @@ class _LoginPageState extends State<LoginPage> {
           } else if (state is LoginSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                  getTranslateText(
-                    context: context,
-                    key: LoginTranslationKeys.loginSuccess,
-                  ),
-                ),
+                content: Text(state.message),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
                 duration: Duration(

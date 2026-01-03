@@ -1,32 +1,47 @@
-class ValidationMessages {
-  static const String emailRequired = 'El email es requerido';
-  static const String emailInvalid = 'Ingresa un email válido';
-  static const String passwordRequired = 'La contraseña es requerida';
-  static const String passwordTooShort =
-      'La contraseña debe tener al menos 8 caracteres';
-  static const String passwordTooWeak =
-      'La contraseña debe contener al menos una mayúscula, una minúscula y un número';
+/// Mensajes de FALLBACK para errores cuando el backend NO está disponible.
+///
+/// IMPORTANTE: Estos mensajes solo se usan en situaciones donde no hay
+/// respuesta del servidor (errores de red, timeout, etc.).
+/// Cuando el backend responde, siempre se usa el mensaje del backend.
+///
+/// Los mensajes deben ser:
+/// - Amigables y empáticos con el usuario
+/// - Claros sobre qué pasó
+/// - Con sugerencias de qué hacer
+class FallbackMessages {
+  // ============ ERRORES DE CONEXIÓN ============
 
-  static const String invalidCredentials = 'Email o contraseña incorrectos';
-  static const String emailNotVerified =
-      'Email no verificado. Hemos enviado un nuevo enlace de verificación a tu correo electrónico.';
-  static const String invalidJsonFormat =
-      'Datos no validos. Verifica que el email y contraseña estén correctos.';
-  static const String validationError =
-      'Error de validación en los datos enviados';
+  /// Error cuando no hay conexión a internet
+  static const String networkError =
+      '¡Ups! Parece que no hay conexión a internet. '
+      'Revisa tu conexión e intenta de nuevo.';
 
-  static const String networkError = 'Error de conexión. Verifica tu internet';
-  static const String serverError = 'Error del servidor. Intenta más tarde';
+  /// Error cuando el servidor no responde
+  static const String serverError =
+      'Lo sentimos, nuestros servidores están ocupados. '
+      'Por favor, intenta en unos minutos.';
+
+  /// Error cuando la solicitud tarda demasiado
   static const String timeoutError =
-      'La solicitud tardó demasiado. Intenta nuevamente';
-  static const String genericError = 'Ocurrió un error inesperado';
-  static const String userAlreadyExists =
-      'Ya existe un registro con los datos ingresados. Verifica tu documento, correo o teléfono.';
-  static const String failedDependency =
-      'Ocurrió un error, por favor intenta más tarde';
-  static const String connectionFailed =
-      'No se pudo establecer conexión con el servidor';
+      'La conexión está tardando más de lo esperado. '
+      'Revisa tu internet e intenta nuevamente.';
 
-  static const String loginSuccess = 'Inicio de sesión exitoso';
-  static const String logoutSuccess = 'Sesión cerrada correctamente';
+  /// Error genérico cuando algo falla inesperadamente
+  static const String genericError =
+      'Algo salió mal. Por favor, intenta de nuevo. '
+      'Si el problema persiste, contáctanos.';
+
+  /// Error cuando no se puede establecer conexión
+  static const String connectionFailed =
+      'No pudimos conectar con el servidor. '
+      'Verifica tu conexión a internet.';
+
+  /// Error cuando la respuesta del servidor no es válida
+  static const String invalidResponse =
+      'Recibimos una respuesta inesperada. '
+      'Por favor, intenta nuevamente.';
 }
+
+/// @deprecated Use FallbackMessages en su lugar
+/// Alias para compatibilidad hacia atrás
+typedef ValidationMessages = FallbackMessages;

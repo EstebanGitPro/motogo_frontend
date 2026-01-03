@@ -8,7 +8,16 @@ part of 'injector.dart';
 
 class _$InjectorApp extends InjectorApp {
   @override
-  void _configureCoreFactories() {}
+  void _configureCoreFactories() {
+    final KiwiContainer container = KiwiContainer();
+    container
+      ..registerSingleton((c) => Client())
+      ..registerFactory<UserSessionDataSource>(
+          (c) => UserSessionDataSourceImpl(c.resolve<Client>()))
+      ..registerFactory<UserSessionRepository>(
+          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()));
+  }
+
   @override
   void _configureAuthFactories() {
     final KiwiContainer container = KiwiContainer();
@@ -21,22 +30,24 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory<LoginRepository>(
           (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()))
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
-      ..registerFactory((c) => LoginDataSource())
-      ..registerFactory<EditProfileRepository>((c) =>
-          EditProfileRepositoryImpl(c.resolve<EditProfileRemoteDataSource>()))
       ..registerFactory(
-          (c) => GetPersonUsecase(c.resolve<EditProfileRepository>()))
+          (c) => LoginDataSource(c.resolve<UserSessionDataSource>()))
       ..registerFactory(
-          (c) => UpdatePersonUsecase(c.resolve<EditProfileRepository>()))
-      ..registerSingleton((c) => Client())
-      ..registerFactory<EditProfileRemoteDataSource>(
-          (c) => EditProfileRemoteDataSourceImpl(c.resolve<Client>()))
+          (c) => GetPersonUsecase(c.resolve<UserSessionRepository>()))
+      ..registerFactory(
+          (c) => UpdatePersonUsecase(c.resolve<UserSessionRepository>()))
       ..registerFactory<EmailRecoveryVerificationRepository>((c) =>
           EmailRecoveryVerificationRepositoryImpl(
               c.resolve<EmailRecoveryVerificationDataSource>()))
       ..registerFactory((c) => VerifyRecoveryEmailUseCase(
           c.resolve<EmailRecoveryVerificationRepository>()))
       ..registerFactory(
-          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()));
+          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()))
+      ..registerFactory<ChangePasswordRepository>((c) =>
+          ChangePasswordRepositoryImpl(c.resolve<ChangePasswordDataSource>()))
+      ..registerFactory(
+          (c) => ChangePasswordUseCase(c.resolve<ChangePasswordRepository>()))
+      ..registerFactory<ChangePasswordDataSource>(
+          (c) => ChangePasswordDataSourceImpl(c.resolve<Client>()));
   }
 }

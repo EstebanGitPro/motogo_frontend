@@ -135,7 +135,7 @@ class IdentityValidator extends BaseValidator {
 
   const IdentityValidator({
     this.minLength = 7,
-    this.maxLength = 20,
+    this.maxLength = 10,
     super.customMessage,
   });
 

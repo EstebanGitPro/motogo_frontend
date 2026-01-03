@@ -67,17 +67,17 @@ class _EditProfileViewState extends State<_EditProfileView> {
     });
   }
 
-  void _updateControllersWithPersonData(person) {
+  void _updateControllersWithUserData(user) {
     if (!_controllersInitialized) {
-      _firstNameController.text = person.firstName ?? '';
-      _lastNameController.text = person.lastName ?? '';
-      _secondLastNameController.text = person.secondLastName ?? '';
-      _phoneController.text = person.phoneNumber ?? '';
+      _firstNameController.text = user.firstName;
+      _lastNameController.text = user.lastName;
+      _secondLastNameController.text = user.secondLastName ?? '';
+      _phoneController.text = user.phoneNumber;
 
-      _originalFirstName = person.firstName ?? '';
-      _originalLastName = person.lastName ?? '';
-      _originalSecondLastName = person.secondLastName ?? '';
-      _originalPhone = person.phoneNumber ?? '';
+      _originalFirstName = user.firstName;
+      _originalLastName = user.lastName;
+      _originalSecondLastName = user.secondLastName ?? '';
+      _originalPhone = user.phoneNumber;
 
       _controllersInitialized = true;
     }
@@ -146,17 +146,13 @@ class _EditProfileViewState extends State<_EditProfileView> {
       },
       child: BlocListener<EditProfileBloc, EditProfileState>(
         listener: (context, state) {
-          if (state.status == EditProfileStatus.success && _hasChanges) {
+          // Show success message from backend (for update operations)
+          if (state.status == EditProfileStatus.success &&
+              state.successMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(
-                  state.isFromCache
-                      ? 'Datos cargados desde caché'
-                      : 'Perfil actualizado exitosamente',
-                ),
-                backgroundColor: state.isFromCache
-                    ? Colors.orange
-                    : Colors.green,
+                content: Text(state.successMessage!),
+                backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -164,12 +160,11 @@ class _EditProfileViewState extends State<_EditProfileView> {
               ),
             );
 
-            if (!state.isFromCache) {
-              _originalFirstName = _firstNameController.text.trim();
-              _originalLastName = _lastNameController.text.trim();
-              _originalSecondLastName = _secondLastNameController.text.trim();
-              _originalPhone = _phoneController.text.trim();
-            }
+            // Update original values after successful save
+            _originalFirstName = _firstNameController.text.trim();
+            _originalLastName = _lastNameController.text.trim();
+            _originalSecondLastName = _secondLastNameController.text.trim();
+            _originalPhone = _phoneController.text.trim();
           }
 
           if (state.status == EditProfileStatus.failure) {
@@ -188,9 +183,9 @@ class _EditProfileViewState extends State<_EditProfileView> {
         child: BlocBuilder<EditProfileBloc, EditProfileState>(
           builder: (context, state) {
             final status = state.status;
-            final person = state.person;
+            final user = state.user;
 
-            if (status == EditProfileStatus.loading && person == null) {
+            if (status == EditProfileStatus.loading && user == null) {
               return Scaffold(
                 backgroundColor: Colors.grey[50],
                 appBar: AppBar(
@@ -216,7 +211,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
               );
             }
 
-            if (person == null) {
+            if (user == null) {
               return Scaffold(
                 backgroundColor: Colors.grey[50],
                 appBar: AppBar(
@@ -258,7 +253,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
               );
             }
 
-            _updateControllersWithPersonData(person);
+            _updateControllersWithUserData(user);
 
             return Scaffold(
               backgroundColor: Colors.grey[50],
@@ -363,7 +358,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
                             ReadOnlyField(
                               label: 'Número de identificación',
-                              value: person.identityNumber,
+                              value: user.identityNumber,
                               prefixIcon: Icons.badge_outlined,
                             ),
                             const SizedBox(height: 20),
@@ -406,7 +401,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
 
                             ReadOnlyField(
                               label: 'Correo electrónico',
-                              value: person.email,
+                              value: user.email,
                               prefixIcon: Icons.email_outlined,
                             ),
                             const SizedBox(height: 16),
@@ -431,7 +426,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
                                 onPressed:
                                     _hasChanges &&
                                         status != EditProfileStatus.loading
-                                    ? () => _onSave(person)
+                                    ? () => _onSave(user)
                                     : null,
                                 icon: status == EditProfileStatus.loading
                                     ? const SizedBox(
@@ -486,10 +481,10 @@ class _EditProfileViewState extends State<_EditProfileView> {
     );
   }
 
-  void _onSave(person) {
+  void _onSave(user) {
     if (!_formKey.currentState!.validate()) return;
 
-    final updated = person.copyWith(
+    final updated = user.copyWith(
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       secondLastName: _secondLastNameController.text.trim().isEmpty

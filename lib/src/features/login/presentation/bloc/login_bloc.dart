@@ -1,9 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/login/domain/entities/person_login_entity.dart';
+import 'package:motogo_frontend/src/core/constants/login_constants.dart';
+import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';
@@ -35,16 +36,42 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       if (result.isLeft) {
         final failure = result.left;
-        if (failure.message.toLowerCase().contains('verificar') ||
-            failure.message.toLowerCase().contains('verification')) {
+
+        // DEBUG: Ver qué error está llegando
+        debugPrint('LOGIN ERROR:');
+        debugPrint('  Message: ${failure.message}');
+        debugPrint('  ErrorCode: ${failure.errorCode}');
+        debugPrint('  StatusCode: ${failure.statusCode}');
+
+        // Check both errorCode and message for email verification
+        final messageLower = failure.message.toLowerCase();
+        final needsVerification =
+            failure.errorCode == LoginErrorConstants.emailNotVerifiedCode ||
+            failure.errorCode == LoginErrorConstants.unverifiedEmailCode ||
+            failure.errorCode == LoginErrorConstants.forbiddenCode ||
+            LoginErrorConstants.verificationKeywords.any(
+              (keyword) => messageLower.contains(keyword),
+            );
+
+        debugPrint('  NeedsVerification: $needsVerification');
+
+        if (needsVerification) {
           emit(LoginNeedsVerification(message: failure.message));
         } else {
           emit(LoginFailure(error: failure));
         }
       } else {
-        final user = result.right;
-        await _saveUserData(user);
-        emit(LoginSuccess(user: user));
+        final loginResult = result.right;
+        debugPrint('✅ LOGIN SUCCESS: ${loginResult.message}');
+
+        // Emitir éxito con el mensaje del backend
+        emit(
+          LoginSuccess(
+            user: loginResult.user,
+            message: loginResult.message,
+            code: loginResult.code,
+          ),
+        );
       }
     } catch (e) {
       emit(LoginFailure(error: ErrorModel(message: 'Error inesperado: $e')));
@@ -54,29 +81,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Future<void> _onLogout(LoginLogout event, Emitter<LoginState> emit) async {
     try {
       emit(LoginInProgress());
-      await _clearUserData();
+      // Usar UserSessionManager para limpiar la sesión
+      await UserSessionManager.instance.clearSession();
       emit(LoginLoggedOut());
     } catch (e) {
       emit(
         LoginFailure(error: ErrorModel(message: 'Error al cerrar sesión: $e')),
       );
     }
-  }
-
-  Future<void> _saveUserData(PersonEntity user) async {
-    try {
-      final secureStorage = FlutterSecureStorage();
-      await secureStorage.write(key: 'auth_token', value: user.token);
-
-      await secureStorage.write(key: 'user_id', value: user.id);
-    } catch (e) {
-      debugPrint('Error saving user data: $e');
-    }
-  }
-
-  Future<void> _clearUserData() async {
-    final secureStorage = FlutterSecureStorage();
-    await secureStorage.delete(key: 'auth_token');
-    await secureStorage.delete(key: 'user_id');
   }
 }

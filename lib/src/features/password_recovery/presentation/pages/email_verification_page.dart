@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/code_verification_page.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/widgets/email_verification_widget.dart';
 
 class EmailRecoveryVerificationPage extends StatelessWidget {
@@ -31,17 +30,7 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: BlocListener<EmailRecoveryVerificationBloc, EmailRecoveryVerificationState>(
-        listener: (context, state) {
-          if (state is EmailRecoveryVerificationSuccess) {
-          
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CodeVerificationPage(email: email ?? ''),
-              ),
-            );
-          }
-        },
+        listener: (context, state) {},
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {

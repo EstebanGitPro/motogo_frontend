@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
+import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
+import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 
@@ -64,6 +68,27 @@ class HomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const EditMyProfilePage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock, color: Colors.blue),
+              title: const Text(
+                'Cambiar Contraseña',
+                style: TextStyle(fontSize: 16),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (context) => ChangePasswordBloc(
+                        InjectorApp.resolve<ChangePasswordUseCase>(),
+                      ),
+                      child: const ChangePasswordPage(),
+                    ),
                   ),
                 );
               },

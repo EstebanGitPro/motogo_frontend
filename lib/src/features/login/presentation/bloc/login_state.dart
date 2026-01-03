@@ -12,12 +12,18 @@ class LoginInitial extends LoginState {}
 class LoginInProgress extends LoginState {}
 
 class LoginSuccess extends LoginState {
-  final PersonEntity user;
+  final UserEntity user;
+  final String message;
+  final String code;
 
-  const LoginSuccess({required this.user});
+  const LoginSuccess({
+    required this.user,
+    required this.message,
+    this.code = '',
+  });
 
   @override
-  List<Object> get props => [user];
+  List<Object> get props => [user, message, code];
 }
 
 class LoginFailure extends LoginState {

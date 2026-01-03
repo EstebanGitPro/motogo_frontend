@@ -2,18 +2,18 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:either_dart/either.dart';
 import 'package:http/http.dart' as http;
+import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 
 class EmailRecoveryVerificationDataSource {
   final http.Client client;
-  final String baseUrl = 'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo';
 
   EmailRecoveryVerificationDataSource(this.client);
 
   Future<Either<ErrorModel, bool>> verifyEmail(String email) async {
     try {
-      final uri = Uri.parse('$baseUrl/auth/password-recovery/send');
+      final uri = Uri.parse('${Config.baseUrl}/auth/password-reset');
       final response = await client
           .post(
             uri,

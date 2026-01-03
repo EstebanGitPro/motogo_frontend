@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/widgets/register_form.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class RegisterUserPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -21,7 +22,7 @@ class RegisterUserPage extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Text(
-          'Registro Motociclista',
+          getTranslateText(context: context, key: 'register_motorcyclist'),
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
@@ -38,6 +39,26 @@ class RegisterUserPage extends StatelessWidget {
       body: BlocListener<RegisterPersonBloc, RegisterPersonState>(
         listener: (context, state) {
           if (state is RegisterPersonSuccess) {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  getTranslateText(
+                    context: context,
+                    key: 'verification_email_sent',
+                  ),
+                ),
+                backgroundColor: Colors.green[600],
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 16 : 32,
+                  vertical: 16,
+                ),
+              ),
+            );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -45,6 +66,7 @@ class RegisterUserPage extends StatelessWidget {
               ),
             );
           } else if (state is RegisterPersonFailure) {
+            ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.errorModel.message),
@@ -62,11 +84,14 @@ class RegisterUserPage extends StatelessWidget {
           }
         },
 
-        child: const RegisterForm(
+        child: RegisterForm(
           role: 'user',
-          title: 'Crear cuenta',
-          subtitle: 'Completa tus datos para comenzar a usar MotoGo',
-          buttonText: 'Crear cuenta',
+          title: getTranslateText(context: context, key: 'create_account'),
+          subtitle: getTranslateText(
+            context: context,
+            key: 'complete_data_motogo',
+          ),
+          buttonText: getTranslateText(context: context, key: 'create_account'),
           primaryColor: Colors.blue,
           icon: Icons.motorcycle,
         ),

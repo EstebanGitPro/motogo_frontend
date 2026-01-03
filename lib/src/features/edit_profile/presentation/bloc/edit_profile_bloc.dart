@@ -1,12 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'dart:convert';
-
-import 'package:motogo_frontend/src/features/edit_profile/domain/entities/edit_profile_entity.dart';
-import 'package:motogo_frontend/src/features/edit_profile/data/models/edit_profile_model.dart';
+import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/get_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/update_person_usecase.dart';
 
@@ -29,10 +26,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     on<EditProfileCacheCleared>(_onCacheCleared);
   }
 
-  static const String _cachedPersonKey = 'cached_person_data';
-  static const String _lastUpdateKey = 'last_person_update';
-  static const String _userIdKey = 'user_id';
-
   Future<void> _onLoaded(
     EditProfileLoaded event,
     Emitter<EditProfileState> emit,
@@ -41,21 +34,23 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     emit(state.copyWith(status: EditProfileStatus.loading));
 
     try {
-      final cachedPerson = await _getCachedPerson();
-      if (cachedPerson != null && !event.forceRefresh) {
+      // Primero intentar obtener desde el cache en memoria
+      final cachedUser = await _getCachedUser();
+      if (cachedUser != null && !event.forceRefresh) {
         emit(
           state.copyWith(
-            person: cachedPerson,
+            user: cachedUser,
             status: EditProfileStatus.success,
             isFromCache: true,
           ),
         );
       }
 
+      // Obtener datos frescos del servidor
       final result = await getPersonUsecase();
       result.fold(
         (failure) {
-          if (cachedPerson == null) {
+          if (cachedUser == null) {
             emit(
               state.copyWith(
                 status: EditProfileStatus.failure,
@@ -64,11 +59,10 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
             );
           }
         },
-        (person) {
-          _cachePerson(person);
+        (user) {
           emit(
             state.copyWith(
-              person: person,
+              user: user,
               status: EditProfileStatus.success,
               isFromCache: false,
             ),
@@ -101,12 +95,13 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
             error: failure.message,
           ),
         ),
-        (_) {
-          _cachePerson(event.updated);
+        (successMessage) {
+          // El UserSessionManager ya tiene los datos actualizados
           emit(
             state.copyWith(
-              person: event.updated,
+              user: event.updated,
               status: EditProfileStatus.success,
+              successMessage: successMessage,
               isFromCache: false,
             ),
           );
@@ -126,102 +121,15 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     EditProfileCacheCleared event,
     Emitter<EditProfileState> emit,
   ) async {
-    await _clearCache();
     emit(state.copyWith(isFromCache: false));
   }
 
-  Future<PersonEntity?> _getCachedPerson() async {
+  /// Obtiene el usuario desde el cache del UserSessionManager
+  Future<UserEntity?> _getCachedUser() async {
     try {
-      final secureStorage = FlutterSecureStorage();
-      final cachedData = await secureStorage.read(key: _cachedPersonKey);
-
-      if (cachedData != null) {
-        final Map<String, dynamic> json = jsonDecode(cachedData);
-
-        final lastUpdateString = await secureStorage.read(key: _lastUpdateKey);
-        if (lastUpdateString != null) {
-          final lastUpdate = int.tryParse(lastUpdateString) ?? 0;
-          final now = DateTime.now().millisecondsSinceEpoch;
-          const cacheValidityDuration = 60 * 60 * 1000;
-
-          if (now - lastUpdate < cacheValidityDuration) {
-            final personModel = PersonModel.fromMap(json);
-            return PersonEntity(
-              id: personModel.id,
-              role: personModel.role,
-              identityNumber: personModel.identityNumber,
-              firstName: personModel.firstName,
-              lastName: personModel.lastName,
-              secondLastName: personModel.secondLastName,
-              email: personModel.email,
-              phoneNumber: personModel.phoneNumber,
-              emailVerified: personModel.emailVerified,
-              phoneNumberVerified: personModel.phoneNumberVerified,
-            );
-          }
-        }
-      }
+      return await UserSessionManager.instance.getCurrentUser();
     } catch (e) {
-      await _clearCache();
-      debugPrint('Error reading cache: $e');
-    }
-    return null;
-  }
-
-  Future<void> _cachePerson(PersonEntity person) async {
-    try {
-      final secureStorage = FlutterSecureStorage();
-
-      final personModel = PersonModel(
-        id: person.id,
-        role: person.role,
-        identityNumber: person.identityNumber,
-        firstName: person.firstName,
-        lastName: person.lastName,
-        secondLastName: person.secondLastName,
-        email: person.email,
-        phoneNumber: person.phoneNumber,
-        emailVerified: person.emailVerified,
-        phoneNumberVerified: person.phoneNumberVerified,
-      );
-
-      final jsonString = jsonEncode(personModel.toMap());
-      await secureStorage.write(key: _cachedPersonKey, value: jsonString);
-      await secureStorage.write(
-        key: _lastUpdateKey,
-        value: DateTime.now().millisecondsSinceEpoch.toString(),
-      );
-    } catch (e) {
-      debugPrint('Error saving secure cache: $e');
-    }
-  }
-
-  Future<void> _clearCache() async {
-    try {
-      final secureStorage = FlutterSecureStorage();
-      await secureStorage.delete(key: _cachedPersonKey);
-      await secureStorage.delete(key: _lastUpdateKey);
-    } catch (e) {
-      debugPrint('Error clearing cache: $e');
-    }
-  }
-
-  Future<String?> getUserId() async {
-    try {
-      final secureStorage = FlutterSecureStorage();
-      return await secureStorage.read(key: _userIdKey);
-    } catch (e) {
-      debugPrint('Error getting user ID: $e');
-      return null;
-    }
-  }
-
-  Future<String?> getAuthToken() async {
-    try {
-      final secureStorage = FlutterSecureStorage();
-      return await secureStorage.read(key: 'auth_token');
-    } catch (e) {
-      debugPrint('Error getting auth token: $e');
+      debugPrint('Error getting cached user: $e');
       return null;
     }
   }

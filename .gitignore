@@ -15,21 +15,32 @@
 /android/app/profile
 /android/app/release
 /android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+/android/local.properties
 
 # --- iOS ---
 /ios/Runner/GeneratedPluginRegistrant.m
+/ios/Flutter/Debug.xcconfig
+/ios/Flutter/Release.xcconfig
+/ios/Runner.xcworkspace/contents.xcworkspacedata
 Podfile
 Podfile.lock
 
 # --- LINUX ---
 /linux/flutter/ephemeral/
 /linux/flutter/generated_plugin_registrant.cc
+/linux/flutter/generated_plugins.cmake
 
 # --- WINDOWS ---
 /windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugins.cmake
 
 # --- macOS ---
 /macos/Flutter/GeneratedPluginRegistrant.swift
+/macos/Flutter/Flutter-Debug.xcconfig
+/macos/Flutter/Flutter-Release.xcconfig
+/macos/Flutter/ephemeral/
+/macos/Runner.xcodeproj/project.pbxproj
+/macos/Runner.xcworkspace/contents.xcworkspacedata
 
 # --- VSCODE / INTELLIJ ---
 .idea/

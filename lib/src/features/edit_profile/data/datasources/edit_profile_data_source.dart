@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:either_dart/either.dart';
+import 'package:motogo_frontend/src/core/config/config.dart';
 
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
@@ -10,14 +11,16 @@ import 'package:motogo_frontend/src/core/errors/error_model.dart';
 
 import 'package:motogo_frontend/src/features/edit_profile/data/models/edit_profile_model.dart';
 
-
 abstract class EditProfileRemoteDataSource {
   Future<Either<ErrorModel, PersonModel>> fetchPerson({
-    required String userId, 
-    required String token
+    required String userId,
+    required String token,
   });
-  
-  Future<Either<ErrorModel, void>> patchPerson(PersonModel personModel, String token);
+
+  Future<Either<ErrorModel, void>> patchPerson(
+    PersonModel personModel,
+    String token,
+  );
 }
 
 class EditProfileRemoteDataSourceImpl implements EditProfileRemoteDataSource {
@@ -25,23 +28,22 @@ class EditProfileRemoteDataSourceImpl implements EditProfileRemoteDataSource {
 
   EditProfileRemoteDataSourceImpl(this._client);
 
-  final String _baseUrl = 'https://drft97k5-8085.use2.devtunnels.ms/v1/motogo';
-
   @override
   Future<Either<ErrorModel, PersonModel>> fetchPerson({
-    required String userId, 
-    required String token
+    required String userId,
+    required String token,
   }) async {
     try {
       final response = await _client
           .get(
-            Uri.parse('$_baseUrl/users/$userId'),
+            Uri.parse('${Config.baseUrl}/persons/me'),
             headers: _getHeaders(token: token),
           )
           .timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data =
+            (json.decode(response.body) as Map<String, dynamic>)["data"];
         return Right(PersonModel.fromMap(data));
       } else {
         final errorData = json.decode(response.body);
@@ -67,7 +69,10 @@ class EditProfileRemoteDataSourceImpl implements EditProfileRemoteDataSource {
   }
 
   @override
-  Future<Either<ErrorModel, void>> patchPerson(PersonModel personModel, String  token) async {
+  Future<Either<ErrorModel, void>> patchPerson(
+    PersonModel personModel,
+    String token,
+  ) async {
     final payload = {
       'first_name': personModel.firstName,
       'last_name': personModel.lastName,
@@ -77,8 +82,8 @@ class EditProfileRemoteDataSourceImpl implements EditProfileRemoteDataSource {
 
     try {
       final response = await _client
-          .patch(
-            Uri.parse('$_baseUrl/users/${personModel.id}'),
+          .put(
+            Uri.parse('${Config.baseUrl}/persons/me'),
             headers: _getHeaders(token: token),
             body: json.encode(payload),
           )

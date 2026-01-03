@@ -6,17 +6,9 @@ import 'package:motogo_frontend/src/features/edit_profile/domain/repositories/ed
 import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/get_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/update_person_usecase.dart'
     show UpdatePersonUsecase;
-import 'package:motogo_frontend/src/features/password_recovery/data/datasources/code_validation_datasource.dart';
 import 'package:motogo_frontend/src/features/password_recovery/data/datasources/email_verification_datasource.dart';
-import 'package:motogo_frontend/src/features/password_recovery/data/datasources/password_reset_data_source.dart';
-import 'package:motogo_frontend/src/features/password_recovery/data/repositories/code_validation_repository_impl.dart';
 import 'package:motogo_frontend/src/features/password_recovery/data/repositories/email_verification_repository_impl.dart';
-import 'package:motogo_frontend/src/features/password_recovery/data/repositories/password_reset_repository_impl.dart';
-import 'package:motogo_frontend/src/features/password_recovery/domain/repositories/code_validation_repository.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/repositories/email_verification_repository.dart';
-import 'package:motogo_frontend/src/features/password_recovery/domain/repositories/password_reset_repository.dart';
-import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/reset_password_usecase.dart';
-import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/validate_code_usecase.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/verify_email_usecase.dart';
 import 'package:motogo_frontend/src/features/login/data/datasources/login_data_source.dart';
 import 'package:motogo_frontend/src/features/login/data/repositories/login_repository_impl.dart';
@@ -68,20 +60,8 @@ abstract class InjectorApp {
     EditProfileRemoteDataSource,
     from: EditProfileRemoteDataSourceImpl,
   )
-  @Register.factory(
-    CodeValidationRepository,
-    from: CodeValidationRepositoryImpl,
-  )
-  @Register.factory(ValidateCodeUseCase)
-  @Register.factory(CodeValidationDataSource)
-  @Register.factory(
-    EmailRecoveryVerificationRepository,
-    from: EmailRecoveryVerificationRepositoryImpl,
-  )
+  @Register.factory(EmailRecoveryVerificationRepository, from: EmailRecoveryVerificationRepositoryImpl)
   @Register.factory(VerifyRecoveryEmailUseCase)
   @Register.factory(EmailRecoveryVerificationDataSource)
-  @Register.factory(PasswordResetRepository, from: PasswordResetRepositoryImpl)
-  @Register.factory(PasswordResetUseCase)
-  @Register.factory(PasswordResetDataSource)
   void _configureAuthFactories();
 }

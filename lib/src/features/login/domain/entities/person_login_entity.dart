@@ -6,9 +6,8 @@ class PersonEntity {
   final String? secondLastName;
   final String email;
   final String phoneNumber;
-  final String? password;
   final String role;
-  final String token;
+
 
   PersonEntity({
     required this.id,
@@ -18,8 +17,6 @@ class PersonEntity {
     this.secondLastName,
     required this.email,
     required this.phoneNumber,
-    this.password,
     required this.role,
-    required this.token,
   });
 }

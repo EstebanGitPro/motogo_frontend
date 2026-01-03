@@ -12,11 +12,7 @@ import 'package:motogo_frontend/src/features/register_person/presentation/pages/
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_user_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/code_validation_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/password_recovery_bloc.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/code_verification_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/password_reset_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,8 +31,6 @@ void main() async {
           BlocProvider(create: (_) => LoginBloc()),
           BlocProvider(create: (_) => EditProfileBloc()),
           BlocProvider(create: (_) => EmailRecoveryVerificationBloc()),
-          BlocProvider(create: (_) => CodeValidationBloc()),
-          BlocProvider(create: (_) => PasswordRecoveryBloc()),
         ],
         child: const MyApp(),
       ),
@@ -69,8 +63,6 @@ class MyApp extends StatelessWidget {
             const RegisterRepresentativePage(),
         '/edit-my-profile': (context) => const EditMyProfilePage(),
         '/password-recovery/email': (context) => const EmailRecoveryVerificationPage(),
-        '/password-recovery/code': (context) => const CodeVerificationPage(email: ''),
-        '/password-recovery/reset': (context) => const PasswordResetPage(email: '', verificationCode: ''),
       },
     );
   }

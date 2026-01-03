@@ -131,7 +131,7 @@ class LoginDataSource {
     try {
       final response = await http
           .get(
-            Uri.parse('${Config.baseUrl}/auth/me'),
+            Uri.parse('${Config.baseUrl}/persons/me'),
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $accessToken',
@@ -144,7 +144,7 @@ class LoginDataSource {
             },
           );
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        final responseData = json.decode(response.body) as Map<String, dynamic>;
 
         // Verificar que la respuesta sea exitosa
         if (responseData['success'] != true) {
@@ -177,7 +177,6 @@ class LoginDataSource {
           'email': data['email']?.toString() ?? '',
           'phone_number': data['phone_number']?.toString() ?? '',
           'role': data['role']?.toString() ?? '',
-          'token': accessToken,
         });
 
         return Right(person);

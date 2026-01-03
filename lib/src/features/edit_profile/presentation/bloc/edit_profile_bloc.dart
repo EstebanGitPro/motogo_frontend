@@ -155,8 +155,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
               secondLastName: personModel.secondLastName,
               email: personModel.email,
               phoneNumber: personModel.phoneNumber,
-              emailVerified: personModel.emailVerified,
-              phoneNumberVerified: personModel.phoneNumberVerified,
             );
           }
         }
@@ -181,8 +179,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
         secondLastName: person.secondLastName,
         email: person.email,
         phoneNumber: person.phoneNumber,
-        emailVerified: person.emailVerified,
-        phoneNumberVerified: person.phoneNumberVerified,
       );
 
       final jsonString = jsonEncode(personModel.toMap());
@@ -219,7 +215,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   Future<String?> getAuthToken() async {
     try {
       final secureStorage = FlutterSecureStorage();
-      return await secureStorage.read(key: 'auth_token');
+      return await secureStorage.read(key: 'access_token');
     } catch (e) {
       debugPrint('Error getting auth token: $e');
       return null;

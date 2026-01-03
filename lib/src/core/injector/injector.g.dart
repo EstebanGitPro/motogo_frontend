@@ -31,22 +31,12 @@ class _$InjectorApp extends InjectorApp {
       ..registerSingleton((c) => Client())
       ..registerFactory<EditProfileRemoteDataSource>(
           (c) => EditProfileRemoteDataSourceImpl(c.resolve<Client>()))
-      ..registerFactory<CodeValidationRepository>((c) =>
-          CodeValidationRepositoryImpl(c.resolve<CodeValidationDataSource>()))
-      ..registerFactory(
-          (c) => ValidateCodeUseCase(c.resolve<CodeValidationRepository>()))
-      ..registerFactory((c) => CodeValidationDataSource(c.resolve<Client>()))
       ..registerFactory<EmailRecoveryVerificationRepository>((c) =>
           EmailRecoveryVerificationRepositoryImpl(
               c.resolve<EmailRecoveryVerificationDataSource>()))
       ..registerFactory((c) => VerifyRecoveryEmailUseCase(
           c.resolve<EmailRecoveryVerificationRepository>()))
       ..registerFactory(
-          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()))
-      ..registerFactory<PasswordResetRepository>((c) =>
-          PasswordResetRepositoryImpl(c.resolve<PasswordResetDataSource>()))
-      ..registerFactory(
-          (c) => PasswordResetUseCase(c.resolve<PasswordResetRepository>()))
-      ..registerFactory((c) => PasswordResetDataSource(c.resolve<Client>()));
+          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()));
   }
 }

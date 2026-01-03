@@ -16,7 +16,7 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
     try {
       final secureStorage = FlutterSecureStorage();
       final userId = await secureStorage.read(key: 'user_id');
-      final token = await secureStorage.read(key: 'auth_token');
+      final token = await secureStorage.read(key: 'access_token');
 
       if (userId == null || token == null) {
         return Left(
@@ -39,7 +39,7 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
   Future<Either<ErrorModel, void>> updatePerson(PersonEntity person) async {
     try {
       final secureStorage = FlutterSecureStorage();
-      final token = await secureStorage.read(key: 'auth_token');
+      final token = await secureStorage.read(key: 'access_token');
 
       if (token == null) {
         return Left(
@@ -59,8 +59,6 @@ class EditProfileRepositoryImpl implements EditProfileRepository {
           secondLastName: person.secondLastName,
           email: person.email,
           phoneNumber: person.phoneNumber,
-          emailVerified: person.emailVerified,
-          phoneNumberVerified: person.phoneNumberVerified,
           role: person.role,
         ),
         token,

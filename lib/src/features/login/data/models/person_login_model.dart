@@ -10,9 +10,7 @@ class PersonModel extends PersonEntity {
     super.secondLastName,
     required super.email,
     required super.phoneNumber,
-    String? password,
     required super.role,
-    required super.token,
   });
 
   factory PersonModel.fromJson(String str) =>
@@ -28,9 +26,7 @@ class PersonModel extends PersonEntity {
     secondLastName: json["second_last_name"],
     email: json["email"],
     phoneNumber: json["phone_number"],
-    password: json["password"],
     role: json["role"],
-    token: json["token"],
   );
 
   Map<String, dynamic> toMap() => {
@@ -41,8 +37,6 @@ class PersonModel extends PersonEntity {
     "second_last_name": secondLastName,
     "email": email,
     "phone_number": phoneNumber,
-    "password": password ?? '',
-    "role": role,
-    "token": token
+    " role": role,
   };
 }

@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
 import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/code_verification_page.dart';
 
 class EmailVerificationWidget extends StatefulWidget {
   const EmailVerificationWidget({super.key});
@@ -53,12 +52,6 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
                     const SnackBar(
                       content: Text('Correo enviado ✉️'),
                       duration: Duration(seconds: 2),
-                    ),
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CodeVerificationPage(email: _emailCtrl.text.trim()),
                     ),
                   );
                 } else if (state is EmailRecoveryVerificationFailure) {

@@ -43,3 +43,20 @@ class LoginConstants {
   static const int snackbarDurationSeconds = 3;
   static const int successSnackbarDurationSeconds = 1;
 }
+
+/// Login feature error detection constants
+class LoginErrorConstants {
+  // Error codes for email verification
+  static const String emailNotVerifiedCode = 'EMAIL_NOT_VERIFIED';
+  static const String unverifiedEmailCode = 'UNVERIFIED_EMAIL';
+  static const String forbiddenCode = '403';
+
+  // Keywords to detect in error messages
+  static const List<String> verificationKeywords = [
+    'verificado',
+    'verificar',
+    'verification',
+    'verify',
+    'no verificado',
+  ];
+}

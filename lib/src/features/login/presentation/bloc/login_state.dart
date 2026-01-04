@@ -12,18 +12,24 @@ class LoginInitial extends LoginState {}
 class LoginInProgress extends LoginState {}
 
 class LoginSuccess extends LoginState {
-  final PersonEntity person;
+  final UserEntity user;
+  final String message;
+  final String code;
 
-  const LoginSuccess(this.person);
+  const LoginSuccess({
+    required this.user,
+    required this.message,
+    this.code = '',
+  });
 
   @override
-  List<Object> get props => [person];
+  List<Object> get props => [user, message, code];
 }
 
 class LoginFailure extends LoginState {
   final ErrorModel error;
 
-  const LoginFailure(this.error);
+  const LoginFailure({required this.error});
 
   @override
   List<Object> get props => [error];
@@ -37,3 +43,5 @@ class LoginNeedsVerification extends LoginState {
   @override
   List<Object> get props => [message ?? ''];
 }
+
+class LoginLoggedOut extends LoginState {}

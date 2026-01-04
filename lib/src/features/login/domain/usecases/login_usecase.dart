@@ -1,6 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/features/login/domain/entities/person_entity.dart';
+import 'package:motogo_frontend/src/features/login/domain/entities/login_result.dart';
 import 'package:motogo_frontend/src/features/login/domain/repositories/login_repository.dart';
 
 class LoginUseCase {
@@ -8,10 +8,10 @@ class LoginUseCase {
 
   LoginUseCase(this.repository);
 
-  Future<Either<ErrorModel, PersonEntity>> call(
-    String email,
-    String password,
-  ) async {
+  Future<Either<ErrorModel, LoginResult>> call({
+    required String email,
+    required String password,
+  }) async {
     return await repository.login(email, password);
   }
 }

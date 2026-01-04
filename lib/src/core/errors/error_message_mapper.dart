@@ -1,68 +1,58 @@
-
-
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 
+/// Mapper de errores simplificado.
+///
+/// FILOSOFÍA:
+/// - Si el backend responde con un mensaje, USARLO DIRECTAMENTE
+/// - Solo usar fallbacks cuando hay problemas de red (sin respuesta del backend)
 class ErrorMessageMapper {
-  /// Mapea errores del servidor/backend a mensajes localizados
+  /// Mapea un mensaje del servidor.
+  /// Si el mensaje está vacío, retorna un fallback apropiado.
   static String mapServerError(String serverMessage) {
+    if (serverMessage.isEmpty) {
+      return FallbackMessages.genericError;
+    }
+
     final lowerMessage = serverMessage.toLowerCase();
-    
-    // Mapeo específico basado en los errores de tu backend Go
-    if (lowerMessage.contains('email not verified') || 
-        lowerMessage.contains('correo no verificado')) {
-      return ValidationMessages.emailNotVerified;
-    }
-    if (lowerMessage.contains('invalid credentials') || 
-        lowerMessage.contains('credenciales inválidas')) {
-      return ValidationMessages.invalidCredentials;
-    }
-    if (lowerMessage.contains('invalid json') || 
-        lowerMessage.contains('formato json inválido')) {
-      return ValidationMessages.invalidJsonFormat;
-    }
-    if (lowerMessage.contains('validation') || 
-        lowerMessage.contains('validación')) {
-      return ValidationMessages.validationError;
-    }
-    
+
+    // Solo mapear códigos internos de red, no mensajes del backend
     switch (lowerMessage) {
       case 'network_error':
       case 'connection_error':
-        return ValidationMessages.networkError;
+        return FallbackMessages.networkError;
       case 'server_error':
       case 'internal_server_error':
-        return ValidationMessages.serverError;
+        return FallbackMessages.serverError;
       case 'timeout':
       case 'request_timeout':
-        return ValidationMessages.timeoutError;
+        return FallbackMessages.timeoutError;
       default:
-        return serverMessage.isNotEmpty ? serverMessage : ValidationMessages.genericError;
+        // USAR EL MENSAJE DEL BACKEND DIRECTAMENTE
+        return serverMessage;
     }
   }
 
+  /// Mapea errores HTTP cuando NO hay mensaje del backend.
+  /// Si hay mensaje del servidor, usarlo directamente.
   static String mapHttpError(int statusCode, [String? serverMessage]) {
+    // Si hay mensaje del backend, usarlo
+    if (serverMessage != null && serverMessage.isNotEmpty) {
+      return mapServerError(serverMessage);
+    }
+
+    // Sin mensaje del backend, usar fallbacks según código HTTP
     switch (statusCode) {
-      case 400:
-        return serverMessage != null 
-            ? mapServerError(serverMessage) 
-            : ValidationMessages.invalidJsonFormat;
-      case 401:
-        return ValidationMessages.invalidCredentials;
-      case 403:
-        return ValidationMessages.emailNotVerified;
-      case 422:
-        return serverMessage != null 
-            ? mapServerError(serverMessage) 
-            : ValidationMessages.validationError;
+      case 0: // Sin conexión
+        return FallbackMessages.networkError;
+      case 408: // Timeout
+        return FallbackMessages.timeoutError;
       case 500:
+      case 502:
       case 503:
-        return ValidationMessages.serverError;
-      case 408:
-        return ValidationMessages.timeoutError;
+      case 504:
+        return FallbackMessages.serverError;
       default:
-        return serverMessage != null 
-            ? mapServerError(serverMessage) 
-            : ValidationMessages.genericError;
+        return FallbackMessages.genericError;
     }
   }
 }

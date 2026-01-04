@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/validators/validators.dart';
+import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
+import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/register/presentation/pages/user_type_selection_page.dart';
-
+import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
 class LoginForm extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -37,75 +40,72 @@ class LoginForm extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blue,
+                      color: Color(0xFF1976D2),
                     ),
                   ),
                   const SizedBox(height: 32),
-                  TextFormField(
+                  CustomInputWidget(
                     controller: emailController,
+                    labelText: 'Email',
+                    prefixIcon: const Icon(Icons.email_outlined),
                     keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu email';
-                      }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Por favor ingresa un email válido';
-                      }
-                      return null;
-                    },
+                    validator: ValidatorUtils.email().validate,
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
+
+                  CustomInputWidget(
                     controller: passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Contraseña',
-                      prefixIcon: Icon(Icons.lock),
-                      border: OutlineInputBorder(),
-                    ),
+                    labelText: 'Contraseña',
+                    prefixIcon: const Icon(Icons.lock_outline),
                     obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu contraseña';
-                      }
-                      return null;
-                    },
+                    validator: ValidatorUtils.required(
+                      customMessage: 'Por favor ingresa tu contraseña',
+                    ).validate,
                   ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 8),
+                  
+                 
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: state is LoginInProgress
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const EmailRecoveryVerificationPage(),
+                                ),
+                              );
+                            },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.blue[600],
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      ),
+                      child: const Text(
+                        '¿Olvidaste tu contraseña?',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    onPressed: state is LoginInProgress ? null : () {
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  CustomButtonWidget(
+                    title: 'Iniciar sesión',
+                    isLoading: state is LoginInProgress,
+                    onPressed: () {
                       if (formKey.currentState!.validate()) {
                         context.read<LoginBloc>().add(
                           LoginSubmitted(
-                            emailController.text.trim(),
-                            passwordController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
                           ),
                         );
                       }
                     },
-                    child: state is LoginInProgress
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Iniciar sesión',
-                            style: TextStyle(fontSize: 16),
-                          ),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -113,14 +113,26 @@ class LoginForm extends StatelessWidget {
                     children: [
                       const Text('¿No tienes una cuenta?'),
                       TextButton(
-                        onPressed: state is LoginInProgress ? null : () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const UserTypeSelectionPage()),
-                            (route) => false,
-                          );
-                        },
-                        child: const Text('Registrarse'),
+                        onPressed: state is LoginInProgress
+                            ? null
+                            : () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const UserTypeSelectionPage(),
+                                  ),
+                                  (route) => false,
+                                );
+                              },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue[600],
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                        ),
+                        child: const Text(
+                          'Registrarse',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ],
                   ),

@@ -1,4 +1,61 @@
-# Miscellaneous
+
+/docs
+# --- FLUTTER / DART ---
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/.fvm
+
+# --- ANDROID ---
+/android/.gradle
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+/android/local.properties
+
+# --- iOS ---
+/ios/Runner/GeneratedPluginRegistrant.m
+/ios/Flutter/Debug.xcconfig
+/ios/Flutter/Release.xcconfig
+/ios/Runner.xcworkspace/contents.xcworkspacedata
+Podfile
+Podfile.lock
+
+# --- LINUX ---
+/linux/flutter/ephemeral/
+/linux/flutter/generated_plugin_registrant.cc
+/linux/flutter/generated_plugins.cmake
+
+# --- WINDOWS ---
+/windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugins.cmake
+
+# --- macOS ---
+/macos/Flutter/GeneratedPluginRegistrant.swift
+/macos/Flutter/Flutter-Debug.xcconfig
+/macos/Flutter/Flutter-Release.xcconfig
+/macos/Flutter/ephemeral/
+/macos/Runner.xcodeproj/project.pbxproj
+/macos/Runner.xcworkspace/contents.xcworkspacedata
+
+# --- VSCODE / INTELLIJ ---
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# --- NODE / JS (si usás algún script con Node) ---
+node_modules/
+package-lock.json
+
+# --- GENERIC ---
 *.class
 *.log
 *.pyc
@@ -11,43 +68,6 @@
 .svn/
 .swiftpm/
 migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-
-# Symbolication related
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
-
-# Documentation
-/docs/
-
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-/android/.gradle
-node_modules/
-package-lock.json
-.vscode/
+docs/*.md

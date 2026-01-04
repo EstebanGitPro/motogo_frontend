@@ -11,34 +11,43 @@ class _$InjectorApp extends InjectorApp {
   void _configureCoreFactories() {
     final KiwiContainer container = KiwiContainer();
     container
-      ..registerFactory<EmailVerificationRepository>(
-        (c) => EmailVerificationRepositoryImpl(
-          remoteDataSource: c.resolve<EmailVerificationRemoteDataSource>(),
-        ),
-      )
-      ..registerFactory<EmailVerificationRemoteDataSource>(
-        (c) => EmailVerificationRemoteDataSourceImpl(),
-      )
-      ..registerFactory(
-        (c) => VerifyEmailUseCase(
-          repository: c.resolve<EmailVerificationRepository>(),
-        ),
-      );
+      ..registerSingleton((c) => Client())
+      ..registerFactory<UserSessionDataSource>(
+          (c) => UserSessionDataSourceImpl(c.resolve<Client>()))
+      ..registerFactory<UserSessionRepository>(
+          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()));
   }
 
   @override
   void _configureAuthFactories() {
     final KiwiContainer container = KiwiContainer();
     container
-      ..registerFactory<RegisterRepository>(
-        (c) => RegisterRepositoryImp(c.resolve<RegisterDataSource>()),
-      )
-      ..registerFactory((c) => RegisterUseCase(c.resolve<RegisterRepository>()))
-      ..registerFactory((c) => RegisterDataSource())
+      ..registerFactory<RegisterPersonRepository>((c) =>
+          RegisterPersonRepositoryImp(c.resolve<RegisterPersonDataSource>()))
+      ..registerFactory(
+          (c) => RegisterPersonUseCase(c.resolve<RegisterPersonRepository>()))
+      ..registerFactory((c) => RegisterPersonDataSource())
       ..registerFactory<LoginRepository>(
-        (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()),
-      )
+          (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()))
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
-      ..registerFactory((c) => LoginDataSource());
+      ..registerFactory(
+          (c) => LoginDataSource(c.resolve<UserSessionDataSource>()))
+      ..registerFactory(
+          (c) => GetPersonUsecase(c.resolve<UserSessionRepository>()))
+      ..registerFactory(
+          (c) => UpdatePersonUsecase(c.resolve<UserSessionRepository>()))
+      ..registerFactory<EmailRecoveryVerificationRepository>((c) =>
+          EmailRecoveryVerificationRepositoryImpl(
+              c.resolve<EmailRecoveryVerificationDataSource>()))
+      ..registerFactory((c) => VerifyRecoveryEmailUseCase(
+          c.resolve<EmailRecoveryVerificationRepository>()))
+      ..registerFactory(
+          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()))
+      ..registerFactory<ChangePasswordRepository>((c) =>
+          ChangePasswordRepositoryImpl(c.resolve<ChangePasswordDataSource>()))
+      ..registerFactory(
+          (c) => ChangePasswordUseCase(c.resolve<ChangePasswordRepository>()))
+      ..registerFactory<ChangePasswordDataSource>(
+          (c) => ChangePasswordDataSourceImpl(c.resolve<Client>()));
   }
 }

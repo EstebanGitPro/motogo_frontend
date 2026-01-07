@@ -14,10 +14,8 @@ class BranchModel extends BranchEntity {
   final String address;
   final String cityId;
   final String? cityName;
-  final String? departmentId;
+  final String departmentId;
   final String? departmentName;
-  final double? latitude;
-  final double? longitude;
 
   const BranchModel({
     this.id,
@@ -25,15 +23,13 @@ class BranchModel extends BranchEntity {
     required this.establishmentType,
     this.franchiseId,
     this.profileImageUrl,
-    this.status = 'ACTIVE',
+    this.status = BranchStatus.active,
     this.brands = const [],
     required this.address,
     required this.cityId,
     this.cityName,
-    this.departmentId,
+    required this.departmentId,
     this.departmentName,
-    this.latitude,
-    this.longitude,
   }) : super(
          id: id,
          name: name,
@@ -47,8 +43,6 @@ class BranchModel extends BranchEntity {
          cityName: cityName,
          departmentId: departmentId,
          departmentName: departmentName,
-         latitude: latitude,
-         longitude: longitude,
        );
 
   /// Creates a model from domain entity.
@@ -66,8 +60,6 @@ class BranchModel extends BranchEntity {
       cityName: entity.cityName,
       departmentId: entity.departmentId,
       departmentName: entity.departmentName,
-      latitude: entity.latitude,
-      longitude: entity.longitude,
     );
   }
 
@@ -79,18 +71,20 @@ class BranchModel extends BranchEntity {
     return BranchModel(
       id: json['id'] as String?,
       name: json['name'] as String? ?? '',
-      establishmentType: json['establishment_type'] as String? ?? 'WORKSHOP',
+      establishmentType:
+          json['establishment_type'] as String? ?? EstablishmentType.workshop,
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
-      status: json['status'] as String? ?? 'ACTIVE',
+      status: json['status'] as String? ?? BranchStatus.active,
       brands: _parseBrands(json['brands']),
       address: location?['address'] as String? ?? json['address'] as String,
       cityId: location?['city_id'] as String? ?? json['city_id'] as String,
       cityName: location?['city_name'] as String?,
-      departmentId: location?['department_id'] as String?,
+      departmentId:
+          location?['department_id'] as String? ??
+          json['department_id'] as String? ??
+          '',
       departmentName: location?['department_name'] as String?,
-      latitude: _parseDouble(location?['latitude'] ?? json['latitude']),
-      longitude: _parseDouble(location?['longitude'] ?? json['longitude']),
     );
   }
 
@@ -114,13 +108,8 @@ class BranchModel extends BranchEntity {
       map['brands'] = brands;
     }
 
-    // Location as nested object
-    map['location'] = {
-      'address': address,
-      'city_id': cityId,
-      if (latitude != null) 'latitude': latitude,
-      if (longitude != null) 'longitude': longitude,
-    };
+    // Location as nested object (coordinates are calculated by backend via geocoding)
+    map['location'] = {'address': address, 'city_id': cityId};
 
     return map;
   }
@@ -140,8 +129,6 @@ class BranchModel extends BranchEntity {
       cityName: cityName,
       departmentId: departmentId,
       departmentName: departmentName,
-      latitude: latitude,
-      longitude: longitude,
     );
   }
 
@@ -152,14 +139,5 @@ class BranchModel extends BranchEntity {
       return value.map((e) => e.toString()).toList();
     }
     return [];
-  }
-
-  /// Helper to safely parse double values.
-  static double? _parseDouble(dynamic value) {
-    if (value == null) return null;
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
   }
 }

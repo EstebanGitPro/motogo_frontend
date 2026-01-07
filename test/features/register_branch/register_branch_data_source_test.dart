@@ -21,11 +21,14 @@ void main() {
       mockClient = MockClient();
     });
 
-    const testBranch = BranchModel(
+    const testDepartmentId = 'dept-01';
+
+    final testBranch = BranchModel(
       name: 'MotoGo Centro',
       establishmentType: 'WORKSHOP',
       address: 'Calle 123',
       cityId: 'city-01',
+      departmentId: testDepartmentId,
       brands: ['brand-01'],
     );
 
@@ -73,11 +76,12 @@ void main() {
 
     group('Request Formatting', () {
       test('branch with profileImageUrl includes it in JSON', () {
-        const branchWithImage = BranchModel(
+        final branchWithImage = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
           address: 'Test Address',
           cityId: 'city-01',
+          departmentId: testDepartmentId,
           profileImageUrl: 'https://firebase.storage/image.jpg',
         );
 
@@ -86,21 +90,23 @@ void main() {
         expect(json['profile_image_url'], 'https://firebase.storage/image.jpg');
       });
 
-      test('branch with coordinates includes them in location', () {
-        const branchWithCoords = BranchModel(
-          name: 'Test',
-          establishmentType: 'WORKSHOP',
-          address: 'Test Address',
-          cityId: 'city-01',
-          latitude: 4.7110,
-          longitude: -74.0721,
-        );
+      test(
+        'location does not include coordinates (backend handles geocoding)',
+        () {
+          final branch = BranchModel(
+            name: 'Test',
+            establishmentType: 'WORKSHOP',
+            address: 'Test Address',
+            cityId: 'city-01',
+            departmentId: testDepartmentId,
+          );
 
-        final json = branchWithCoords.toJson();
+          final json = branch.toJson();
 
-        expect(json['location']['latitude'], 4.7110);
-        expect(json['location']['longitude'], -74.0721);
-      });
+          expect(json['location'].containsKey('latitude'), isFalse);
+          expect(json['location'].containsKey('longitude'), isFalse);
+        },
+      );
 
       test('encoded JSON is valid', () {
         final jsonData = testBranch.toJson();

@@ -7,21 +7,24 @@ void main() {
     // Sample data for tests
     const testBranchId = 'a1b2c3d4-0000-4000-8000-000000000001';
     const testCityId = 'b2c3d4e5-2222-4000-8000-000000000001';
+    const testDepartmentId = 'c3d4e5f6-3333-4000-8000-000000000001';
     const testBrandIds = ['f6a7b8c9-6666-4000-8000-000000000001'];
 
     group('constructor', () {
       test('should create BranchModel with required fields', () {
-        const model = BranchModel(
+        final model = BranchModel(
           name: 'MotoGo Centro',
           establishmentType: 'WORKSHOP',
           address: 'Calle 123',
           cityId: testCityId,
+          departmentId: testDepartmentId,
         );
 
         expect(model.name, 'MotoGo Centro');
         expect(model.establishmentType, 'WORKSHOP');
         expect(model.address, 'Calle 123');
         expect(model.cityId, testCityId);
+        expect(model.departmentId, testDepartmentId);
         expect(model.status, 'ACTIVE'); // default
         expect(model.brands, isEmpty); // default
       });
@@ -38,26 +41,24 @@ void main() {
           address: 'Calle 123 #45-67',
           cityId: testCityId,
           cityName: 'Bogotá',
-          departmentId: 'dept-01',
+          departmentId: testDepartmentId,
           departmentName: 'Cundinamarca',
-          latitude: 4.7110,
-          longitude: -74.0721,
         );
 
         expect(model.id, testBranchId);
         expect(model.profileImageUrl, 'https://example.com/image.jpg');
-        expect(model.latitude, 4.7110);
-        expect(model.longitude, -74.0721);
+        expect(model.departmentName, 'Cundinamarca');
       });
     });
 
     group('fromEntity', () {
       test('should create BranchModel from BranchEntity', () {
-        const entity = BranchEntity(
+        final entity = BranchEntity(
           name: 'Test Branch',
           establishmentType: 'WORKSHOP',
           address: 'Test Address',
           cityId: testCityId,
+          departmentId: testDepartmentId,
           brands: testBrandIds,
         );
 
@@ -67,6 +68,7 @@ void main() {
         expect(model.establishmentType, entity.establishmentType);
         expect(model.address, entity.address);
         expect(model.cityId, entity.cityId);
+        expect(model.departmentId, entity.departmentId);
         expect(model.brands, entity.brands);
       });
     });
@@ -81,6 +83,7 @@ void main() {
           'brands': testBrandIds,
           'address': 'Calle 123',
           'city_id': testCityId,
+          'department_id': testDepartmentId,
         };
 
         final model = BranchModel.fromJson(json);
@@ -89,6 +92,7 @@ void main() {
         expect(model.name, 'MotoGo Centro');
         expect(model.establishmentType, 'WORKSHOP');
         expect(model.brands, testBrandIds);
+        expect(model.departmentId, testDepartmentId);
       });
 
       test('should parse JSON with nested location object', () {
@@ -100,10 +104,8 @@ void main() {
             'address': 'Calle 123 #45-67',
             'city_id': testCityId,
             'city_name': 'Bogotá',
-            'department_id': 'dept-01',
+            'department_id': testDepartmentId,
             'department_name': 'Cundinamarca',
-            'latitude': 4.7110,
-            'longitude': -74.0721,
           },
         };
 
@@ -112,8 +114,7 @@ void main() {
         expect(model.address, 'Calle 123 #45-67');
         expect(model.cityName, 'Bogotá');
         expect(model.departmentName, 'Cundinamarca');
-        expect(model.latitude, 4.7110);
-        expect(model.longitude, -74.0721);
+        expect(model.departmentId, testDepartmentId);
       });
 
       test('should handle null brands', () {
@@ -122,6 +123,7 @@ void main() {
           'establishment_type': 'WORKSHOP',
           'address': 'Test',
           'city_id': testCityId,
+          'department_id': testDepartmentId,
           'brands': null,
         };
 
@@ -129,66 +131,42 @@ void main() {
 
         expect(model.brands, isEmpty);
       });
-
-      test('should parse coordinates from different formats', () {
-        // Integer coordinates
-        var json = {
-          'name': 'Test',
-          'establishment_type': 'WORKSHOP',
-          'address': 'Test',
-          'city_id': testCityId,
-          'latitude': 4,
-          'longitude': -74,
-        };
-        var model = BranchModel.fromJson(json);
-        expect(model.latitude, 4.0);
-        expect(model.longitude, -74.0);
-
-        // String coordinates
-        json = {
-          'name': 'Test',
-          'establishment_type': 'WORKSHOP',
-          'address': 'Test',
-          'city_id': testCityId,
-          'latitude': '4.7110',
-          'longitude': '-74.0721',
-        };
-        model = BranchModel.fromJson(json);
-        expect(model.latitude, 4.7110);
-        expect(model.longitude, -74.0721);
-      });
     });
 
     group('toJson', () {
-      test('should serialize to JSON with nested location', () {
-        const model = BranchModel(
-          name: 'MotoGo Centro',
-          establishmentType: 'WORKSHOP',
-          address: 'Calle 123',
-          cityId: testCityId,
-          brands: testBrandIds,
-          latitude: 4.7110,
-          longitude: -74.0721,
-        );
+      test(
+        'should serialize to JSON with nested location (no coordinates)',
+        () {
+          final model = BranchModel(
+            name: 'MotoGo Centro',
+            establishmentType: 'WORKSHOP',
+            address: 'Calle 123',
+            cityId: testCityId,
+            departmentId: testDepartmentId,
+            brands: testBrandIds,
+          );
 
-        final json = model.toJson();
+          final json = model.toJson();
 
-        expect(json['name'], 'MotoGo Centro');
-        expect(json['establishment_type'], 'WORKSHOP');
-        expect(json['brands'], testBrandIds);
-        expect(json['location'], isA<Map>());
-        expect(json['location']['address'], 'Calle 123');
-        expect(json['location']['city_id'], testCityId);
-        expect(json['location']['latitude'], 4.7110);
-        expect(json['location']['longitude'], -74.0721);
-      });
+          expect(json['name'], 'MotoGo Centro');
+          expect(json['establishment_type'], 'WORKSHOP');
+          expect(json['brands'], testBrandIds);
+          expect(json['location'], isA<Map>());
+          expect(json['location']['address'], 'Calle 123');
+          expect(json['location']['city_id'], testCityId);
+          // Coordinates should NOT be present (backend handles via geocoding)
+          expect(json['location'].containsKey('latitude'), isFalse);
+          expect(json['location'].containsKey('longitude'), isFalse);
+        },
+      );
 
       test('should omit optional fields when null', () {
-        const model = BranchModel(
+        final model = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
           address: 'Test',
           cityId: testCityId,
+          departmentId: testDepartmentId,
         );
 
         final json = model.toJson();
@@ -196,15 +174,15 @@ void main() {
         expect(json.containsKey('franchise_id'), isFalse);
         expect(json.containsKey('profile_image_url'), isFalse);
         expect(json.containsKey('brands'), isFalse);
-        expect(json['location'].containsKey('latitude'), isFalse);
       });
 
       test('should include profileImageUrl when set', () {
-        const model = BranchModel(
+        final model = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
           address: 'Test',
           cityId: testCityId,
+          departmentId: testDepartmentId,
           profileImageUrl: 'https://example.com/image.jpg',
         );
 
@@ -223,9 +201,8 @@ void main() {
           address: 'Test Address',
           cityId: testCityId,
           cityName: 'Bogotá',
+          departmentId: testDepartmentId,
           brands: testBrandIds,
-          latitude: 4.7110,
-          longitude: -74.0721,
         );
 
         final entity = model.toEntity();
@@ -234,8 +211,8 @@ void main() {
         expect(entity.id, model.id);
         expect(entity.name, model.name);
         expect(entity.cityName, model.cityName);
+        expect(entity.departmentId, model.departmentId);
         expect(entity.brands, model.brands);
-        expect(entity.latitude, model.latitude);
       });
     });
 
@@ -246,6 +223,7 @@ void main() {
           'establishment_type': 'WORKSHOP',
           'address': 'Test',
           'city_id': testCityId,
+          'department_id': testDepartmentId,
           'brands': ['brand-1', 'brand-2'],
         };
 
@@ -260,6 +238,7 @@ void main() {
           'establishment_type': 'WORKSHOP',
           'address': 'Test',
           'city_id': testCityId,
+          'department_id': testDepartmentId,
           'brands': [1, 2, 3],
         };
 

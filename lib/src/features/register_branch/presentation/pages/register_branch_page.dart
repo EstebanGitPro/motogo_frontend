@@ -227,7 +227,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         brands: _selectedBrandIds,
         address: _addressController.text.trim(),
         cityId: _selectedCityId!,
-        departmentId: _selectedDepartmentId,
+        departmentId: _selectedDepartmentId!,
         profileImageUrl: profileImageUrl,
       );
 

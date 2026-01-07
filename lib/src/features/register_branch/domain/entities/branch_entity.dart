@@ -14,10 +14,8 @@ class BranchEntity {
   final String address;
   final String cityId;
   final String? cityName;
-  final String? departmentId;
+  final String departmentId;
   final String? departmentName;
-  final double? latitude;
-  final double? longitude;
 
   const BranchEntity({
     this.id,
@@ -25,15 +23,13 @@ class BranchEntity {
     required this.establishmentType,
     this.franchiseId,
     this.profileImageUrl,
-    this.status = 'ACTIVE',
+    this.status = BranchStatus.active,
     this.brands = const [],
     required this.address,
     required this.cityId,
     this.cityName,
-    this.departmentId,
+    required this.departmentId,
     this.departmentName,
-    this.latitude,
-    this.longitude,
   });
 
   /// Creates a copy of this entity with the given fields replaced.
@@ -50,8 +46,6 @@ class BranchEntity {
     String? cityName,
     String? departmentId,
     String? departmentName,
-    double? latitude,
-    double? longitude,
   }) {
     return BranchEntity(
       id: id ?? this.id,
@@ -66,8 +60,6 @@ class BranchEntity {
       cityName: cityName ?? this.cityName,
       departmentId: departmentId ?? this.departmentId,
       departmentName: departmentName ?? this.departmentName,
-      latitude: latitude ?? this.latitude,
-      longitude: longitude ?? this.longitude,
     );
   }
 }

@@ -68,8 +68,9 @@ class BranchEntity {
 class EstablishmentType {
   static const String workshop = 'WORKSHOP';
   static const String store = 'STORE';
+  static const String workshopStore = 'WORKSHOP_STORE';
 
-  static const List<String> values = [workshop, store];
+  static const List<String> values = [workshop, store, workshopStore];
 
   /// Returns the display name in Spanish
   static String getDisplayName(String type) {
@@ -78,6 +79,8 @@ class EstablishmentType {
         return 'Taller';
       case store:
         return 'Tienda';
+      case workshopStore:
+        return 'Taller y Tienda';
       default:
         return type;
     }

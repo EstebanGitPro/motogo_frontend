@@ -221,13 +221,23 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         }
       }
 
+      // Get selected city and department names for geocoding
+      final selectedCity = _availableCities.firstWhere(
+        (c) => c.id == _selectedCityId,
+      );
+      final selectedDepartment = _availableDepartments.firstWhere(
+        (d) => d.id == _selectedDepartmentId,
+      );
+
       final branch = BranchEntity(
         name: _nameController.text.trim(),
         establishmentType: _selectedEstablishmentType!,
         brands: _selectedBrandIds,
         address: _addressController.text.trim(),
         cityId: _selectedCityId!,
+        cityName: selectedCity.name,
         departmentId: _selectedDepartmentId!,
+        departmentName: selectedDepartment.name,
         profileImageUrl: profileImageUrl,
       );
 

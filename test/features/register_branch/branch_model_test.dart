@@ -135,14 +135,16 @@ void main() {
 
     group('toJson', () {
       test(
-        'should serialize to JSON with nested location (no coordinates)',
+        'should serialize to JSON with nested location per API contract',
         () {
           final model = BranchModel(
             name: 'MotoGo Centro',
             establishmentType: 'WORKSHOP',
             address: 'Calle 123',
             cityId: testCityId,
+            cityName: 'Bogotá',
             departmentId: testDepartmentId,
+            departmentName: 'Cundinamarca',
             brands: testBrandIds,
           );
 
@@ -152,8 +154,12 @@ void main() {
           expect(json['establishment_type'], 'WORKSHOP');
           expect(json['brands'], testBrandIds);
           expect(json['location'], isA<Map>());
-          expect(json['location']['address'], 'Calle 123');
+          expect(json['location']['department_id'], testDepartmentId);
           expect(json['location']['city_id'], testCityId);
+          expect(json['location']['address'], 'Calle 123');
+          // Names are included for geocoding assistance
+          expect(json['location']['city_name'], 'Bogotá');
+          expect(json['location']['department_name'], 'Cundinamarca');
           // Coordinates should NOT be present (backend handles via geocoding)
           expect(json['location'].containsKey('latitude'), isFalse);
           expect(json['location'].containsKey('longitude'), isFalse);

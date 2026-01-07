@@ -93,7 +93,6 @@ class BranchModel extends BranchEntity {
     final map = <String, dynamic>{
       'name': name,
       'establishment_type': establishmentType,
-      'status': status,
     };
 
     if (franchiseId != null) {
@@ -108,8 +107,15 @@ class BranchModel extends BranchEntity {
       map['brands'] = brands;
     }
 
-    // Location as nested object (coordinates are calculated by backend via geocoding)
-    map['location'] = {'address': address, 'city_id': cityId};
+    // Location as nested object per API contract
+    // Coordinates are optional - backend calculates via geocoding if not provided
+    map['location'] = {
+      'department_id': departmentId,
+      'city_id': cityId,
+      'address': address,
+      if (cityName != null) 'city_name': cityName,
+      if (departmentName != null) 'department_name': departmentName,
+    };
 
     return map;
   }

@@ -33,13 +33,15 @@ void main() {
     );
 
     group('HTTP Response Parsing', () {
-      test('BranchModel toJson produces valid JSON', () {
+      test('BranchModel toJson produces valid JSON with location', () {
         // Act
         final json = testBranch.toJson();
 
         // Assert
         expect(json['name'], 'MotoGo Centro');
         expect(json['establishment_type'], 'WORKSHOP');
+        expect(json['location']['department_id'], testDepartmentId);
+        expect(json['location']['city_id'], 'city-01');
         expect(json['location']['address'], 'Calle 123');
         expect(json['brands'], ['brand-01']);
       });

@@ -34,6 +34,21 @@ import 'package:motogo_frontend/src/features/change_password/data/repositories/c
 import 'package:motogo_frontend/src/features/change_password/domain/repositories/change_password_repository.dart';
 import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
 
+// Features - Register Branch
+import 'package:motogo_frontend/src/features/register_branch/data/datasources/register_branch_data_source.dart';
+import 'package:motogo_frontend/src/features/register_branch/data/repositories/branch_repository_impl.dart';
+import 'package:motogo_frontend/src/features/register_branch/domain/repositories/branch_repository.dart';
+import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
+
+// Core - Catalogs
+import 'package:motogo_frontend/src/core/catalogs/data/datasources/catalogs_data_source.dart';
+import 'package:motogo_frontend/src/core/catalogs/data/repositories/catalogs_repository_impl.dart';
+import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
+
+// Core - Firebase Services
+import 'package:motogo_frontend/src/core/services/firebase/firebase_token_data_source.dart';
+import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -52,6 +67,17 @@ abstract class InjectorApp {
 
   void _configureCore() {
     _configureCoreFactories();
+    // Manual registration for services that need Firebase instances
+    _configureFirebaseServices();
+  }
+
+  void _configureFirebaseServices() {
+    // StorageService needs FirebaseAuth and FirebaseStorage
+    // which aren't in the DI container, so we register manually
+    container.registerFactory<StorageService>(
+      (c) =>
+          StorageService(tokenDataSource: c.resolve<FirebaseTokenDataSource>()),
+    );
   }
 
   void _configureAuth() {
@@ -62,6 +88,11 @@ abstract class InjectorApp {
   @Register.singleton(Client)
   @Register.factory(UserSessionDataSource, from: UserSessionDataSourceImpl)
   @Register.factory(UserSessionRepository, from: UserSessionRepositoryImpl)
+  // Core - Catalogs
+  @Register.factory(CatalogsDataSource, from: CatalogsDataSourceImpl)
+  @Register.factory(CatalogsRepository, from: CatalogsRepositoryImpl)
+  // Core - Firebase Services (StorageService is registered manually in _configureFirebaseServices)
+  @Register.factory(FirebaseTokenDataSource, from: FirebaseTokenDataSourceImpl)
   void _configureCoreFactories();
 
   // Features - Login, Register, Edit Profile, Password Recovery
@@ -87,6 +118,13 @@ abstract class InjectorApp {
   @Register.factory(
     ChangePasswordDataSource,
     from: ChangePasswordDataSourceImpl,
+  )
+  // Features - Register Branch
+  @Register.factory(BranchRepository, from: BranchRepositoryImpl)
+  @Register.factory(RegisterBranchUseCase)
+  @Register.factory(
+    RegisterBranchDataSource,
+    from: RegisterBranchDataSourceImpl,
   )
   void _configureAuthFactories();
 }

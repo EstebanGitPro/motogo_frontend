@@ -6,15 +6,31 @@ import 'package:motogo_frontend/src/features/change_password/presentation/bloc/c
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  void _navigateToRegisterBranch(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) =>
+              RegisterBranchBloc(InjectorApp.resolve<RegisterBranchUseCase>()),
+          child: const RegisterBranchPage(),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Aplicación'),
+        title: const Text('Mis Sedes'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -109,12 +125,12 @@ class HomePage extends StatelessWidget {
               title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
               onTap: () {
                 Navigator.pop(context);
-                // Aquí puedes agregar navegación a información
               },
             ),
           ],
         ),
       ),
+      // Body - Dashboard de Sedes del Representante
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -123,27 +139,79 @@ class HomePage extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.home, size: 100, color: Colors.blue),
-              SizedBox(height: 20),
-              Text(
-                'Bienvenido a tu aplicación',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+        child: _buildEmptyState(context),
+      ),
+      // FAB para crear sede
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _navigateToRegisterBranch(context),
+        backgroundColor: Colors.blue[600],
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add_business),
+        label: const Text('Nueva Sede'),
+      ),
+    );
+  }
+
+  /// Empty state when representative has no branches yet.
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.store_outlined,
+                size: 80,
+                color: Colors.blue[400],
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              '¡Bienvenido!',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Aún no tienes sedes registradas.\nCrea tu primera sede para empezar.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () => _navigateToRegisterBranch(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue[600],
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              SizedBox(height: 10),
-              Text(
-                'Usa el menú para navegar',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+              icon: const Icon(Icons.add),
+              label: const Text(
+                'Crear mi primera sede',
+                style: TextStyle(fontSize: 16),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -163,12 +231,14 @@ class HomePage extends StatelessWidget {
           },
           builder: (context, state) {
             return AlertDialog(
-              title: Text('Cerrar Sesión'),
-              content: Text('¿Estás seguro de que quieres cerrar sesión?'),
+              title: const Text('Cerrar Sesión'),
+              content: const Text(
+                '¿Estás seguro de que quieres cerrar sesión?',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Cancelar'),
+                  child: const Text('Cancelar'),
                 ),
                 TextButton(
                   onPressed: () {
@@ -181,7 +251,7 @@ class HomePage extends StatelessWidget {
                     }
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: Text('Cerrar Sesión'),
+                  child: const Text('Cerrar Sesión'),
                 ),
               ],
             );

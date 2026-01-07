@@ -15,7 +15,13 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory<UserSessionDataSource>(
           (c) => UserSessionDataSourceImpl(c.resolve<Client>()))
       ..registerFactory<UserSessionRepository>(
-          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()));
+          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()))
+      ..registerFactory<CatalogsDataSource>(
+          (c) => CatalogsDataSourceImpl(c.resolve<Client>()))
+      ..registerFactory<CatalogsRepository>(
+          (c) => CatalogsRepositoryImpl(c.resolve<CatalogsDataSource>()))
+      ..registerFactory<FirebaseTokenDataSource>(
+          (c) => FirebaseTokenDataSourceImpl(c.resolve<Client>()));
   }
 
   @override
@@ -48,6 +54,12 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory(
           (c) => ChangePasswordUseCase(c.resolve<ChangePasswordRepository>()))
       ..registerFactory<ChangePasswordDataSource>(
-          (c) => ChangePasswordDataSourceImpl(c.resolve<Client>()));
+          (c) => ChangePasswordDataSourceImpl(c.resolve<Client>()))
+      ..registerFactory<BranchRepository>(
+          (c) => BranchRepositoryImpl(c.resolve<RegisterBranchDataSource>()))
+      ..registerFactory(
+          (c) => RegisterBranchUseCase(c.resolve<BranchRepository>()))
+      ..registerFactory<RegisterBranchDataSource>(
+          (c) => RegisterBranchDataSourceImpl(c.resolve<Client>()));
   }
 }

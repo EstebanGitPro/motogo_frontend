@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/datasources/catalogs_data_source.dart';
+import 'package:motogo_frontend/src/core/catalogs/domain/entities/branch_type_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/department_entity.dart';
@@ -29,6 +30,12 @@ class CatalogsRepositoryImpl implements CatalogsRepository {
     String departmentId,
   ) async {
     final result = await dataSource.getCitiesByDepartment(departmentId);
+    return result.map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
+  Future<Either<ErrorModel, List<BranchTypeEntity>>> getBranchTypes() async {
+    final result = await dataSource.getBranchTypes();
     return result.map((models) => models.map((m) => m.toEntity()).toList());
   }
 }

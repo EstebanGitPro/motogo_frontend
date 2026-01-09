@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/catalogs/domain/entities/branch_type_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/department_entity.dart';
@@ -58,6 +59,11 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
   String? _citiesError;
   String? _selectedCityId;
 
+  // Branch types catalog state
+  List<BranchTypeEntity> _availableBranchTypes = [];
+  bool _isLoadingBranchTypes = true;
+  String? _branchTypesError;
+
   // Image state
   File? _selectedImage;
   bool _isUploadingImage = false;
@@ -68,6 +74,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
     super.initState();
     _loadBrands();
     _loadDepartments();
+    _loadBranchTypes();
   }
 
   Future<void> _loadBrands() async {
@@ -109,6 +116,28 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         setState(() {
           _isLoadingDepartments = false;
           _availableDepartments = departments;
+        });
+      },
+    );
+  }
+
+  Future<void> _loadBranchTypes() async {
+    final catalogsRepository = InjectorApp.resolve<CatalogsRepository>();
+    final result = await catalogsRepository.getBranchTypes();
+
+    if (!mounted) return;
+
+    result.fold(
+      (error) {
+        setState(() {
+          _isLoadingBranchTypes = false;
+          _branchTypesError = error.message;
+        });
+      },
+      (types) {
+        setState(() {
+          _isLoadingBranchTypes = false;
+          _availableBranchTypes = types;
         });
       },
     );
@@ -332,6 +361,9 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
                     // Establishment type dropdown
                     BranchTypeDropdown(
                       selectedValue: _selectedEstablishmentType,
+                      branchTypes: _availableBranchTypes,
+                      isLoading: _isLoadingBranchTypes,
+                      errorMessage: _branchTypesError,
                       onChanged: (value) {
                         setState(() {
                           _selectedEstablishmentType = value;

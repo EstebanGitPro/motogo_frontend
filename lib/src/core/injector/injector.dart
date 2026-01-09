@@ -1,5 +1,9 @@
-import 'package:http/http.dart';
 import 'package:kiwi/kiwi.dart';
+
+// Core - Network (Dio)
+import 'package:motogo_frontend/src/core/network/auth_interceptor.dart';
+import 'package:motogo_frontend/src/core/network/dio_client.dart';
+import 'package:motogo_frontend/src/core/network/refresh_token_data_source.dart';
 
 // Core - User Session
 import 'package:motogo_frontend/src/core/user/data/datasources/user_session_data_source.dart';
@@ -40,6 +44,12 @@ import 'package:motogo_frontend/src/features/register_branch/data/repositories/b
 import 'package:motogo_frontend/src/features/register_branch/domain/repositories/branch_repository.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 
+// Features - My Branches
+import 'package:motogo_frontend/src/features/my_branches/data/datasources/my_branches_data_source.dart';
+import 'package:motogo_frontend/src/features/my_branches/data/repositories/my_branches_repository_impl.dart';
+import 'package:motogo_frontend/src/features/my_branches/domain/repositories/my_branches_repository.dart';
+import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
+
 // Core - Catalogs
 import 'package:motogo_frontend/src/core/catalogs/data/datasources/catalogs_data_source.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/repositories/catalogs_repository_impl.dart';
@@ -67,8 +77,72 @@ abstract class InjectorApp {
 
   void _configureCore() {
     _configureCoreFactories();
+    // Manual registration for Dio infrastructure
+    _configureDioClient();
+    // Manual registration for Dio-based datasources
+    _configureDioDataSources();
     // Manual registration for services that need Firebase instances
     _configureFirebaseServices();
+  }
+
+  /// Configures DioClient with AuthInterceptor for automatic token refresh.
+  void _configureDioClient() {
+    // Register RefreshTokenDataSource first
+    container.registerSingleton<RefreshTokenDataSource>(
+      (c) => RefreshTokenDataSourceImpl(),
+    );
+
+    // Register AuthInterceptor with RefreshTokenDataSource
+    container.registerSingleton<AuthInterceptor>(
+      (c) => AuthInterceptor(c.resolve<RefreshTokenDataSource>()),
+    );
+
+    // Register DioClient with AuthInterceptor
+    container.registerSingleton<DioClient>(
+      (c) => DioClient(authInterceptor: c.resolve<AuthInterceptor>()),
+    );
+  }
+
+  /// Registers datasources that have been migrated to use DioClient or have their own Dio.
+  void _configureDioDataSources() {
+    // === Core DataSources ===
+
+    // Catalogs - uses DioClient
+    container.registerFactory<CatalogsDataSource>(
+      (c) => CatalogsDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // UserSession - has its own Dio (receives token as parameter)
+    container.registerFactory<UserSessionDataSource>(
+      (c) => UserSessionDataSourceImpl(),
+    );
+
+    // FirebaseToken - uses DioClient
+    container.registerFactory<FirebaseTokenDataSource>(
+      (c) => FirebaseTokenDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // === Feature DataSources ===
+
+    // Register Branch - uses DioClient
+    container.registerFactory<RegisterBranchDataSource>(
+      (c) => RegisterBranchDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // My Branches - uses DioClient
+    container.registerFactory<MyBranchesDataSource>(
+      (c) => MyBranchesDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Change Password - has its own Dio (receives token as parameter)
+    container.registerFactory<ChangePasswordDataSource>(
+      (c) => ChangePasswordDataSourceImpl(),
+    );
+
+    // Email Recovery - has its own Dio (public endpoint, no auth)
+    container.registerFactory<EmailRecoveryVerificationDataSource>(
+      (c) => EmailRecoveryVerificationDataSource(),
+    );
   }
 
   void _configureFirebaseServices() {
@@ -84,18 +158,12 @@ abstract class InjectorApp {
     _configureAuthFactories();
   }
 
-  // Core - HTTP Client and User Session (centralized)
-  @Register.singleton(Client)
-  @Register.factory(UserSessionDataSource, from: UserSessionDataSourceImpl)
+  // Core - Repositories only (DataSources are registered manually in _configureDioDataSources)
   @Register.factory(UserSessionRepository, from: UserSessionRepositoryImpl)
-  // Core - Catalogs
-  @Register.factory(CatalogsDataSource, from: CatalogsDataSourceImpl)
   @Register.factory(CatalogsRepository, from: CatalogsRepositoryImpl)
-  // Core - Firebase Services (StorageService is registered manually in _configureFirebaseServices)
-  @Register.factory(FirebaseTokenDataSource, from: FirebaseTokenDataSourceImpl)
   void _configureCoreFactories();
 
-  // Features - Login, Register, Edit Profile, Password Recovery
+  // Features - Repositories, UseCases, and remaining DataSources
   @Register.factory(RegisterPersonRepository, from: RegisterPersonRepositoryImp)
   @Register.factory(RegisterPersonUseCase)
   @Register.factory(RegisterPersonDataSource)
@@ -109,22 +177,16 @@ abstract class InjectorApp {
     from: EmailRecoveryVerificationRepositoryImpl,
   )
   @Register.factory(VerifyRecoveryEmailUseCase)
-  @Register.factory(EmailRecoveryVerificationDataSource)
   @Register.factory(
     ChangePasswordRepository,
     from: ChangePasswordRepositoryImpl,
   )
   @Register.factory(ChangePasswordUseCase)
-  @Register.factory(
-    ChangePasswordDataSource,
-    from: ChangePasswordDataSourceImpl,
-  )
-  // Features - Register Branch
+  // Features - Register Branch (Repository and UseCase only)
   @Register.factory(BranchRepository, from: BranchRepositoryImpl)
   @Register.factory(RegisterBranchUseCase)
-  @Register.factory(
-    RegisterBranchDataSource,
-    from: RegisterBranchDataSourceImpl,
-  )
+  // Features - My Branches (Repository and UseCase only)
+  @Register.factory(MyBranchesRepository, from: MyBranchesRepositoryImpl)
+  @Register.factory(GetBranchesUseCase)
   void _configureAuthFactories();
 }

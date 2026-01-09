@@ -24,32 +24,32 @@ class HttpErrorHandler {
   /// Usar en el catch genérico de las llamadas HTTP.
   static Either<ErrorModel, T> handleException<T>(Object exception) {
     if (exception is SocketException) {
-      return Left(ErrorModel(message: ValidationMessages.networkError));
+      return Left(ErrorModel(message: FallbackMessages.networkError));
     }
 
     if (exception is TimeoutException) {
-      return Left(ErrorModel(message: ValidationMessages.timeoutError));
+      return Left(ErrorModel(message: FallbackMessages.timeoutError));
     }
 
     if (exception is HttpException) {
-      return Left(ErrorModel(message: ValidationMessages.serverError));
+      return Left(ErrorModel(message: FallbackMessages.serverError));
     }
 
     if (exception is http.ClientException) {
-      return Left(ErrorModel(message: ValidationMessages.connectionFailed));
+      return Left(ErrorModel(message: FallbackMessages.connectionFailed));
     }
 
     if (exception is FormatException) {
-      return Left(ErrorModel(message: 'Respuesta inválida del servidor'));
+      return Left(ErrorModel(message: FallbackMessages.invalidResponse));
     }
 
     // Verificar si es un error de timeout por string
     final errorString = exception.toString();
     if (errorString.contains('timeout')) {
-      return Left(ErrorModel(message: ValidationMessages.timeoutError));
+      return Left(ErrorModel(message: FallbackMessages.timeoutError));
     }
 
-    return Left(ErrorModel(message: ValidationMessages.genericError));
+    return Left(ErrorModel(message: FallbackMessages.genericError));
   }
 
   /// Crea un ErrorModel a partir de una respuesta HTTP fallida.
@@ -84,8 +84,7 @@ class HttpErrorHandler {
   static ErrorModel fromBackendError(Map<String, dynamic> responseData) {
     return ErrorModel(
       message:
-          responseData['message']?.toString() ??
-          ValidationMessages.genericError,
+          responseData['message']?.toString() ?? FallbackMessages.genericError,
       errorCode: responseData['code']?.toString(),
     );
   }

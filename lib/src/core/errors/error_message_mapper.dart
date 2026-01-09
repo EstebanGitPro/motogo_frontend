@@ -44,8 +44,22 @@ class ErrorMessageMapper {
     switch (statusCode) {
       case 0: // Sin conexión
         return FallbackMessages.networkError;
+      case 400: // Bad Request
+        return FallbackMessages.badRequest;
+      case 401: // Unauthorized
+        return FallbackMessages.unauthorized;
+      case 403: // Forbidden
+        return FallbackMessages.forbidden;
+      case 404: // Not Found
+        return FallbackMessages.notFound;
       case 408: // Timeout
         return FallbackMessages.timeoutError;
+      case 409: // Conflict
+        return FallbackMessages.conflict;
+      case 422: // Unprocessable Entity
+        return FallbackMessages.validationError;
+      case 429: // Too Many Requests
+        return FallbackMessages.tooManyRequests;
       case 500:
       case 502:
       case 503:

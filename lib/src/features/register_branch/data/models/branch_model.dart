@@ -71,8 +71,7 @@ class BranchModel extends BranchEntity {
     return BranchModel(
       id: json['id'] as String?,
       name: json['name'] as String? ?? '',
-      establishmentType:
-          json['establishment_type'] as String? ?? EstablishmentType.workshop,
+      establishmentType: json['establishment_type'] as String? ?? '',
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       status: json['status'] as String? ?? BranchStatus.active,

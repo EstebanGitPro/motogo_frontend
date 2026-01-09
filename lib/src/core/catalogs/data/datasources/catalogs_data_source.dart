@@ -1,15 +1,16 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:http/http.dart' as http;
+import 'package:motogo_frontend/src/core/catalogs/data/models/branch_type_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/brand_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/city_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/department_model.dart';
-import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/errors/http_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/dio_client.dart';
+import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 
 /// DataSource for fetching catalog data from the API.
+///
+/// Uses DioClient with automatic token refresh.
 abstract class CatalogsDataSource {
   /// Fetches the list of motorcycle brands.
   Future<Either<ErrorModel, List<BrandModel>>> getBrands();
@@ -21,76 +22,59 @@ abstract class CatalogsDataSource {
   Future<Either<ErrorModel, List<CityModel>>> getCitiesByDepartment(
     String departmentId,
   );
+
+  /// Fetches the list of branch establishment types.
+  Future<Either<ErrorModel, List<BranchTypeModel>>> getBranchTypes();
 }
 
 class CatalogsDataSourceImpl implements CatalogsDataSource {
-  final http.Client client;
+  final DioClient _dioClient;
 
-  CatalogsDataSourceImpl(this.client);
+  CatalogsDataSourceImpl(this._dioClient);
 
   @override
   Future<Either<ErrorModel, List<BrandModel>>> getBrands() async {
     try {
-      final response = await client
-          .get(
-            Uri.parse('${Config.baseUrl}/brands'),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dioClient.get('/brands');
+      final responseData = response.data;
 
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          final responseData = json.decode(response.body);
-
-          if (responseData is Map<String, dynamic>) {
-            final success = responseData['success'] as bool?;
-            if (success == false) {
-              return Left(HttpErrorHandler.fromBackendError(responseData));
-            }
-
-            final brands = BrandModel.fromJsonList(responseData);
-            return Right(brands);
-          }
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
         }
-        return const Right([]);
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+
+        final brands = BrandModel.fromJsonList(responseData);
+        return Right(brands);
       }
+      return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return HttpErrorHandler.handleException(e);
+      return DioErrorHandler.handleException(e);
     }
   }
 
   @override
   Future<Either<ErrorModel, List<DepartmentModel>>> getDepartments() async {
     try {
-      final response = await client
-          .get(
-            Uri.parse('${Config.baseUrl}/departments'),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dioClient.get('/departments');
+      final responseData = response.data;
 
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          final responseData = json.decode(response.body);
-
-          if (responseData is Map<String, dynamic>) {
-            final success = responseData['success'] as bool?;
-            if (success == false) {
-              return Left(HttpErrorHandler.fromBackendError(responseData));
-            }
-
-            final departments = DepartmentModel.fromJsonList(responseData);
-            return Right(departments);
-          }
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
         }
-        return const Right([]);
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+
+        final departments = DepartmentModel.fromJsonList(responseData);
+        return Right(departments);
       }
+      return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return HttpErrorHandler.handleException(e);
+      return DioErrorHandler.handleException(e);
     }
   }
 
@@ -99,33 +83,53 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
     String departmentId,
   ) async {
     try {
-      final response = await client
-          .get(
-            Uri.parse('${Config.baseUrl}/departments/$departmentId/cities'),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dioClient.get(
+        '/departments/$departmentId/cities',
+      );
+      final responseData = response.data;
 
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          final responseData = json.decode(response.body);
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
 
-          if (responseData is Map<String, dynamic>) {
-            final success = responseData['success'] as bool?;
-            if (success == false) {
-              return Left(HttpErrorHandler.fromBackendError(responseData));
-            }
+        final cities = CityModel.fromJsonList(responseData);
+        return Right(cities);
+      }
+      return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
 
-            final cities = CityModel.fromJsonList(responseData);
-            return Right(cities);
-          }
+  @override
+  Future<Either<ErrorModel, List<BranchTypeModel>>> getBranchTypes() async {
+    try {
+      final response = await _dioClient.get('/branch-types');
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        // Extract data object that contains types array
+        final data = responseData['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          final types = BranchTypeModel.fromJsonList(data);
+          return Right(types);
         }
         return const Right([]);
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
       }
+      return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return HttpErrorHandler.handleException(e);
+      return DioErrorHandler.handleException(e);
     }
   }
 }

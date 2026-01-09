@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
+import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/branch_card.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
@@ -13,8 +20,35 @@ import 'package:motogo_frontend/src/features/register_branch/presentation/pages/
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  void _navigateToRegisterBranch(BuildContext context) {
-    Navigator.push(
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) =>
+          MyBranchesBloc(InjectorApp.resolve<GetBranchesUseCase>())
+            ..add(LoadBranches()),
+      child: const _HomeView(),
+    );
+  }
+}
+
+class _HomeView extends StatefulWidget {
+  const _HomeView();
+
+  @override
+  State<_HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<_HomeView> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _navigateToRegisterBranch(BuildContext context) async {
+    final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
@@ -24,113 +58,23 @@ class HomePage extends StatelessWidget {
         ),
       ),
     );
+
+    // Refresh branches if a new one was created
+    if (result == true && context.mounted) {
+      context.read<MyBranchesBloc>().add(RefreshBranches());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Sedes'),
+        title: const Text(BranchConstants.myBranchesTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue, Colors.blueAccent],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(Icons.account_circle, size: 60, color: Colors.white),
-                  SizedBox(height: 8),
-                  Text(
-                    'Menú Principal',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.home, color: Colors.blue),
-              title: const Text('Inicio', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.edit, color: Colors.blue),
-              title: const Text(
-                'Editar Perfil',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const EditMyProfilePage(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.lock, color: Colors.blue),
-              title: const Text(
-                'Cambiar Contraseña',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BlocProvider(
-                      create: (context) => ChangePasswordBloc(
-                        InjectorApp.resolve<ChangePasswordUseCase>(),
-                      ),
-                      child: const ChangePasswordPage(),
-                    ),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.blue),
-              title: const Text(
-                'Cerrar Sesión',
-                style: TextStyle(fontSize: 16),
-              ),
-              onTap: () {
-                _showLogoutDialog(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.info, color: Colors.blue),
-              title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      // Body - Dashboard de Sedes del Representante
+      drawer: _buildDrawer(context),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -139,20 +83,201 @@ class HomePage extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: _buildEmptyState(context),
+        child: Column(
+          children: [
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: BranchConstants.searchPlaceholder,
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blue),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                onChanged: (value) {
+                  context.read<MyBranchesBloc>().add(
+                    SearchBranches(query: value),
+                  );
+                },
+              ),
+            ),
+            // Branches list
+            Expanded(
+              child: BlocBuilder<MyBranchesBloc, MyBranchesState>(
+                builder: (context, state) {
+                  if (state is MyBranchesLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is MyBranchesError) {
+                    return _buildErrorState(context, state.error.message);
+                  }
+
+                  if (state is MyBranchesLoaded) {
+                    if (state.branches.isEmpty) {
+                      return _buildEmptyState(context);
+                    }
+
+                    if (state.filteredBranches.isEmpty &&
+                        state.searchQuery.isNotEmpty) {
+                      return _buildNoSearchResults();
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        context.read<MyBranchesBloc>().add(RefreshBranches());
+                      },
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(top: 8, bottom: 80),
+                        itemCount: state.filteredBranches.length,
+                        itemBuilder: (context, index) {
+                          final branch = state.filteredBranches[index];
+                          return BranchCard(
+                            branch: branch,
+                            onTap: () {
+                              debugPrint(
+                                '=== TAP DETECTED on branch: ${branch.name} ===',
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      BranchDetailPage(branch: branch),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
-      // FAB para crear sede
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToRegisterBranch(context),
         backgroundColor: Colors.blue[600],
         foregroundColor: Colors.white,
-        icon: const Icon(Icons.add_business),
-        label: const Text('Nueva Sede'),
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  /// Empty state when representative has no branches yet.
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue, Colors.blueAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Icon(Icons.account_circle, size: 60, color: Colors.white),
+                SizedBox(height: 8),
+                Text(
+                  'Menú Principal',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.home, color: Colors.blue),
+            title: const Text('Inicio', style: TextStyle(fontSize: 16)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.edit, color: Colors.blue),
+            title: const Text('Editar Perfil', style: TextStyle(fontSize: 16)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EditMyProfilePage(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.lock, color: Colors.blue),
+            title: const Text(
+              'Cambiar Contraseña',
+              style: TextStyle(fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => ChangePasswordBloc(
+                      InjectorApp.resolve<ChangePasswordUseCase>(),
+                    ),
+                    child: const ChangePasswordPage(),
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.blue),
+            title: const Text('Cerrar Sesión', style: TextStyle(fontSize: 16)),
+            onTap: () {
+              _showLogoutDialog(context);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.info, color: Colors.blue),
+            title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
@@ -207,7 +332,7 @@ class HomePage extends StatelessWidget {
               ),
               icon: const Icon(Icons.add),
               label: const Text(
-                'Crear mi primera sede',
+                BranchConstants.createFirstBranchButton,
                 style: TextStyle(fontSize: 16),
               ),
             ),
@@ -217,10 +342,51 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildNoSearchResults() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            BranchConstants.noSearchResults,
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.read<MyBranchesBloc>().add(LoadBranches());
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginLoggedOut) {
@@ -237,18 +403,13 @@ class HomePage extends StatelessWidget {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
                   child: const Text('Cancelar'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
                     context.read<LoginBloc>().add(LoginLogout());
-                    if (context.read<LoginBloc>().state is LoginLoggedOut) {
-                      Navigator.of(
-                        context,
-                      ).pushNamedAndRemoveUntil('/login', (route) => false);
-                    }
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('Cerrar Sesión'),

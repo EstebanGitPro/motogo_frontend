@@ -36,8 +36,13 @@ class CityDropdown extends StatelessWidget {
       return _buildErrorState();
     }
 
+    // Only use selected value if it exists in the list
+    final effectiveValue = cities.any((c) => c.id == selectedCityId)
+        ? selectedCityId
+        : null;
+
     return DropdownButtonFormField<String>(
-      initialValue: selectedCityId,
+      value: effectiveValue,
       decoration: InputDecoration(
         labelText: 'Ciudad',
         hintText: 'Selecciona una ciudad',

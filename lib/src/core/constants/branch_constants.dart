@@ -72,4 +72,21 @@ class BranchConstants {
 
   // Placeholders (for future tabs)
   static const String comingSoon = 'Próximamente';
+
+  // Edit form
+  static const String updateBranchButton = 'Actualizar Sede';
+  static const String updatingBranch = 'Actualizando sede...';
+  static const String branchUpdatedSuccess = 'Sede actualizada exitosamente';
+
+  // Delete confirmation
+  static const String deleteBranchTitle = 'Eliminar Sede';
+  static const String deleteBranchConfirmMessage =
+      'Esta acción no se puede deshacer. Para confirmar, escribe "eliminar" abajo:';
+  static const String deleteBranchConfirmWord = 'eliminar';
+  static const String deleteBranchConfirmHint = 'Escribe "eliminar"';
+  static const String deleteBranchConfirmError =
+      'Debes escribir "eliminar" para confirmar';
+  static const String deleteBranchButton = 'Eliminar Sede';
+  static const String deletingBranch = 'Eliminando sede...';
+  static const String branchDeletedSuccess = 'Sede eliminada exitosamente';
 }

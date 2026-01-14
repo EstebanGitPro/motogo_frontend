@@ -30,8 +30,13 @@ class DepartmentDropdown extends StatelessWidget {
       return _buildErrorState();
     }
 
+    // Only use selected value if it exists in the list
+    final effectiveValue = departments.any((d) => d.id == selectedDepartmentId)
+        ? selectedDepartmentId
+        : null;
+
     return DropdownButtonFormField<String>(
-      initialValue: selectedDepartmentId,
+      value: effectiveValue,
       decoration: InputDecoration(
         labelText: 'Departamento',
         hintText: 'Selecciona un departamento',

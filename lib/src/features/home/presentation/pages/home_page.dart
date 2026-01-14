@@ -16,6 +16,8 @@ import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/br
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
+import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
+import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -152,17 +154,24 @@ class _HomeViewState extends State<_HomeView> {
                           final branch = state.filteredBranches[index];
                           return BranchCard(
                             branch: branch,
-                            onTap: () {
+                            onTap: () async {
                               debugPrint(
                                 '=== TAP DETECTED on branch: ${branch.name} ===',
                               );
-                              Navigator.push(
+                              // Await result - updated branch or true for deletion
+                              final result = await Navigator.push<dynamic>(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       BranchDetailPage(branch: branch),
                                 ),
                               );
+                              // Refresh if there was any modification
+                              if (result != null && context.mounted) {
+                                context.read<MyBranchesBloc>().add(
+                                  RefreshBranches(),
+                                );
+                              }
                             },
                           );
                         },
@@ -256,6 +265,17 @@ class _HomeViewState extends State<_HomeView> {
                   ),
                 ),
               );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_forever, color: Colors.red),
+            title: const Text(
+              PersonConstants.deleteAccountMenuTitle,
+              style: TextStyle(fontSize: 16, color: Colors.red),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              _showDeleteAccountDialog(context);
             },
           ),
           ListTile(
@@ -380,6 +400,136 @@ class _HomeViewState extends State<_HomeView> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    final confirmController = TextEditingController();
+    bool isConfirmValid = false;
+    bool isDeleting = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (stateContext, setDialogState) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      PersonConstants.deleteAccountTitle,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    PersonConstants.deleteAccountWarning,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    PersonConstants.deleteAccountConfirmPrompt,
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: confirmController,
+                    enabled: !isDeleting,
+                    decoration: InputDecoration(
+                      hintText: PersonConstants.deleteAccountConfirmWord,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setDialogState(() {
+                        isConfirmValid =
+                            value.toLowerCase().trim() ==
+                            PersonConstants.deleteAccountConfirmWord;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isDeleting
+                      ? null
+                      : () => Navigator.pop(dialogContext),
+                  child: const Text('Cancelar'),
+                ),
+                TextButton(
+                  onPressed: (!isConfirmValid || isDeleting)
+                      ? null
+                      : () async {
+                          setDialogState(() {
+                            isDeleting = true;
+                          });
+
+                          final deleteUseCase =
+                              InjectorApp.resolve<DeletePersonUseCase>();
+                          final result = await deleteUseCase();
+
+                          result.fold(
+                            (error) {
+                              setDialogState(() {
+                                isDeleting = false;
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(error.message),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            },
+                            (message) {
+                              Navigator.pop(dialogContext);
+                              // Show success message from backend
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(message),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              // Clear session and redirect to login
+                              context.read<LoginBloc>().add(LoginLogout());
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/login',
+                                (route) => false,
+                              );
+                            },
+                          );
+                        },
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: isDeleting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text(PersonConstants.deleteAccountButton),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

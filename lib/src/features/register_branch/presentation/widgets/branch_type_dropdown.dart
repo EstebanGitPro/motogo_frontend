@@ -58,8 +58,13 @@ class BranchTypeDropdown extends StatelessWidget {
       );
     }
 
+    // Only use selectedValue if it matches an item in the list
+    final effectiveValue = branchTypes.any((t) => t.code == selectedValue)
+        ? selectedValue
+        : null;
+
     return DropdownButtonFormField<String>(
-      value: selectedValue,
+      value: effectiveValue,
       decoration: _buildDecoration(),
       items: branchTypes.map((type) {
         return DropdownMenuItem(value: type.code, child: Text(type.label));

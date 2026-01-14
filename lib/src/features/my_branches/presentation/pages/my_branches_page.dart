@@ -31,11 +31,33 @@ class _MyBranchesView extends StatefulWidget {
   State<_MyBranchesView> createState() => _MyBranchesViewState();
 }
 
-class _MyBranchesViewState extends State<_MyBranchesView> {
+class _MyBranchesViewState extends State<_MyBranchesView>
+    with WidgetsBindingObserver {
   final _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // Auto-refresh when page is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<MyBranchesBloc>().add(RefreshBranches());
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Refresh when app comes back to foreground
+    if (state == AppLifecycleState.resumed && mounted) {
+      context.read<MyBranchesBloc>().add(RefreshBranches());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     super.dispose();
   }
@@ -164,17 +186,28 @@ class _MyBranchesViewState extends State<_MyBranchesView> {
                         final branch = state.filteredBranches[index];
                         return BranchCard(
                           branch: branch,
-                          onTap: () {
+                          onTap: () async {
                             debugPrint(
                               '=== TAP DETECTED on branch: ${branch.name} ===',
                             );
-                            Navigator.push(
+                            // Await result - true means branch was deleted or updated
+                            final result = await Navigator.push<dynamic>(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     BranchDetailPage(branch: branch),
                               ),
                             );
+                            debugPrint(
+                              '=== Returned from detail with result: $result ===',
+                            );
+                            // Refresh if there was any modification (BranchEntity or true for deletion)
+                            if (result != null && context.mounted) {
+                              debugPrint('=== Triggering RefreshBranches ===');
+                              context.read<MyBranchesBloc>().add(
+                                RefreshBranches(),
+                              );
+                            }
                           },
                         );
                       },

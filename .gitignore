@@ -71,3 +71,10 @@ migrate_working_dir/
 app.*.symbols
 app.*.map.json
 docs/*.md
+icov.info
+
+# Agent Skills & Workflows (local AI tools)
+.github/skills/
+.agent/
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/Generated.xcconfig

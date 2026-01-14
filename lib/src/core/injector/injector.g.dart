@@ -11,11 +11,10 @@ class _$InjectorApp extends InjectorApp {
   void _configureCoreFactories() {
     final KiwiContainer container = KiwiContainer();
     container
-      ..registerSingleton((c) => Client())
-      ..registerFactory<UserSessionDataSource>(
-          (c) => UserSessionDataSourceImpl(c.resolve<Client>()))
       ..registerFactory<UserSessionRepository>(
-          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()));
+          (c) => UserSessionRepositoryImpl(c.resolve<UserSessionDataSource>()))
+      ..registerFactory<CatalogsRepository>(
+          (c) => CatalogsRepositoryImpl(c.resolve<CatalogsDataSource>()));
   }
 
   @override
@@ -41,13 +40,28 @@ class _$InjectorApp extends InjectorApp {
               c.resolve<EmailRecoveryVerificationDataSource>()))
       ..registerFactory((c) => VerifyRecoveryEmailUseCase(
           c.resolve<EmailRecoveryVerificationRepository>()))
-      ..registerFactory(
-          (c) => EmailRecoveryVerificationDataSource(c.resolve<Client>()))
       ..registerFactory<ChangePasswordRepository>((c) =>
           ChangePasswordRepositoryImpl(c.resolve<ChangePasswordDataSource>()))
       ..registerFactory(
           (c) => ChangePasswordUseCase(c.resolve<ChangePasswordRepository>()))
-      ..registerFactory<ChangePasswordDataSource>(
-          (c) => ChangePasswordDataSourceImpl(c.resolve<Client>()));
+      ..registerFactory<BranchRepository>((c) => BranchRepositoryImpl(
+          c.resolve<RegisterBranchDataSource>(),
+          c.resolve<EditBranchDataSource>()))
+      ..registerFactory(
+          (c) => RegisterBranchUseCase(c.resolve<BranchRepository>()))
+      ..registerFactory(
+          (c) => UpdateBranchUseCase(c.resolve<BranchRepository>()))
+      ..registerFactory<DeleteBranchRepository>((c) =>
+          DeleteBranchRepositoryImpl(c.resolve<DeleteBranchDataSource>()))
+      ..registerFactory(
+          (c) => DeleteBranchUseCase(c.resolve<DeleteBranchRepository>()))
+      ..registerFactory<MyBranchesRepository>(
+          (c) => MyBranchesRepositoryImpl(c.resolve<MyBranchesDataSource>()))
+      ..registerFactory(
+          (c) => GetBranchesUseCase(c.resolve<MyBranchesRepository>()))
+      ..registerFactory<DeletePersonRepository>((c) =>
+          DeletePersonRepositoryImpl(c.resolve<DeletePersonDataSource>()))
+      ..registerFactory(
+          (c) => DeletePersonUseCase(c.resolve<DeletePersonRepository>()));
   }
 }

@@ -1,13 +1,15 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:motogo_frontend/src/core/config/config.dart';
+import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/errors/http_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 
 /// DataSource para operaciones de cambio de contraseña.
+///
+/// Nota: Recibe el token como parámetro porque se usa después de obtenerlo
+/// del UserSessionManager.
 abstract class ChangePasswordDataSource {
   /// Cambia la contraseña del usuario autenticado.
   /// Retorna el mensaje de éxito del backend.
@@ -19,9 +21,15 @@ abstract class ChangePasswordDataSource {
 }
 
 class ChangePasswordDataSourceImpl implements ChangePasswordDataSource {
-  final http.Client _client;
-
-  ChangePasswordDataSourceImpl(this._client);
+  // Uses its own Dio instance because it receives token as parameter
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: Config.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
 
   @override
   Future<Either<ErrorModel, String>> changePassword({
@@ -30,41 +38,31 @@ class ChangePasswordDataSourceImpl implements ChangePasswordDataSource {
     required String token,
   }) async {
     try {
-      final response = await _client
-          .put(
-            Uri.parse('${Config.baseUrl}/persons/me/password'),
-            headers: _getHeaders(token: token),
-            body: json.encode({
-              'current_password': currentPassword,
-              'new_password': newPassword,
-            }),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dio.put(
+        '/persons/me/password',
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+        },
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body) as Map<String, dynamic>;
+      final responseData = response.data as Map<String, dynamic>;
 
-        // Verificar que la respuesta sea exitosa
-        if (responseData['success'] != true) {
-          return Left(HttpErrorHandler.fromBackendError(responseData));
-        }
-
-        final message =
-            responseData['message'] as String? ??
-            'Contraseña actualizada correctamente';
-        return Right(message);
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+      // Verificar que la respuesta sea exitosa
+      if (responseData['success'] != true) {
+        return Left(DioErrorHandler.fromBackendError(responseData));
       }
-    } catch (e) {
-      return HttpErrorHandler.handleException(e);
-    }
-  }
 
-  Map<String, String> _getHeaders({required String token}) {
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
+      // Extraer mensaje del backend
+      final message =
+          responseData['message'] as String? ??
+          FallbackMessages.operationSuccess;
+      return Right(message);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
   }
 }

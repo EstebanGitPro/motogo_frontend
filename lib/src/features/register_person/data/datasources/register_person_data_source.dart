@@ -1,15 +1,28 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/config/config.dart';
+import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/errors/http_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/register_person/data/models/person_register_model.dart';
 
+/// DataSource para el registro de personas.
+///
+/// Usa su propia instancia de Dio (sin interceptor de auth) porque el
+/// endpoint de registro es público y no requiere token.
 class RegisterPersonDataSource {
-  String _deriveIdFromLocationHeader(Map<String, String> headers) {
-    final location = headers['location'] ?? headers['Location'];
+  // Dio instance without auth interceptor (register is public endpoint)
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: Config.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
+
+  String _deriveIdFromLocationHeader(Headers headers) {
+    final location = headers.value('location') ?? headers.value('Location');
     if (location == null || location.isEmpty) {
       return '';
     }
@@ -62,7 +75,7 @@ class RegisterPersonDataSource {
     String role,
   ) async {
     try {
-      var body = {
+      final body = <String, dynamic>{
         'identity_number': identityNumber,
         'first_name': firstName,
         'last_name': lastName,
@@ -76,25 +89,19 @@ class RegisterPersonDataSource {
       if (secondLastName != null) {
         body['second_last_name'] = secondLastName;
       }
-      final response = await http
-          .post(
-            Uri.parse('${Config.baseUrl}/persons'),
-            headers: {'Content-Type': 'application/json'},
-            body: json.encode(body),
-          )
-          .timeout(const Duration(seconds: 15));
+
+      final response = await _dio.post('/persons', data: body);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        dynamic responseData;
-        if (response.body.trim().isNotEmpty) {
-          responseData = json.decode(response.body);
-        }
+        final responseData = response.data;
+
         // Manejo de posibles respuestas con envoltura HATEOAS
         final data =
             responseData is Map<String, dynamic> &&
                 responseData.containsKey('data')
             ? responseData['data']
             : responseData;
+
         if (data is Map<String, dynamic> &&
             data.containsKey('identity_number') &&
             data.containsKey('email')) {
@@ -124,10 +131,18 @@ class RegisterPersonDataSource {
         }
       } else {
         // Usar el mensaje del backend directamente
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+        return Left(
+          DioErrorHandler.fromBackendError(
+            response.data is Map<String, dynamic>
+                ? response.data
+                : {'message': FallbackMessages.registerError},
+          ),
+        );
       }
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return HttpErrorHandler.handleException(e);
+      return DioErrorHandler.handleException(e);
     }
   }
 }

@@ -7,7 +7,7 @@ import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.
 import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
-class LoginForm extends StatelessWidget {
+class LoginForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -22,6 +22,13 @@ class LoginForm extends StatelessWidget {
   });
 
   @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  bool _obscurePassword = true;
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
@@ -30,7 +37,7 @@ class LoginForm extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
-              key: formKey,
+              key: widget.formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -45,7 +52,7 @@ class LoginForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   CustomInputWidget(
-                    controller: emailController,
+                    controller: widget.emailController,
                     labelText: 'Email',
                     prefixIcon: const Icon(Icons.email_outlined),
                     keyboardType: TextInputType.emailAddress,
@@ -54,33 +61,49 @@ class LoginForm extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   CustomInputWidget(
-                    controller: passwordController,
+                    controller: widget.passwordController,
                     labelText: 'Contraseña',
                     prefixIcon: const Icon(Icons.lock_outline),
-                    obscureText: true,
+                    obscureText: _obscurePassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.grey[600],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                     validator: ValidatorUtils.required(
                       customMessage: 'Por favor ingresa tu contraseña',
                     ).validate,
                   ),
                   const SizedBox(height: 8),
-                  
-                 
+
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: state is LoginInProgress
+                      onPressed: widget.state is LoginInProgress
                           ? null
                           : () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const EmailRecoveryVerificationPage(),
+                                  builder: (context) =>
+                                      const EmailRecoveryVerificationPage(),
                                 ),
                               );
                             },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.blue[600],
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                       ),
                       child: const Text(
                         '¿Olvidaste tu contraseña?',
@@ -91,17 +114,17 @@ class LoginForm extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
                   CustomButtonWidget(
                     title: 'Iniciar sesión',
-                    isLoading: state is LoginInProgress,
+                    isLoading: widget.state is LoginInProgress,
                     onPressed: () {
-                      if (formKey.currentState!.validate()) {
+                      if (widget.formKey.currentState!.validate()) {
                         context.read<LoginBloc>().add(
                           LoginSubmitted(
-                            email: emailController.text,
-                            password: passwordController.text,
+                            email: widget.emailController.text,
+                            password: widget.passwordController.text,
                           ),
                         );
                       }
@@ -113,7 +136,7 @@ class LoginForm extends StatelessWidget {
                     children: [
                       const Text('¿No tienes una cuenta?'),
                       TextButton(
-                        onPressed: state is LoginInProgress
+                        onPressed: widget.state is LoginInProgress
                             ? null
                             : () {
                                 Navigator.pushAndRemoveUntil(

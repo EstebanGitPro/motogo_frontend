@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/services/navigation_service.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
@@ -17,7 +19,8 @@ import 'package:motogo_frontend/src/features/password_recovery/presentation/page
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  
+  await Firebase.initializeApp();
+
   InjectorApp.setup();
 
   runApp(
@@ -44,6 +47,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'MotoGo',
       localizationsDelegates: context.localizationDelegates,
@@ -62,7 +66,8 @@ class MyApp extends StatelessWidget {
         '/register/representative': (context) =>
             const RegisterRepresentativePage(),
         '/edit-my-profile': (context) => const EditMyProfilePage(),
-        '/password-recovery/email': (context) => const EmailRecoveryVerificationPage(),
+        '/password-recovery/email': (context) =>
+            const EmailRecoveryVerificationPage(),
       },
     );
   }

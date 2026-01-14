@@ -1,15 +1,17 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:motogo_frontend/src/core/config/config.dart';
+import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/errors/http_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/core/user/data/models/user_model.dart';
 
 /// DataSource para operaciones relacionadas con la sesión del usuario.
 /// Este es el ÚNICO punto de la aplicación que hace llamadas a /persons/me
+///
+/// Nota: Este datasource recibe el token como parámetro porque se usa
+/// durante el login antes de que el token esté guardado en storage.
 abstract class UserSessionDataSource {
   /// Obtiene el perfil del usuario autenticado desde el backend
   Future<Either<ErrorModel, UserModel>> fetchCurrentUser(String token);
@@ -23,45 +25,50 @@ abstract class UserSessionDataSource {
 }
 
 class UserSessionDataSourceImpl implements UserSessionDataSource {
-  final http.Client _client;
-
-  UserSessionDataSourceImpl(this._client);
+  // Uses its own Dio instance because it receives token as parameter
+  // (used during login before token is stored)
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: Config.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      headers: {'Content-Type': 'application/json'},
+    ),
+  );
 
   @override
   Future<Either<ErrorModel, UserModel>> fetchCurrentUser(String token) async {
     try {
-      final response = await _client
-          .get(
-            Uri.parse('${Config.baseUrl}/persons/me'),
-            headers: _getHeaders(token: token),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dio.get(
+        '/persons/me',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body) as Map<String, dynamic>;
+      final responseData = response.data as Map<String, dynamic>;
 
-        // Verificar que la respuesta sea exitosa
-        if (responseData['success'] != true) {
-          return Left(HttpErrorHandler.fromBackendError(responseData));
-        }
-
-        // Verificar que exista el objeto 'data'
-        final data = responseData['data'];
-        if (data == null) {
-          return Left(
-            HttpErrorHandler.fromBackendError({
-              'message': 'Respuesta del servidor incompleta',
-              'code': responseData['code'],
-            }),
-          );
-        }
-
-        return Right(UserModel.fromMap(data as Map<String, dynamic>));
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+      // Verificar que la respuesta sea exitosa
+      if (responseData['success'] != true) {
+        return Left(DioErrorHandler.fromBackendError(responseData));
       }
+
+      // Verificar que exista el objeto 'data'
+      final data = responseData['data'];
+      if (data == null) {
+        return Left(
+          DioErrorHandler.fromBackendError({
+            'message':
+                responseData['message'] ??
+                FallbackMessages.incompleteServerResponse,
+            'code': responseData['code'],
+          }),
+        );
+      }
+
+      return Right(UserModel.fromMap(data as Map<String, dynamic>));
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return HttpErrorHandler.handleException(e);
+      return DioErrorHandler.handleException(e);
     }
   }
 
@@ -71,32 +78,28 @@ class UserSessionDataSourceImpl implements UserSessionDataSource {
     String token,
   ) async {
     try {
-      final response = await _client
-          .put(
-            Uri.parse('${Config.baseUrl}/persons/me'),
-            headers: _getHeaders(token: token),
-            body: json.encode(user.toUpdateMap()),
-          )
-          .timeout(const Duration(seconds: 15));
+      final response = await _dio.put(
+        '/persons/me',
+        data: user.toUpdateMap(),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body) as Map<String, dynamic>;
-        final message =
-            responseData['message'] as String? ??
-            'Datos actualizados correctamente';
-        return Right(message);
-      } else {
-        return Left(HttpErrorHandler.fromHttpResponse(response));
+      final responseData = response.data as Map<String, dynamic>;
+
+      // Verificar que la respuesta sea exitosa
+      if (responseData['success'] != true) {
+        return Left(DioErrorHandler.fromBackendError(responseData));
       }
-    } catch (e) {
-      return HttpErrorHandler.handleException(e);
-    }
-  }
 
-  Map<String, String> _getHeaders({required String token}) {
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
+      // Extraer mensaje del backend
+      final message =
+          responseData['message'] as String? ??
+          FallbackMessages.operationSuccess;
+      return Right(message);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
   }
 }

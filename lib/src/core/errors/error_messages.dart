@@ -1,16 +1,17 @@
-/// Mensajes de FALLBACK para errores cuando el backend NO está disponible.
+/// Mensajes de FALLBACK para cuando el backend NO está disponible.
 ///
-/// IMPORTANTE: Estos mensajes solo se usan en situaciones donde no hay
-/// respuesta del servidor (errores de red, timeout, etc.).
-/// Cuando el backend responde, siempre se usa el mensaje del backend.
+/// IMPORTANTE: Estos mensajes solo se usan cuando no hay respuesta del servidor
+/// (errores de red, timeout, etc.) o cuando el backend no incluye un mensaje.
+/// Cuando el backend responde con un 'message', siempre se usa ese mensaje.
 ///
 /// Los mensajes deben ser:
 /// - Amigables y empáticos con el usuario
 /// - Claros sobre qué pasó
 /// - Con sugerencias de qué hacer
-class FallbackMessages {
-  // ============ ERRORES DE CONEXIÓN ============
 
+// ============ ERRORES DE CONEXIÓN ============
+
+class FallbackMessages {
   /// Error cuando no hay conexión a internet
   static const String networkError =
       '¡Ups! Parece que no hay conexión a internet. '
@@ -40,6 +41,78 @@ class FallbackMessages {
   static const String invalidResponse =
       'Recibimos una respuesta inesperada. '
       'Por favor, intenta nuevamente.';
+
+  // ============ ERRORES HTTP ESPECÍFICOS ============
+
+  /// Error 404 - Recurso no encontrado
+  static const String notFound =
+      'Lo que buscas no está disponible en este momento. '
+      'Si el problema persiste, contáctanos.';
+
+  /// Error 401 - No autorizado
+  static const String unauthorized =
+      'Tu sesión ha expirado. '
+      'Por favor, inicia sesión nuevamente.';
+
+  /// Error 403 - Prohibido
+  static const String forbidden =
+      'No tienes permisos para realizar esta acción. '
+      'Si crees que esto es un error, contáctanos.';
+
+  /// Error 400 - Solicitud incorrecta
+  static const String badRequest =
+      'Hubo un problema con la información enviada. '
+      'Por favor, verifica los datos e intenta de nuevo.';
+
+  /// Error 409 - Conflicto
+  static const String conflict =
+      'Esta información ya existe en el sistema. '
+      'Por favor, verifica los datos.';
+
+  /// Error 422 - Validación fallida
+  static const String validationError =
+      'Algunos datos no son válidos. '
+      'Por favor, revisa la información e intenta de nuevo.';
+
+  /// Error 429 - Demasiadas solicitudes
+  static const String tooManyRequests =
+      'Has realizado demasiadas solicitudes. '
+      'Por favor, espera un momento e intenta de nuevo.';
+
+  // ============ ERRORES DE SESIÓN ============
+
+  /// Error al refrescar sesión
+  static const String sessionRefreshError = 'Error al refrescar sesión';
+
+  /// Sesión expirada - requiere login
+  static const String sessionExpired =
+      'Sesión expirada. Por favor, inicia sesión nuevamente.';
+
+  // ============ ERRORES TÉCNICOS ============
+
+  /// Error de certificado SSL
+  static const String sslCertificateError = 'Error de certificado SSL';
+
+  /// Solicitud cancelada
+  static const String requestCancelled = 'Solicitud cancelada';
+
+  /// Error de conexión genérico
+  static const String connectionError = 'Error de conexión';
+
+  /// Error inesperado
+  static const String unexpectedError = 'Error inesperado';
+
+  // ============ MENSAJES DE ÉXITO (FALLBACK) ============
+
+  /// Mensaje genérico de éxito cuando el backend no envía uno
+  static const String operationSuccess = 'Operación exitosa';
+
+  /// Respuesta del servidor incompleta
+  static const String incompleteServerResponse =
+      'Respuesta del servidor incompleta';
+
+  /// Error genérico de registro
+  static const String registerError = 'Error en el registro';
 }
 
 /// @deprecated Use FallbackMessages en su lugar

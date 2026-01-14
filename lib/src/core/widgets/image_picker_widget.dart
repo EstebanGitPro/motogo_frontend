@@ -10,6 +10,9 @@ class ImagePickerWidget extends StatelessWidget {
   /// The currently selected image file.
   final File? selectedImage;
 
+  /// Existing image URL for edit mode (displays network image if no file selected).
+  final String? existingImageUrl;
+
   /// Callback when an image is selected or removed.
   final ValueChanged<File?> onImageChanged;
 
@@ -28,6 +31,7 @@ class ImagePickerWidget extends StatelessWidget {
   const ImagePickerWidget({
     super.key,
     required this.selectedImage,
+    this.existingImageUrl,
     required this.onImageChanged,
     this.enabled = true,
     this.isUploading = false,
@@ -154,6 +158,47 @@ class ImagePickerWidget extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(11),
                         child: Image.file(selectedImage!, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            onPressed: enabled
+                                ? () => _showPickerOptions(context)
+                                : null,
+                            tooltip: 'Cambiar imagen',
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : existingImageUrl != null && existingImageUrl!.isNotEmpty
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(11),
+                        child: Image.network(
+                          existingImageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 40,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        ),
                       ),
                       Positioned(
                         top: 8,

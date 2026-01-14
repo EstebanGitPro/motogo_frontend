@@ -35,4 +35,13 @@ class DebugMessages {
 
   /// Creando branch
   static const String creatingBranch = '📤 Creating branch with payload';
+
+  /// Actualizando branch
+  static const String updatingBranch = '📤 Updating branch';
+
+  /// Eliminando branch
+  static const String deletingBranch = '🗑️ Deleting branch';
+
+  /// Eliminando cuenta
+  static const String deletingAccount = '🗑️ Deleting user account';
 }

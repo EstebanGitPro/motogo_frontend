@@ -11,10 +11,19 @@ class BranchInfoCard extends StatelessWidget {
   /// Optional label for the establishment type (from catalog).
   final String? establishmentTypeLabel;
 
+  /// Map of brand IDs to names for display.
+  /// If provided, brand chips will show names instead of IDs.
+  final Map<String, String>? brandNamesMap;
+
+  /// Whether brands are currently being loaded.
+  final bool isLoadingBrands;
+
   const BranchInfoCard({
     super.key,
     required this.branch,
     this.establishmentTypeLabel,
+    this.brandNamesMap,
+    this.isLoadingBrands = false,
   });
 
   @override
@@ -60,7 +69,20 @@ class BranchInfoCard extends StatelessWidget {
             runSpacing: 8,
             children: [
               _buildTypeChip(),
-              ...branch.brands.map((brand) => _buildBrandChip(brand)),
+              if (isLoadingBrands)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  child: const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              else
+                ...branch.brands.map((brandId) => _buildBrandChip(brandId)),
             ],
           ),
           const SizedBox(height: 12),
@@ -136,7 +158,9 @@ class BranchInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBrandChip(String brand) {
+  Widget _buildBrandChip(String brandId) {
+    // Use resolved name if available, otherwise show ID
+    final displayText = brandNamesMap?[brandId] ?? brandId;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -145,7 +169,7 @@ class BranchInfoCard extends StatelessWidget {
         border: Border.all(color: Colors.grey[300]!, width: 1),
       ),
       child: Text(
-        brand,
+        displayText,
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,

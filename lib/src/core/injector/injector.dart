@@ -44,6 +44,20 @@ import 'package:motogo_frontend/src/features/register_branch/data/repositories/b
 import 'package:motogo_frontend/src/features/register_branch/domain/repositories/branch_repository.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 
+// Features - Edit Branch
+import 'package:motogo_frontend/src/features/edit_branch/data/datasources/edit_branch_data_source.dart';
+import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
+
+// Features - Delete Branch
+import 'package:motogo_frontend/src/features/delete_branch/data/datasources/delete_branch_data_source.dart';
+import 'package:motogo_frontend/src/features/delete_branch/domain/repositories/delete_branch_repository.dart';
+import 'package:motogo_frontend/src/features/delete_branch/domain/usecases/delete_branch_usecase.dart';
+
+// Features - Delete Person
+import 'package:motogo_frontend/src/features/delete_person/data/datasources/delete_person_data_source.dart';
+import 'package:motogo_frontend/src/features/delete_person/domain/repositories/delete_person_repository.dart';
+import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
+
 // Features - My Branches
 import 'package:motogo_frontend/src/features/my_branches/data/datasources/my_branches_data_source.dart';
 import 'package:motogo_frontend/src/features/my_branches/data/repositories/my_branches_repository_impl.dart';
@@ -129,9 +143,24 @@ abstract class InjectorApp {
       (c) => RegisterBranchDataSourceImpl(c.resolve<DioClient>()),
     );
 
+    // Edit Branch - uses DioClient
+    container.registerFactory<EditBranchDataSource>(
+      (c) => EditBranchDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Delete Branch - uses DioClient
+    container.registerFactory<DeleteBranchDataSource>(
+      (c) => DeleteBranchDataSourceImpl(c.resolve<DioClient>()),
+    );
+
     // My Branches - uses DioClient
     container.registerFactory<MyBranchesDataSource>(
       (c) => MyBranchesDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Delete Person - uses DioClient
+    container.registerFactory<DeletePersonDataSource>(
+      (c) => DeletePersonDataSourceImpl(c.resolve<DioClient>()),
     );
 
     // Change Password - has its own Dio (receives token as parameter)
@@ -182,11 +211,18 @@ abstract class InjectorApp {
     from: ChangePasswordRepositoryImpl,
   )
   @Register.factory(ChangePasswordUseCase)
-  // Features - Register Branch (Repository and UseCase only)
+  // Features - Register/Edit Branch (Repository and UseCases)
   @Register.factory(BranchRepository, from: BranchRepositoryImpl)
   @Register.factory(RegisterBranchUseCase)
+  @Register.factory(UpdateBranchUseCase)
+  // Features - Delete Branch (Repository and UseCase)
+  @Register.factory(DeleteBranchRepository, from: DeleteBranchRepositoryImpl)
+  @Register.factory(DeleteBranchUseCase)
   // Features - My Branches (Repository and UseCase only)
   @Register.factory(MyBranchesRepository, from: MyBranchesRepositoryImpl)
   @Register.factory(GetBranchesUseCase)
+  // Features - Delete Person (Repository and UseCase)
+  @Register.factory(DeletePersonRepository, from: DeletePersonRepositoryImpl)
+  @Register.factory(DeletePersonUseCase)
   void _configureAuthFactories();
 }

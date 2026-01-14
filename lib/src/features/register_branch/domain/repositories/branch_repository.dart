@@ -12,4 +12,13 @@ abstract class BranchRepository {
   /// Returns [Right] with the success message from backend on success,
   /// or [Left] with [ErrorModel] on failure.
   Future<Either<ErrorModel, String>> registerBranch(BranchEntity branch);
+
+  /// Updates an existing branch.
+  ///
+  /// Returns [Right] with the updated [BranchEntity] on success,
+  /// or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, BranchEntity>> updateBranch(
+    String id,
+    BranchEntity branch,
+  );
 }

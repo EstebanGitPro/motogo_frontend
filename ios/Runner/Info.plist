@@ -45,5 +45,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Mapbox Access Token - Use dart-define at runtime, don't commit real token! -->
+	<key>MBXAccessToken</key>
+	<string>MAPBOX_TOKEN_PLACEHOLDER</string>
 </dict>
 </plist>

@@ -13,9 +13,17 @@ import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_br
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/branch_card.dart';
+import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
+import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
+import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
+import 'package:motogo_frontend/src/features/register_franchise/presentation/pages/register_franchise_page.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_bloc.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_event.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/pages/manage_franchise_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 
@@ -25,9 +33,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          MyBranchesBloc(InjectorApp.resolve<GetBranchesUseCase>())
-            ..add(LoadBranches()),
+      create: (context) => MyBranchesBloc(
+        InjectorApp.resolve<GetBranchesUseCase>(),
+        listFranchisesUseCase: InjectorApp.resolve<ListFranchisesUseCase>(),
+      )..add(LoadBranches()),
       child: const _HomeView(),
     );
   }
@@ -152,8 +161,22 @@ class _HomeViewState extends State<_HomeView> {
                         itemCount: state.filteredBranches.length,
                         itemBuilder: (context, index) {
                           final branch = state.filteredBranches[index];
+                          // Get franchise name from the map if exists, fallback to "Franquicia" if has ID
+                          String? franchiseName;
+                          if (branch.franchiseId != null) {
+                            franchiseName =
+                                state.franchiseNames[branch.franchiseId] ??
+                                'Franquicia';
+                          }
                           return BranchCard(
                             branch: branch,
+                            franchiseName: franchiseName,
+                            onFranchiseTap: branch.franchiseId != null
+                                ? () => _navigateToManageFranchise(
+                                    context,
+                                    branch.franchiseId!,
+                                  )
+                                : null,
                             onTap: () async {
                               debugPrint(
                                 '=== TAP DETECTED on branch: ${branch.name} ===',
@@ -187,12 +210,121 @@ class _HomeViewState extends State<_HomeView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToRegisterBranch(context),
+        onPressed: () => _showCreateOptions(context),
         backgroundColor: Colors.blue[600],
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  void _showCreateOptions(BuildContext context) {
+    final parentContext = context; // Capture parent context
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(
+                  Icons.storefront,
+                  color: Colors.blue[600],
+                  size: 32,
+                ),
+                title: const Text(
+                  BranchConstants.newBranchOption,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _navigateToRegisterBranch(parentContext);
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: Icon(Icons.store, color: Colors.blue[600], size: 32),
+                title: const Text(
+                  BranchConstants.newFranchiseOption,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+                onTap: () {
+                  Navigator.pop(sheetContext);
+                  _navigateToRegisterFranchise(parentContext);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToRegisterFranchise(BuildContext context) async {
+    // Get branches without franchise from the current loaded state
+    final myBranchesState = context.read<MyBranchesBloc>().state;
+    List<BranchEntity> availableBranches = [];
+
+    if (myBranchesState is MyBranchesLoaded) {
+      // Filter branches that don't belong to a franchise
+      availableBranches = myBranchesState.branches
+          .where((branch) => branch.franchiseId == null && branch.id != null)
+          .toList();
+    }
+
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => RegisterFranchiseBloc(
+            InjectorApp.resolve<RegisterFranchiseUseCase>(),
+          ),
+          child: RegisterFranchisePage(availableBranches: availableBranches),
+        ),
+      ),
+    );
+
+    // Refresh branches if a new franchise was created
+    if (result == true && context.mounted) {
+      context.read<MyBranchesBloc>().add(RefreshBranches());
+    }
+  }
+
+  void _navigateToManageFranchise(
+    BuildContext context,
+    String franchiseId,
+  ) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => ManageFranchiseBloc(
+            getFranchiseUseCase: InjectorApp.resolve<GetFranchiseUseCase>(),
+            updateFranchiseUseCase:
+                InjectorApp.resolve<UpdateFranchiseUseCase>(),
+            deleteFranchiseUseCase:
+                InjectorApp.resolve<DeleteFranchiseUseCase>(),
+            linkBranchUseCase:
+                InjectorApp.resolve<LinkBranchToFranchiseUseCase>(),
+            unlinkBranchUseCase:
+                InjectorApp.resolve<UnlinkBranchFromFranchiseUseCase>(),
+            getBranchesUseCase: InjectorApp.resolve<GetBranchesUseCase>(),
+          )..add(LoadFranchise(franchiseId)),
+          child: ManageFranchisePage(franchiseId: franchiseId),
+        ),
+      ),
+    );
+
+    // Refresh branches if any changes were made
+    if (result == true && context.mounted) {
+      context.read<MyBranchesBloc>().add(RefreshBranches());
+    }
   }
 
   Widget _buildDrawer(BuildContext context) {

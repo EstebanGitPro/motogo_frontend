@@ -62,6 +62,10 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory<DeletePersonRepository>((c) =>
           DeletePersonRepositoryImpl(c.resolve<DeletePersonDataSource>()))
       ..registerFactory(
-          (c) => DeletePersonUseCase(c.resolve<DeletePersonRepository>()));
+          (c) => DeletePersonUseCase(c.resolve<DeletePersonRepository>()))
+      ..registerFactory<FranchiseRepository>((c) =>
+          FranchiseRepositoryImpl(c.resolve<RegisterFranchiseDataSource>()))
+      ..registerFactory(
+          (c) => RegisterFranchiseUseCase(c.resolve<FranchiseRepository>()));
   }
 }

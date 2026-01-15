@@ -64,10 +64,23 @@ import 'package:motogo_frontend/src/features/my_branches/data/repositories/my_br
 import 'package:motogo_frontend/src/features/my_branches/domain/repositories/my_branches_repository.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 
+// Features - Register Franchise
+import 'package:motogo_frontend/src/features/register_franchise/data/datasources/register_franchise_data_source.dart';
+import 'package:motogo_frontend/src/features/register_franchise/data/repositories/franchise_repository_impl.dart';
+import 'package:motogo_frontend/src/features/register_franchise/domain/repositories/franchise_repository.dart';
+import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
+
+// Features - Manage Franchise
+import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+
 // Core - Catalogs
 import 'package:motogo_frontend/src/core/catalogs/data/datasources/catalogs_data_source.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/repositories/catalogs_repository_impl.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
+
+// Core - Geocoding
+import 'package:motogo_frontend/src/core/geocoding/data/datasources/geocoding_data_source.dart';
 
 // Core - Firebase Services
 import 'package:motogo_frontend/src/core/services/firebase/firebase_token_data_source.dart';
@@ -136,6 +149,11 @@ abstract class InjectorApp {
       (c) => FirebaseTokenDataSourceImpl(c.resolve<DioClient>()),
     );
 
+    // Geocoding - uses DioClient
+    container.registerFactory<GeocodingDataSource>(
+      (c) => GeocodingDataSourceImpl(c.resolve<DioClient>()),
+    );
+
     // === Feature DataSources ===
 
     // Register Branch - uses DioClient
@@ -171,6 +189,36 @@ abstract class InjectorApp {
     // Email Recovery - has its own Dio (public endpoint, no auth)
     container.registerFactory<EmailRecoveryVerificationDataSource>(
       (c) => EmailRecoveryVerificationDataSource(),
+    );
+
+    // Register Franchise - uses DioClient
+    container.registerFactory<RegisterFranchiseDataSource>(
+      (c) => RegisterFranchiseDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Manage Franchise - uses DioClient
+    container.registerFactory<FranchiseDataSource>(
+      (c) => FranchiseDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Manage Franchise Use Cases
+    container.registerFactory<GetFranchiseUseCase>(
+      (c) => GetFranchiseUseCase(c.resolve<FranchiseDataSource>()),
+    );
+    container.registerFactory<ListFranchisesUseCase>(
+      (c) => ListFranchisesUseCase(c.resolve<FranchiseDataSource>()),
+    );
+    container.registerFactory<UpdateFranchiseUseCase>(
+      (c) => UpdateFranchiseUseCase(c.resolve<FranchiseDataSource>()),
+    );
+    container.registerFactory<DeleteFranchiseUseCase>(
+      (c) => DeleteFranchiseUseCase(c.resolve<FranchiseDataSource>()),
+    );
+    container.registerFactory<LinkBranchToFranchiseUseCase>(
+      (c) => LinkBranchToFranchiseUseCase(c.resolve<FranchiseDataSource>()),
+    );
+    container.registerFactory<UnlinkBranchFromFranchiseUseCase>(
+      (c) => UnlinkBranchFromFranchiseUseCase(c.resolve<FranchiseDataSource>()),
     );
   }
 
@@ -224,5 +272,8 @@ abstract class InjectorApp {
   // Features - Delete Person (Repository and UseCase)
   @Register.factory(DeletePersonRepository, from: DeletePersonRepositoryImpl)
   @Register.factory(DeletePersonUseCase)
+  // Features - Register Franchise (Repository and UseCase)
+  @Register.factory(FranchiseRepository, from: FranchiseRepositoryImpl)
+  @Register.factory(RegisterFranchiseUseCase)
   void _configureAuthFactories();
 }

@@ -44,4 +44,17 @@ class DebugMessages {
 
   /// Eliminando cuenta
   static const String deletingAccount = '🗑️ Deleting user account';
+
+  // ============ GEOCODING ============
+
+  /// Geocoding fallido
+  static const String geocodingFailed =
+      'No se pudo obtener la ubicación. Intenta más tarde.';
+
+  /// Error inesperado
+  static const String unexpectedError =
+      'Ocurrió un error inesperado. Intenta más tarde.';
+
+  /// Geocoding en progreso
+  static const String loadingLocation = '📍 Cargando ubicación...';
 }

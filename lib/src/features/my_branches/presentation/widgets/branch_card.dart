@@ -13,11 +13,19 @@ class BranchCard extends StatelessWidget {
   /// If not provided, the raw code will be displayed.
   final String? establishmentTypeLabel;
 
+  /// Optional franchise name to display as a badge.
+  final String? franchiseName;
+
+  /// Callback when the franchise badge is tapped.
+  final VoidCallback? onFranchiseTap;
+
   const BranchCard({
     super.key,
     required this.branch,
     this.onTap,
     this.establishmentTypeLabel,
+    this.franchiseName,
+    this.onFranchiseTap,
   });
 
   @override
@@ -88,6 +96,11 @@ class BranchCard extends StatelessWidget {
                         _buildTypeChip(),
                       ],
                     ),
+                    // Franchise badge (if applicable)
+                    if (franchiseName != null) ...[
+                      const SizedBox(height: 8),
+                      _buildFranchiseBadge(),
+                    ],
                   ],
                 ),
               ),
@@ -162,6 +175,37 @@ class BranchCard extends StatelessWidget {
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: Colors.blue[700],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFranchiseBadge() {
+    return GestureDetector(
+      onTap: onFranchiseTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.orange[50],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.orange[300]!, width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.store, size: 14, color: Colors.orange[700]),
+            const SizedBox(width: 6),
+            Text(
+              franchiseName!,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.orange[700],
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, size: 16, color: Colors.orange[700]),
+          ],
         ),
       ),
     );

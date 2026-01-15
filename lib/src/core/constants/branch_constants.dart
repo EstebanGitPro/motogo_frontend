@@ -70,6 +70,12 @@ class BranchConstants {
   static const String serviceBasicMaintenance = 'Mantenimiento Básico';
   static const String serviceGeneralRepair = 'Reparación General';
 
+  // Location tab
+  static const String loadingLocation = 'Cargando ubicación...';
+  static const String errorLoadingLocation = 'No se pudo cargar la ubicación';
+  static const String openInMaps = 'Abrir en Maps';
+  static const String locationNotAvailable = 'Ubicación no disponible';
+
   // Placeholders (for future tabs)
   static const String comingSoon = 'Próximamente';
 
@@ -89,4 +95,8 @@ class BranchConstants {
   static const String deleteBranchButton = 'Eliminar Sede';
   static const String deletingBranch = 'Eliminando sede...';
   static const String branchDeletedSuccess = 'Sede eliminada exitosamente';
+
+  // FAB menu options
+  static const String newBranchOption = 'Nueva Sede';
+  static const String newFranchiseOption = 'Nueva Franquicia';
 }

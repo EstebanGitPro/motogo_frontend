@@ -5,6 +5,7 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/delete_branch/domain/usecases/delete_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/edit_branch_page.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_info_card.dart';
+import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_location_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_services_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_tab_bar.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
@@ -305,7 +306,7 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
       case 1:
         return _buildPlaceholderTab(BranchConstants.tabSchedule);
       case 2:
-        return _buildPlaceholderTab(BranchConstants.tabLocation);
+        return BranchLocationTab(branch: _currentBranch);
       case 3:
         // Trigger navigation and show placeholder while transitioning
         WidgetsBinding.instance.addPostFrameCallback((_) {

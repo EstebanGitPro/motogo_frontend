@@ -78,3 +78,9 @@ icov.info
 .agent/
 ios/Flutter/flutter_export_environment.sh
 ios/Flutter/Generated.xcconfig
+
+# Secrets and Environment Files
+.env
+*.env.local
+secrets.json
+.vscode/launch.json

@@ -48,6 +48,9 @@ import 'package:motogo_frontend/src/features/register_branch/domain/usecases/reg
 import 'package:motogo_frontend/src/features/edit_branch/data/datasources/edit_branch_data_source.dart';
 import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
 
+// Features - Branch Services
+import 'package:motogo_frontend/src/features/branch_services/data/datasources/branch_services_datasource.dart';
+
 // Features - Delete Branch
 import 'package:motogo_frontend/src/features/delete_branch/data/datasources/delete_branch_data_source.dart';
 import 'package:motogo_frontend/src/features/delete_branch/domain/repositories/delete_branch_repository.dart';
@@ -169,6 +172,11 @@ abstract class InjectorApp {
     // Delete Branch - uses DioClient
     container.registerFactory<DeleteBranchDataSource>(
       (c) => DeleteBranchDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Branch Services - uses DioClient
+    container.registerFactory<BranchServicesDataSource>(
+      (c) => BranchServicesDataSourceImpl(c.resolve<DioClient>()),
     );
 
     // My Branches - uses DioClient

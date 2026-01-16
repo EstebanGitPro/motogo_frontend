@@ -30,7 +30,7 @@ class GeocodingDataSourceImpl implements GeocodingDataSource {
   }) async {
     try {
       final response = await _dioClient.dio.post(
-        '/geocoding/test',
+        '/location/geocode',
         data: {
           'address': address,
           'city_name': cityName,

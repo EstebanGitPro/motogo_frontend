@@ -302,7 +302,10 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
   Widget _buildTabContent() {
     switch (_selectedTabIndex) {
       case 0:
-        return BranchServicesTab(branchId: _currentBranch.id ?? '');
+        return BranchServicesTab(
+          branchId: _currentBranch.id ?? '',
+          branchName: _currentBranch.name,
+        );
       case 1:
         return _buildPlaceholderTab(BranchConstants.tabSchedule);
       case 2:

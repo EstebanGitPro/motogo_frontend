@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
+import 'package:motogo_frontend/src/features/branch_services/presentation/pages/branch_services_page.dart';
 
-/// Tab content widget displaying branch services with toggles.
+/// Tab content widget that navigates to the full services management page.
 ///
-/// Shows a list of services that can be enabled/disabled.
-/// Currently uses placeholder data.
-class BranchServicesTab extends StatefulWidget {
+/// Shows a preview card that opens the BranchServicesPage when tapped.
+class BranchServicesTab extends StatelessWidget {
   final String branchId;
+  final String branchName;
 
-  const BranchServicesTab({super.key, required this.branchId});
-
-  @override
-  State<BranchServicesTab> createState() => _BranchServicesTabState();
-}
-
-class _BranchServicesTabState extends State<BranchServicesTab> {
-  // Placeholder services data
-  final Map<String, bool> _services = {
-    BranchConstants.serviceBasicMaintenance: true,
-    BranchConstants.serviceGeneralRepair: true,
-  };
+  const BranchServicesTab({
+    super.key,
+    required this.branchId,
+    this.branchName = '',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,75 +33,77 @@ class _BranchServicesTabState extends State<BranchServicesTab> {
           ),
           const SizedBox(height: 12),
 
-          // Services list
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
+          // Navigate to services management card
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BranchServicesPage(
+                    branchId: branchId,
+                    branchName: branchName,
+                  ),
                 ),
-              ],
-            ),
-            child: Column(
-              children: _services.entries.map((entry) {
-                final isLast = entry.key == _services.keys.last;
-                return _buildServiceTile(
-                  name: entry.key,
-                  isEnabled: entry.value,
-                  showDivider: !isLast,
-                );
-              }).toList(),
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.build_outlined,
+                      color: Colors.blue[600],
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Gestionar Servicios',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Asocia servicios del catálogo a esta sede',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, color: Colors.grey[400]),
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildServiceTile({
-    required String name,
-    required bool isEnabled,
-    required bool showDivider,
-  }) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Switch(
-                value: isEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _services[name] = value;
-                  });
-                },
-                activeColor: Colors.blue[600],
-              ),
-            ],
-          ),
-        ),
-        if (showDivider)
-          Divider(
-            height: 1,
-            indent: 16,
-            endIndent: 16,
-            color: Colors.grey[200],
-          ),
-      ],
     );
   }
 }

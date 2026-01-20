@@ -34,12 +34,31 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
   // Mapbox controller
   MapboxMap? _mapboxMap;
 
+  // Annotation manager for cleanup
+  CircleAnnotationManager? _circleManager;
+
   @override
   void initState() {
     super.initState();
     // Configure Mapbox access token from secrets
     MapboxOptions.setAccessToken(Secrets.mapboxAccessToken);
     _loadLocation();
+  }
+
+  @override
+  void didUpdateWidget(covariant BranchLocationTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reload location when branch data changes
+    if (oldWidget.branch.address != widget.branch.address ||
+        oldWidget.branch.cityId != widget.branch.cityId ||
+        oldWidget.branch.departmentId != widget.branch.departmentId) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+        _geocodingResult = null;
+      });
+      _loadLocation();
+    }
   }
 
   Future<void> _loadLocation() async {
@@ -121,28 +140,39 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
     final lat = _geocodingResult!.latitude;
     final lng = _geocodingResult!.longitude;
 
-    // Create circle annotation manager for markers
-    final circleManager = await _mapboxMap!.annotations
-        .createCircleAnnotationManager();
+    // Clean up existing markers if manager exists
+    if (_circleManager != null) {
+      await _circleManager!.deleteAll();
+    } else {
+      // Create circle annotation manager for markers
+      _circleManager = await _mapboxMap!.annotations
+          .createCircleAnnotationManager();
+    }
 
     // Add a red circle marker at the branch location
-    await circleManager.create(
+    await _circleManager!.create(
       CircleAnnotationOptions(
         geometry: Point(coordinates: Position(lng, lat)),
         circleRadius: 12.0,
-        circleColor: Colors.red.value,
+        circleColor: Colors.red.toARGB32(),
         circleStrokeWidth: 3.0,
-        circleStrokeColor: Colors.white.value,
+        circleStrokeColor: Colors.white.toARGB32(),
       ),
     );
 
     // Also add a smaller inner dot for better visibility
-    await circleManager.create(
+    await _circleManager!.create(
       CircleAnnotationOptions(
         geometry: Point(coordinates: Position(lng, lat)),
         circleRadius: 5.0,
-        circleColor: Colors.white.value,
+        circleColor: Colors.white.toARGB32(),
       ),
+    );
+
+    // Update camera to the new location
+    await _mapboxMap!.flyTo(
+      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 15.0),
+      MapAnimationOptions(duration: 500),
     );
   }
 
@@ -263,7 +293,7 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),

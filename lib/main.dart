@@ -8,6 +8,7 @@ import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
+import 'package:motogo_frontend/src/features/admin_home/presentation/pages/admin_home_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_representative_page.dart';
@@ -62,6 +63,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const UserTypeSelectionPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/admin-home': (context) => const AdminHomePage(),
         '/register/user': (context) => const RegisterUserPage(),
         '/register/representative': (context) =>
             const RegisterRepresentativePage(),

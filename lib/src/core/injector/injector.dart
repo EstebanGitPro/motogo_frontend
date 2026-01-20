@@ -89,6 +89,12 @@ import 'package:motogo_frontend/src/core/geocoding/data/datasources/geocoding_da
 import 'package:motogo_frontend/src/core/services/firebase/firebase_token_data_source.dart';
 import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
 
+// Features - Admin Services
+import 'package:motogo_frontend/src/features/admin_services/data/datasources/admin_service_datasource.dart';
+import 'package:motogo_frontend/src/features/admin_services/data/repositories/admin_service_repository_impl.dart';
+import 'package:motogo_frontend/src/features/admin_services/domain/repositories/admin_service_repository.dart';
+import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -227,6 +233,26 @@ abstract class InjectorApp {
     );
     container.registerFactory<UnlinkBranchFromFranchiseUseCase>(
       (c) => UnlinkBranchFromFranchiseUseCase(c.resolve<FranchiseDataSource>()),
+    );
+
+    // Admin Services - uses DioClient
+    container.registerFactory<AdminServiceDataSource>(
+      (c) => AdminServiceDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<AdminServiceRepository>(
+      (c) => AdminServiceRepositoryImpl(c.resolve<AdminServiceDataSource>()),
+    );
+    container.registerFactory<GetServicesCatalogUseCase>(
+      (c) => GetServicesCatalogUseCase(c.resolve<AdminServiceRepository>()),
+    );
+    container.registerFactory<UpdateServiceUseCase>(
+      (c) => UpdateServiceUseCase(c.resolve<AdminServiceRepository>()),
+    );
+    container.registerFactory<ActivateServiceUseCase>(
+      (c) => ActivateServiceUseCase(c.resolve<AdminServiceRepository>()),
+    );
+    container.registerFactory<DeactivateServiceUseCase>(
+      (c) => DeactivateServiceUseCase(c.resolve<AdminServiceRepository>()),
     );
   }
 

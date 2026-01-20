@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
+import 'package:motogo_frontend/src/features/admin_home/presentation/pages/admin_home_page.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
 import 'package:motogo_frontend/src/core/constants/login_constants.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
@@ -68,9 +70,15 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
 
+            // Conditional routing based on user role
+            final userRole = state.user.role.toUpperCase();
+            final Widget targetPage = userRole == AdminConstants.roleAdmin
+                ? const AdminHomePage()
+                : const HomePage();
+
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
+              MaterialPageRoute(builder: (context) => targetPage),
               (route) => false,
             );
           }

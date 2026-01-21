@@ -272,10 +272,32 @@ class _HomeViewState extends State<_HomeView> {
     List<BranchEntity> availableBranches = [];
 
     if (myBranchesState is MyBranchesLoaded) {
-      // Filter branches that don't belong to a franchise
+      // Debug: Check what data we have
+      debugPrint(
+        '[Franchise] Total branches: ${myBranchesState.branches.length}',
+      );
+      debugPrint(
+        '[Franchise] Branches with franchise: ${myBranchesState.branchesWithFranchise}',
+      );
+      for (final branch in myBranchesState.branches) {
+        debugPrint(
+          '[Franchise] Branch ${branch.name} (${branch.id}) - franchiseId: ${branch.franchiseId}',
+        );
+      }
+
+      // Filter branches that don't belong to any franchise
+      // Uses branchesWithFranchise set built from all franchises' branchIds
       availableBranches = myBranchesState.branches
-          .where((branch) => branch.franchiseId == null && branch.id != null)
+          .where(
+            (branch) =>
+                branch.id != null &&
+                !myBranchesState.branchesWithFranchise.contains(branch.id),
+          )
           .toList();
+
+      debugPrint(
+        '[Franchise] Available branches for new franchise: ${availableBranches.length}',
+      );
     }
 
     final result = await Navigator.push<bool>(

@@ -34,8 +34,10 @@ class MyBranchesBloc extends Bloc<MyBranchesEvent, MyBranchesState> {
   Future<void> _fetchBranches(Emitter<MyBranchesState> emit) async {
     final result = await getBranchesUseCase.call();
 
-    // Build franchise names map
+    // Build franchise names map and collect all branch IDs that belong to franchises
     Map<String, String> franchiseNames = {};
+    Set<String> branchesWithFranchise = {};
+
     if (listFranchisesUseCase != null) {
       final franchisesResult = await listFranchisesUseCase!.call();
       franchisesResult.fold(
@@ -45,21 +47,31 @@ class MyBranchesBloc extends Bloc<MyBranchesEvent, MyBranchesState> {
             if (f.id != null) {
               franchiseNames[f.id!] = f.name;
             }
+            // Collect all branch IDs that belong to this franchise
+            branchesWithFranchise.addAll(f.branchIds);
           }
         },
       );
     }
 
-    result.fold(
-      (error) => emit(MyBranchesError(error: error)),
-      (branches) => emit(
+    result.fold((error) => emit(MyBranchesError(error: error)), (branches) {
+      // Also add branches that have franchiseId set directly
+      // This handles cases where the list endpoint doesn't include branch_ids
+      for (final branch in branches) {
+        if (branch.id != null && branch.franchiseId != null) {
+          branchesWithFranchise.add(branch.id!);
+        }
+      }
+
+      emit(
         MyBranchesLoaded(
           branches: branches,
           filteredBranches: branches,
           franchiseNames: franchiseNames,
+          branchesWithFranchise: branchesWithFranchise,
         ),
-      ),
-    );
+      );
+    });
   }
 
   void _onSearchBranches(SearchBranches event, Emitter<MyBranchesState> emit) {

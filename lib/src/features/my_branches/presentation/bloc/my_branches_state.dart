@@ -19,11 +19,16 @@ class MyBranchesLoaded extends MyBranchesState {
   /// Map of franchise ID to franchise name for badge display.
   final Map<String, String> franchiseNames;
 
+  /// Set of branch IDs that already belong to a franchise.
+  /// Used to filter available branches when creating a new franchise.
+  final Set<String> branchesWithFranchise;
+
   MyBranchesLoaded({
     required this.branches,
     required this.filteredBranches,
     this.searchQuery = '',
     this.franchiseNames = const {},
+    this.branchesWithFranchise = const {},
   });
 
   /// Creates a copy with optional overrides.
@@ -32,12 +37,15 @@ class MyBranchesLoaded extends MyBranchesState {
     List<BranchEntity>? filteredBranches,
     String? searchQuery,
     Map<String, String>? franchiseNames,
+    Set<String>? branchesWithFranchise,
   }) {
     return MyBranchesLoaded(
       branches: branches ?? this.branches,
       filteredBranches: filteredBranches ?? this.filteredBranches,
       searchQuery: searchQuery ?? this.searchQuery,
       franchiseNames: franchiseNames ?? this.franchiseNames,
+      branchesWithFranchise:
+          branchesWithFranchise ?? this.branchesWithFranchise,
     );
   }
 }

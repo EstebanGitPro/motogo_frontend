@@ -7,10 +7,30 @@ import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 /// Page for managing a franchise and its branches.
-class ManageFranchisePage extends StatelessWidget {
+class ManageFranchisePage extends StatefulWidget {
   final String franchiseId;
 
   const ManageFranchisePage({super.key, required this.franchiseId});
+
+  @override
+  State<ManageFranchisePage> createState() => _ManageFranchisePageState();
+}
+
+class _ManageFranchisePageState extends State<ManageFranchisePage> {
+  /// Tracks if any changes were made (link/unlink/update)
+  bool _hasChanges = false;
+
+  /// Tracks how many times data has been loaded
+  /// First load (loadCount == 0) is initial, subsequent loads mean data changed
+  int _loadCount = 0;
+
+  void _markChanged() {
+    if (!_hasChanges) {
+      setState(() {
+        _hasChanges = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,18 +49,26 @@ class ManageFranchisePage extends StatelessWidget {
           );
           Navigator.pop(context, true);
         } else if (state is ManageFranchiseUpdated) {
+          _markChanged();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
               backgroundColor: Colors.green,
             ),
           );
+        } else if (state is ManageFranchiseLoaded) {
+          // After initial load, any reload means link/unlink was performed
+          if (_loadCount > 0) {
+            _markChanged();
+          }
+          _loadCount++;
         }
       },
       builder: (context, state) {
         if (state is ManageFranchiseLoading) {
           return Scaffold(
             appBar: AppBar(
+              leading: _buildBackButton(context),
               title: const Text(FranchiseConstants.loadingTitle),
               backgroundColor: Colors.white,
               foregroundColor: Colors.black87,
@@ -55,6 +83,7 @@ class ManageFranchisePage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
+            leading: _buildBackButton(context),
             title: const Text(FranchiseConstants.errorTitle),
             backgroundColor: Colors.white,
             foregroundColor: Colors.black87,
@@ -67,10 +96,19 @@ class ManageFranchisePage extends StatelessWidget {
     );
   }
 
+  /// Custom back button that returns true when changes were made
+  Widget _buildBackButton(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => Navigator.pop(context, _hasChanges ? true : null),
+    );
+  }
+
   Widget _buildLoadedState(BuildContext context, ManageFranchiseLoaded state) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
+        leading: _buildBackButton(context),
         title: Text(
           '${FranchiseConstants.franchisePrefix}${state.franchise.name}',
         ),

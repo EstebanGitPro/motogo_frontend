@@ -95,6 +95,12 @@ import 'package:motogo_frontend/src/features/admin_services/data/repositories/ad
 import 'package:motogo_frontend/src/features/admin_services/domain/repositories/admin_service_repository.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
 
+// Features - Branch Schedules
+import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource_impl.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/data/repositories/branch_schedule_repository_impl.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -253,6 +259,15 @@ abstract class InjectorApp {
     );
     container.registerFactory<DeactivateServiceUseCase>(
       (c) => DeactivateServiceUseCase(c.resolve<AdminServiceRepository>()),
+    );
+
+    // Branch Schedules - uses DioClient
+    container.registerFactory<BranchScheduleDataSource>(
+      (c) => BranchScheduleDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<BranchScheduleRepository>(
+      (c) =>
+          BranchScheduleRepositoryImpl(c.resolve<BranchScheduleDataSource>()),
     );
   }
 

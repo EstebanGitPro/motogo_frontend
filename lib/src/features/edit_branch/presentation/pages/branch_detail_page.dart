@@ -8,6 +8,7 @@ import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/br
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_location_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_services_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_tab_bar.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/branch_schedule_tab.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 /// Page displaying detailed information about a branch.
@@ -307,7 +308,10 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
           branchName: _currentBranch.name,
         );
       case 1:
-        return _buildPlaceholderTab(BranchConstants.tabSchedule);
+        return BranchScheduleTab(
+          branchId: _currentBranch.id ?? '',
+          branchName: _currentBranch.name,
+        );
       case 2:
         return BranchLocationTab(branch: _currentBranch);
       case 3:
@@ -321,30 +325,5 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
       default:
         return const SizedBox.shrink();
     }
-  }
-
-  Widget _buildPlaceholderTab(String tabName) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.construction, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            tabName,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            BranchConstants.comingSoon,
-            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-          ),
-        ],
-      ),
-    );
   }
 }

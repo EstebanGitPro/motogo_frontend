@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_entity.dart';
 
 /// Repository contract for branch schedule operations.
@@ -33,4 +34,31 @@ abstract class BranchScheduleRepository {
 
   /// Gets the days catalog.
   Future<Either<ErrorModel, List<DayEntity>>> getDaysCatalog();
+
+  // ========== Schedule Details ==========
+
+  /// Gets all schedule details (time slots) for a branch.
+  Future<Either<ErrorModel, List<ScheduleDetailEntity>>> getScheduleDetails(
+    String branchId,
+  );
+
+  /// Creates a new time slot for a day.
+  Future<Either<ErrorModel, ScheduleDetailEntity>> createScheduleDetail(
+    String branchId, {
+    required int dayOfWeek,
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  });
+
+  /// Updates an existing time slot.
+  Future<Either<ErrorModel, ScheduleDetailEntity>> updateScheduleDetail(
+    String detailId, {
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  });
+
+  /// Deletes a time slot.
+  Future<Either<ErrorModel, String>> deleteScheduleDetail(String detailId);
 }

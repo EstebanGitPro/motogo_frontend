@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/models/day_model.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/data/models/schedule_detail_model.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/models/schedule_model.dart';
 
 /// Implementation of [BranchScheduleDataSource].
@@ -281,6 +282,173 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
         return const Right([]);
       }
       return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  // ========== Schedule Details Implementation ==========
+
+  @override
+  Future<Either<ErrorModel, List<ScheduleDetailModel>>> getScheduleDetails(
+    String branchId,
+  ) async {
+    try {
+      final path = ScheduleConstants.getScheduleDetailsPath(branchId);
+      final response = await _dioClient.get(path);
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final data = responseData['data'];
+        if (data is Map<String, dynamic>) {
+          // API returns { "data": { "details": [...], "_links": [...] } }
+          final detailsList = data['details'];
+          if (detailsList is List) {
+            final details = detailsList
+                .map(
+                  (json) => ScheduleDetailModel.fromJson(
+                    json as Map<String, dynamic>,
+                  ),
+                )
+                .toList();
+            return Right(details);
+          }
+        }
+        return const Right([]);
+      }
+      return const Right([]);
+    } on DioException catch (e) {
+      // 404 means no details exist - return empty list
+      if (e.response?.statusCode == 404) {
+        return const Right([]);
+      }
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<ErrorModel, ScheduleDetailModel>> createScheduleDetail(
+    String branchId, {
+    required int dayOfWeek,
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'day_of_week': dayOfWeek,
+        'opening_time': openingTime,
+        'closing_time': closingTime,
+        'is_closed': isClosed,
+      };
+
+      final response = await _dioClient.post(
+        ScheduleConstants.getScheduleDetailsPath(branchId),
+        data: body,
+      );
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final data = responseData['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          return Right(ScheduleDetailModel.fromJson(data));
+        }
+      }
+
+      return Left(
+        ErrorModel(
+          errorCode: ScheduleConstants.parseErrorCode,
+          message: ScheduleConstants.parseErrorMessage,
+        ),
+      );
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<ErrorModel, ScheduleDetailModel>> updateScheduleDetail(
+    String detailId, {
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'opening_time': openingTime,
+        'closing_time': closingTime,
+        'is_closed': isClosed,
+      };
+
+      final response = await _dioClient.put(
+        '${ScheduleConstants.scheduleDetailEndpoint}/$detailId',
+        data: body,
+      );
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final data = responseData['data'] as Map<String, dynamic>?;
+        if (data != null) {
+          return Right(ScheduleDetailModel.fromJson(data));
+        }
+      }
+
+      return Left(
+        ErrorModel(
+          errorCode: ScheduleConstants.parseErrorCode,
+          message: ScheduleConstants.parseErrorMessage,
+        ),
+      );
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> deleteScheduleDetail(
+    String detailId,
+  ) async {
+    try {
+      final response = await _dioClient.delete(
+        '${ScheduleConstants.scheduleDetailEndpoint}/$detailId',
+      );
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+        final message =
+            responseData['message'] as String? ??
+            ScheduleConstants.defaultDeleteDetailMessage;
+        return Right(message);
+      }
+
+      return const Right(ScheduleConstants.defaultDeleteDetailMessage);
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {

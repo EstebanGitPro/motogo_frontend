@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
 
@@ -62,5 +63,56 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   @override
   Future<Either<ErrorModel, List<DayEntity>>> getDaysCatalog() async {
     return _dataSource.getDaysCatalog();
+  }
+
+  // ========== Schedule Details Implementation ==========
+
+  @override
+  Future<Either<ErrorModel, List<ScheduleDetailEntity>>> getScheduleDetails(
+    String branchId,
+  ) async {
+    final result = await _dataSource.getScheduleDetails(branchId);
+    return result.map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
+  Future<Either<ErrorModel, ScheduleDetailEntity>> createScheduleDetail(
+    String branchId, {
+    required int dayOfWeek,
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    final result = await _dataSource.createScheduleDetail(
+      branchId,
+      dayOfWeek: dayOfWeek,
+      openingTime: openingTime,
+      closingTime: closingTime,
+      isClosed: isClosed,
+    );
+    return result.map((model) => model.toEntity());
+  }
+
+  @override
+  Future<Either<ErrorModel, ScheduleDetailEntity>> updateScheduleDetail(
+    String detailId, {
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    final result = await _dataSource.updateScheduleDetail(
+      detailId,
+      openingTime: openingTime,
+      closingTime: closingTime,
+      isClosed: isClosed,
+    );
+    return result.map((model) => model.toEntity());
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> deleteScheduleDetail(
+    String detailId,
+  ) async {
+    return _dataSource.deleteScheduleDetail(detailId);
   }
 }

@@ -69,3 +69,78 @@ class UpdateSchedule extends BranchScheduleEvent {
 
 /// Clear any displayed message.
 class ClearMessage extends BranchScheduleEvent {}
+
+// ========== Schedule Details Events ==========
+
+/// Load schedule details (time slots) for a branch.
+class LoadScheduleDetails extends BranchScheduleEvent {
+  final String branchId;
+
+  const LoadScheduleDetails(this.branchId);
+
+  @override
+  List<Object?> get props => [branchId];
+}
+
+/// Create a new time slot.
+class CreateScheduleDetail extends BranchScheduleEvent {
+  final String branchId;
+  final int dayOfWeek;
+  final String openingTime;
+  final String closingTime;
+  final bool isClosed;
+
+  const CreateScheduleDetail({
+    required this.branchId,
+    required this.dayOfWeek,
+    required this.openingTime,
+    required this.closingTime,
+    this.isClosed = false,
+  });
+
+  @override
+  List<Object?> get props => [
+    branchId,
+    dayOfWeek,
+    openingTime,
+    closingTime,
+    isClosed,
+  ];
+}
+
+/// Update an existing time slot.
+class UpdateScheduleDetail extends BranchScheduleEvent {
+  final String branchId;
+  final String detailId;
+  final String openingTime;
+  final String closingTime;
+  final bool isClosed;
+
+  const UpdateScheduleDetail({
+    required this.branchId,
+    required this.detailId,
+    required this.openingTime,
+    required this.closingTime,
+    this.isClosed = false,
+  });
+
+  @override
+  List<Object?> get props => [
+    branchId,
+    detailId,
+    openingTime,
+    closingTime,
+    isClosed,
+  ];
+}
+
+/// Delete a time slot.
+class DeleteScheduleDetail extends BranchScheduleEvent {
+  final String branchId;
+  final String detailId;
+
+  const DeleteScheduleDetail({required this.branchId, required this.detailId});
+
+  @override
+  List<Object?> get props => [branchId, detailId];
+}

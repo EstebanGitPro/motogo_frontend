@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
-import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
 
 /// Card widget displaying schedule status with toggle and delete options.
+///
+/// Note: The days accordion is now managed by the parent widget.
 class ScheduleStatusCard extends StatelessWidget {
   final bool isActive;
   final DateTime? startDate;
   final DateTime? endDate;
-  final List<DayEntity> daysCatalog;
   final ValueChanged<bool> onToggle;
   final VoidCallback onDelete;
   final VoidCallback? onEditValidity;
@@ -18,7 +18,6 @@ class ScheduleStatusCard extends StatelessWidget {
     required this.isActive,
     this.startDate,
     this.endDate,
-    this.daysCatalog = const [],
     required this.onToggle,
     required this.onDelete,
     this.onEditValidity,
@@ -120,6 +119,7 @@ class ScheduleStatusCard extends StatelessWidget {
               const SizedBox(height: 16),
             ],
             // Actions row
+            // Actions row with visibility info and delete
             Row(
               children: [
                 Expanded(
@@ -151,82 +151,7 @@ class ScheduleStatusCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Divider(height: 1),
-            const SizedBox(height: 16),
-            // Days section
-            _buildDaysSection(),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDaysSection() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
-              const SizedBox(width: 8),
-              Text(
-                'Días de Atención',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[700],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (daysCatalog.isEmpty)
-            Text(
-              'Cargando días...',
-              style: TextStyle(fontSize: 13, color: Colors.grey[500]),
-            )
-          else
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: daysCatalog.map((day) {
-                // TODO: Replace with actual selected days from schedule_details
-                final isSelected =
-                    true; // Placeholder - all days shown as available
-                return _buildDayChip(day, isSelected);
-              }).toList(),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDayChip(DayEntity day, bool isSelected) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? const Color(0xFF10B981).withValues(alpha: 0.1)
-            : Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: isSelected ? const Color(0xFF10B981) : Colors.grey[300]!,
-          width: 1,
-        ),
-      ),
-      child: Text(
-        day.label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          color: isSelected ? const Color(0xFF10B981) : Colors.grey[600],
         ),
       ),
     );

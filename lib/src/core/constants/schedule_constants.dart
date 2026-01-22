@@ -108,4 +108,34 @@ class ScheduleConstants {
   /// Builds the deactivate endpoint for a specific branch.
   static String getDeactivatePath(String branchId) =>
       '/branches/$branchId/schedules/deactivate';
+
+  /// Builds the schedule details endpoint for a specific branch.
+  static String getScheduleDetailsPath(String branchId) =>
+      '/branches/$branchId/schedules/details';
+
+  /// Schedule details base endpoint.
+  static const String scheduleDetailEndpoint = '/schedule-details';
+
+  // Time slots
+  static const String addTimeSlot = 'Agregar franja';
+  static const String editTimeSlot = 'Editar franja';
+  static const String deleteTimeSlot = 'Eliminar franja';
+  static const String deleteTimeSlotTitle = 'Eliminar franja horaria';
+  static const String deleteTimeSlotMessage =
+      '¿Estás seguro de que deseas eliminar esta franja horaria?';
+  static const String deleteTimeSlotConfirm = 'Eliminar';
+  static const String closedForDay = 'Cerrado';
+  static const String openingTimeLabel = 'Hora de apertura';
+  static const String closingTimeLabel = 'Hora de cierre';
+  static const String closedAllDay = 'Cerrado todo el día';
+  static const String timeSlotCreated = 'Franja horaria creada exitosamente';
+  static const String timeSlotUpdated =
+      'Franja horaria actualizada exitosamente';
+  static const String timeSlotDeleted = 'Franja horaria eliminada exitosamente';
+  static const String defaultDeleteDetailMessage = 'Franja horaria eliminada';
+
+  // Days section
+  static const String daysOfAttention = 'Días de Atención';
+  static const String loadingDays = 'Cargando días...';
+  static const String noTimeSlots = 'Sin franjas configuradas';
 }

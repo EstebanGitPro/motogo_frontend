@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/domain/repositorie
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_bloc.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_event.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_state.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/schedule_days_accordion.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/schedule_status_card.dart';
 
 /// Tab widget for managing branch schedules.
@@ -179,7 +180,6 @@ class _BranchScheduleContent extends StatelessWidget {
             isActive: state.schedule.active,
             startDate: state.schedule.startDate,
             endDate: state.schedule.endDate,
-            daysCatalog: state.daysCatalog,
             onToggle: (value) {
               context.read<BranchScheduleBloc>().add(
                 ToggleScheduleStatus(branchId: branchId, activate: value),
@@ -187,6 +187,13 @@ class _BranchScheduleContent extends StatelessWidget {
             },
             onDelete: () => _showDeleteConfirmation(context),
             onEditValidity: () => _showEditValidityDialog(context, state),
+          ),
+          const SizedBox(height: 16),
+          // Days accordion
+          ScheduleDaysAccordion(
+            branchId: branchId,
+            daysCatalog: state.daysCatalog,
+            detailsByDay: state.detailsByDay,
           ),
         ],
       ),

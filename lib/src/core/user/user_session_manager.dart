@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:motogo_frontend/src/core/user/data/models/user_model.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
+import 'package:motogo_frontend/src/core/utils/app_logger.dart';
 
 /// Singleton que gestiona la sesión del usuario autenticado.
 ///
@@ -78,9 +78,9 @@ class UserSessionManager {
         _currentUser = UserModel.fromJson(userDataJson);
       }
 
-      debugPrint('🔐 Session loaded: isAuthenticated=$isAuthenticated');
+      AppLogger.auth('Session loaded: isAuthenticated=$isAuthenticated');
     } catch (e) {
-      debugPrint('❌ Error loading session: $e');
+      AppLogger.error('Error loading session', e);
       await clearSession();
     }
   }
@@ -108,9 +108,9 @@ class UserSessionManager {
       await _secureStorage.write(key: _userDataKey, value: userModel.toJson());
       await _secureStorage.write(key: _userIdKey, value: user.id);
 
-      debugPrint('✅ Session saved for user: ${user.email}');
+      AppLogger.auth('Session saved for user: ${user.email}');
     } catch (e) {
-      debugPrint('❌ Error saving session: $e');
+      AppLogger.error('Error saving session', e);
       rethrow;
     }
   }
@@ -129,9 +129,9 @@ class UserSessionManager {
       await _secureStorage.delete(key: _userDataKey);
       await _secureStorage.delete(key: _userIdKey);
 
-      debugPrint('🚪 Session cleared');
+      AppLogger.auth('Session cleared');
     } catch (e) {
-      debugPrint('❌ Error clearing session: $e');
+      AppLogger.error('Error clearing session', e);
     }
   }
 
@@ -147,9 +147,9 @@ class UserSessionManager {
       final userModel = UserModel.fromEntity(user);
       await _secureStorage.write(key: _userDataKey, value: userModel.toJson());
 
-      debugPrint('📝 User data updated: ${user.email}');
+      AppLogger.auth('User data updated: ${user.email}');
     } catch (e) {
-      debugPrint('❌ Error updating user: $e');
+      AppLogger.error('Error updating user', e);
     }
   }
 
@@ -167,9 +167,9 @@ class UserSessionManager {
         await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
       }
 
-      debugPrint('🔑 Tokens updated');
+      AppLogger.auth('Tokens updated');
     } catch (e) {
-      debugPrint('❌ Error updating tokens: $e');
+      AppLogger.error('Error updating tokens', e);
     }
   }
 }

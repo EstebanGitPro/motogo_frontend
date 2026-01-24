@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
@@ -23,6 +24,10 @@ void main() async {
   await Firebase.initializeApp();
 
   InjectorApp.setup();
+
+  // Load stored session (tokens + user data) from SecureStorage
+  // This is critical for AuthInterceptor to have access to the refresh token
+  await UserSessionManager.instance.loadSession();
 
   runApp(
     EasyLocalization(

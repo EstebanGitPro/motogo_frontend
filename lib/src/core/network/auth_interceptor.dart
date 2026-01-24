@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
-import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/network/refresh_token_data_source.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
@@ -152,9 +151,11 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Handles session expiration by clearing session and redirecting to login.
+  /// Note: We don't show a SnackBar here - the error propagates to the UI
+  /// which is responsible for displaying the appropriate error message.
+  /// This prevents duplicate SnackBars when errors are handled by BlocConsumers.
   Future<void> _handleSessionExpired() async {
     await UserSessionManager.instance.clearSession();
     NavigationService.navigateToLogin();
-    NavigationService.showSnackBar(FallbackMessages.sessionExpired);
   }
 }

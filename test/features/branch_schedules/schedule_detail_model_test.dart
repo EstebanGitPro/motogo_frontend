@@ -79,12 +79,10 @@ void main() {
 
         final json = model.toJson();
 
-        // toJson only includes fields needed for API request
         expect(json['day_of_week'], 2);
         expect(json['opening_time'], '09:00');
         expect(json['closing_time'], '17:00');
         expect(json['is_closed'], false);
-        // These should NOT be in toJson for create/update
         expect(json.containsKey('id'), false);
         expect(json.containsKey('schedule_id'), false);
         expect(json.containsKey('day_name'), false);

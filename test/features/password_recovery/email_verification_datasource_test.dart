@@ -5,8 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 
-// We create a testable version of the datasource since the original
-// creates its Dio internally
 class TestableEmailRecoveryDataSource {
   final Dio dio;
 

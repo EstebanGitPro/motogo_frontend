@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
-import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -34,10 +32,6 @@ class EditBranchDataSourceImpl implements EditBranchDataSource {
   ) async {
     try {
       final body = branch.toJson();
-
-      debugPrint('🔄 ${DebugMessages.updatingBranch}: $id');
-      debugPrint('🔄 establishment_type: ${branch.establishmentType}');
-      debugPrint('🔄 PUT /branches/$id body: $body');
 
       final response = await _dioClient.put('/branches/$id', data: body);
       final responseData = response.data;

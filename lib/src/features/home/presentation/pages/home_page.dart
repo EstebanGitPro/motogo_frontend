@@ -178,10 +178,6 @@ class _HomeViewState extends State<_HomeView> {
                                   )
                                 : null,
                             onTap: () async {
-                              debugPrint(
-                                '=== TAP DETECTED on branch: ${branch.name} ===',
-                              );
-                              // Await result - updated branch or true for deletion
                               final result = await Navigator.push<dynamic>(
                                 context,
                                 MaterialPageRoute(
@@ -189,7 +185,6 @@ class _HomeViewState extends State<_HomeView> {
                                       BranchDetailPage(branch: branch),
                                 ),
                               );
-                              // Refresh if there was any modification
                               if (result != null && context.mounted) {
                                 context.read<MyBranchesBloc>().add(
                                   RefreshBranches(),
@@ -272,21 +267,6 @@ class _HomeViewState extends State<_HomeView> {
     List<BranchEntity> availableBranches = [];
 
     if (myBranchesState is MyBranchesLoaded) {
-      // Debug: Check what data we have
-      debugPrint(
-        '[Franchise] Total branches: ${myBranchesState.branches.length}',
-      );
-      debugPrint(
-        '[Franchise] Branches with franchise: ${myBranchesState.branchesWithFranchise}',
-      );
-      for (final branch in myBranchesState.branches) {
-        debugPrint(
-          '[Franchise] Branch ${branch.name} (${branch.id}) - franchiseId: ${branch.franchiseId}',
-        );
-      }
-
-      // Filter branches that don't belong to any franchise
-      // Uses branchesWithFranchise set built from all franchises' branchIds
       availableBranches = myBranchesState.branches
           .where(
             (branch) =>
@@ -294,10 +274,6 @@ class _HomeViewState extends State<_HomeView> {
                 !myBranchesState.branchesWithFranchise.contains(branch.id),
           )
           .toList();
-
-      debugPrint(
-        '[Franchise] Available branches for new franchise: ${availableBranches.length}',
-      );
     }
 
     final result = await Navigator.push<bool>(

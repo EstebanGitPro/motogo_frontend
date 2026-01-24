@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
@@ -27,8 +26,6 @@ class RegisterFranchiseDataSourceImpl implements RegisterFranchiseDataSource {
   ) async {
     try {
       final body = franchise.toJson();
-
-      debugPrint('[RegisterFranchise] Creating franchise: $body');
 
       final response = await _dioClient.post('/franchises', data: body);
       final responseData = response.data;

@@ -74,7 +74,6 @@ void main() {
         expect(json['name'], 'MotoRed');
         expect(json['description'], 'Una descripción válida');
         expect(json['branch_ids'], ['branch-a', 'branch-b']);
-        // id is not included in toJson (server generates it)
         expect(json.containsKey('id'), false);
       });
 
@@ -117,7 +116,7 @@ void main() {
         expect(model.name, 'Entity Franchise');
         expect(model.description, 'Entity description');
         expect(model.branchIds, ['b1', 'b2']);
-        expect(model.branchCount, null); // branchCount not in entity
+        expect(model.branchCount, null);
       });
 
       test('should handle entity with minimal fields', () {

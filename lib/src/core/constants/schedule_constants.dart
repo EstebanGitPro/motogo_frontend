@@ -133,9 +133,68 @@ class ScheduleConstants {
       'Franja horaria actualizada exitosamente';
   static const String timeSlotDeleted = 'Franja horaria eliminada exitosamente';
   static const String defaultDeleteDetailMessage = 'Franja horaria eliminada';
+  static const String defaultUpdateDetailMessage = 'Franja horaria actualizada';
 
   // Days section
   static const String daysOfAttention = 'Días de Atención';
   static const String loadingDays = 'Cargando días...';
   static const String noTimeSlots = 'Sin franjas configuradas';
+
+  // === Schedule Exceptions (HU20-25) ===
+
+  // UI Labels
+  static const String exceptionsTitle = 'Excepciones de Horario';
+  static const String addException = 'Agregar Excepción';
+  static const String editException = 'Editar Excepción';
+  static const String deleteException = 'Eliminar Excepción';
+  static const String newExceptionTitle = 'Nueva Excepción de Horario';
+  static const String editExceptionTitle = 'Editar Excepción de Horario';
+  static const String noExceptions = 'Sin excepciones configuradas';
+  static const String exceptionDateLabel = 'Fecha';
+  static const String exceptionStartDateLabel = 'Fecha de inicio';
+  static const String exceptionEndDateLabel = 'Fecha de fin';
+  static const String dateRangeToggle = 'Rango de fechas';
+  static const String closedThisDay = 'Cerrado este día';
+  static const String exceptionOpeningTimeLabel =
+      'Hora de apertura (excepción)';
+  static const String exceptionClosingTimeLabel = 'Hora de cierre (excepción)';
+
+  // Delete confirmation
+  static const String deleteExceptionTitle = 'Eliminar Excepción';
+  static const String deleteExceptionMessage =
+      '¿Estás seguro de que deseas eliminar esta excepción de horario?';
+  static const String deleteExceptionConfirm = 'Eliminar';
+
+  // Success messages
+  static const String exceptionCreated = 'Excepción creada exitosamente';
+  static const String exceptionUpdated = 'Excepción actualizada exitosamente';
+  static const String exceptionDeleted = 'Excepción eliminada exitosamente';
+  static const String exceptionActivated = 'Excepción activada exitosamente';
+  static const String exceptionDeactivated =
+      'Excepción desactivada exitosamente';
+  static const String defaultDeleteExceptionMessage = 'Excepción eliminada';
+  static const String defaultActivateExceptionMessage = 'Excepción activada';
+  static const String defaultDeactivateExceptionMessage =
+      'Excepción desactivada';
+
+  // Error messages
+  static const String errorLoadingExceptions = 'Error al cargar excepciones';
+  static const String errorCreatingException = 'Error al crear excepción';
+  static const String errorUpdatingException = 'Error al actualizar excepción';
+  static const String errorDeletingException = 'Error al eliminar excepción';
+
+  // API Endpoints
+  static const String scheduleExceptionEndpoint = '/schedule-exceptions';
+
+  /// Builds the schedule exceptions endpoint for a specific branch.
+  static String getScheduleExceptionsPath(String branchId) =>
+      '/branches/$branchId/schedules/exceptions';
+
+  /// Builds the activate exception endpoint.
+  static String getExceptionActivatePath(String exceptionId) =>
+      '/schedule-exceptions/$exceptionId/activate';
+
+  /// Builds the deactivate exception endpoint.
+  static String getExceptionDeactivatePath(String exceptionId) =>
+      '/schedule-exceptions/$exceptionId/deactivate';
 }

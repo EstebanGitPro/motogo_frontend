@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
-import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
@@ -24,8 +22,6 @@ class RegisterBranchDataSourceImpl implements RegisterBranchDataSource {
   Future<Either<ErrorModel, String>> registerBranch(BranchModel branch) async {
     try {
       final body = branch.toJson();
-
-      debugPrint('${DebugMessages.creatingBranch}: $body');
 
       final response = await _dioClient.post('/branches', data: body);
       final responseData = response.data;

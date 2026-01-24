@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
@@ -128,8 +127,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   Future<UserEntity?> _getCachedUser() async {
     try {
       return await UserSessionManager.instance.getCurrentUser();
-    } catch (e) {
-      debugPrint('Error getting cached user: $e');
+    } catch (_) {
       return null;
     }
   }

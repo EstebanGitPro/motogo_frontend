@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_event.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_state.dart';
@@ -14,6 +15,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/
 /// - Deleting existing schedule
 /// - Activating/Deactivating schedule
 /// - Managing schedule details (time slots)
+/// - Managing schedule exceptions (HU20-25)
 class BranchScheduleBloc
     extends Bloc<BranchScheduleEvent, BranchScheduleState> {
   final BranchScheduleRepository _repository;
@@ -32,10 +34,17 @@ class BranchScheduleBloc
     on<CreateScheduleDetail>(_onCreateScheduleDetail);
     on<UpdateScheduleDetail>(_onUpdateScheduleDetail);
     on<DeleteScheduleDetail>(_onDeleteScheduleDetail);
+    // Schedule Exceptions handlers (HU20-25)
+    on<LoadScheduleExceptions>(_onLoadScheduleExceptions);
+    on<CreateScheduleException>(_onCreateScheduleException);
+    on<UpdateScheduleException>(_onUpdateScheduleException);
+    on<DeleteScheduleException>(_onDeleteScheduleException);
+    on<ToggleScheduleExceptionStatus>(_onToggleScheduleExceptionStatus);
   }
 
   List<DayEntity> _daysCatalog = [];
   List<ScheduleDetailEntity> _scheduleDetails = [];
+  List<ScheduleExceptionEntity> _scheduleExceptions = [];
 
   Future<void> _onLoadSchedule(
     LoadSchedule event,
@@ -58,6 +67,7 @@ class BranchScheduleBloc
       (schedule) async {
         if (schedule == null) {
           _scheduleDetails = [];
+          _scheduleExceptions = [];
           emit(BranchScheduleNotFound(daysCatalog: _daysCatalog));
         } else {
           // Also load schedule details
@@ -69,11 +79,21 @@ class BranchScheduleBloc
             (details) => _scheduleDetails = details,
           );
 
+          // Also load schedule exceptions
+          final exceptionsResult = await _repository.getScheduleExceptions(
+            event.branchId,
+          );
+          exceptionsResult.fold(
+            (error) => _scheduleExceptions = [],
+            (exceptions) => _scheduleExceptions = exceptions,
+          );
+
           emit(
             BranchScheduleLoaded(
               schedule: schedule,
               daysCatalog: _daysCatalog,
               details: _scheduleDetails,
+              exceptions: _scheduleExceptions,
             ),
           );
         }
@@ -94,14 +114,17 @@ class BranchScheduleBloc
         emit(BranchScheduleError(error.message));
         emit(BranchScheduleNotFound(daysCatalog: _daysCatalog));
       },
-      (schedule) {
+      (record) {
+        final (schedule, message) = record;
         _scheduleDetails = [];
+        _scheduleExceptions = [];
         emit(
           BranchScheduleLoaded(
             schedule: schedule,
             daysCatalog: _daysCatalog,
             details: _scheduleDetails,
-            message: ScheduleConstants.scheduleCreated,
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );
@@ -139,6 +162,7 @@ class BranchScheduleBloc
             schedule: schedule,
             daysCatalog: _daysCatalog,
             details: _scheduleDetails,
+            exceptions: _scheduleExceptions,
             message: ScheduleConstants.scheduleUpdated,
             isSuccess: true,
           ),
@@ -163,10 +187,11 @@ class BranchScheduleBloc
       },
       (message) {
         _scheduleDetails = [];
+        _scheduleExceptions = [];
         emit(
           BranchScheduleNotFound(
             daysCatalog: _daysCatalog,
-            message: ScheduleConstants.scheduleDeleted,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );
@@ -197,15 +222,15 @@ class BranchScheduleBloc
           add(LoadSchedule(event.branchId));
         }
       },
-      (schedule) {
+      (record) {
+        final (schedule, message) = record;
         emit(
           BranchScheduleLoaded(
             schedule: schedule,
             daysCatalog: _daysCatalog,
             details: _scheduleDetails,
-            message: event.activate
-                ? ScheduleConstants.scheduleActivated
-                : ScheduleConstants.scheduleDeactivated,
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );
@@ -250,6 +275,9 @@ class BranchScheduleBloc
 
     final currentState = state as BranchScheduleLoaded;
 
+    // Emit loading state for details section
+    emit(currentState.copyWith(loadingSection: LoadingSection.details));
+
     final result = await _repository.createScheduleDetail(
       event.branchId,
       dayOfWeek: event.dayOfWeek,
@@ -283,6 +311,9 @@ class BranchScheduleBloc
 
     final currentState = state as BranchScheduleLoaded;
 
+    // Emit loading state for details section
+    emit(currentState.copyWith(loadingSection: LoadingSection.details));
+
     final result = await _repository.updateScheduleDetail(
       event.detailId,
       openingTime: event.openingTime,
@@ -294,14 +325,23 @@ class BranchScheduleBloc
       (error) {
         emit(currentState.copyWith(message: error.message, isSuccess: false));
       },
-      (updatedDetail) {
+      (message) {
+        // Backend returns success message without updated entity,
+        // so we update the detail locally with the event values
         _scheduleDetails = _scheduleDetails.map((d) {
-          return d.id == event.detailId ? updatedDetail : d;
+          if (d.id == event.detailId) {
+            return d.copyWith(
+              openingTime: event.openingTime,
+              closingTime: event.closingTime,
+              isClosed: event.isClosed,
+            );
+          }
+          return d;
         }).toList();
         emit(
           currentState.copyWith(
             details: _scheduleDetails,
-            message: ScheduleConstants.timeSlotUpdated,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );
@@ -317,6 +357,9 @@ class BranchScheduleBloc
 
     final currentState = state as BranchScheduleLoaded;
 
+    // Emit loading state for details section
+    emit(currentState.copyWith(loadingSection: LoadingSection.details));
+
     final result = await _repository.deleteScheduleDetail(event.detailId);
 
     result.fold(
@@ -330,7 +373,185 @@ class BranchScheduleBloc
         emit(
           currentState.copyWith(
             details: _scheduleDetails,
-            message: ScheduleConstants.timeSlotDeleted,
+            message: message, // Use backend message
+            isSuccess: true,
+          ),
+        );
+      },
+    );
+  }
+
+  // ========== Schedule Exceptions Handlers (HU20-25) ==========
+
+  Future<void> _onLoadScheduleExceptions(
+    LoadScheduleExceptions event,
+    Emitter<BranchScheduleState> emit,
+  ) async {
+    if (state is! BranchScheduleLoaded) return;
+
+    final currentState = state as BranchScheduleLoaded;
+
+    final result = await _repository.getScheduleExceptions(event.branchId);
+
+    result.fold(
+      (error) {
+        emit(currentState.copyWith(message: error.message, isSuccess: false));
+      },
+      (exceptions) {
+        _scheduleExceptions = exceptions;
+        emit(currentState.copyWith(exceptions: _scheduleExceptions));
+      },
+    );
+  }
+
+  Future<void> _onCreateScheduleException(
+    CreateScheduleException event,
+    Emitter<BranchScheduleState> emit,
+  ) async {
+    if (state is! BranchScheduleLoaded) return;
+
+    final currentState = state as BranchScheduleLoaded;
+
+    // Emit loading state for exceptions section
+    emit(currentState.copyWith(loadingSection: LoadingSection.exceptions));
+
+    final result = await _repository.createScheduleException(
+      event.branchId,
+      exceptionStartDate: event.exceptionStartDate,
+      exceptionEndDate: event.exceptionEndDate,
+      openingTime: event.openingTime,
+      closingTime: event.closingTime,
+      isClosed: event.isClosed,
+    );
+
+    result.fold(
+      (error) {
+        emit(currentState.copyWith(message: error.message, isSuccess: false));
+      },
+      (record) {
+        final (exception, message) = record;
+        _scheduleExceptions = [..._scheduleExceptions, exception];
+        emit(
+          currentState.copyWith(
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message
+            isSuccess: true,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onUpdateScheduleException(
+    UpdateScheduleException event,
+    Emitter<BranchScheduleState> emit,
+  ) async {
+    if (state is! BranchScheduleLoaded) return;
+
+    final currentState = state as BranchScheduleLoaded;
+
+    // Emit loading state for exceptions section
+    emit(currentState.copyWith(loadingSection: LoadingSection.exceptions));
+
+    final result = await _repository.updateScheduleException(
+      event.exceptionId,
+      openingTime: event.openingTime,
+      closingTime: event.closingTime,
+      isClosed: event.isClosed,
+    );
+
+    result.fold(
+      (error) {
+        emit(currentState.copyWith(message: error.message, isSuccess: false));
+      },
+      (message) {
+        // Backend returns success message without updated entity,
+        // so we update the exception locally with the event values
+        _scheduleExceptions = _scheduleExceptions.map((e) {
+          if (e.id == event.exceptionId) {
+            return e.copyWith(
+              openingTime: event.openingTime,
+              closingTime: event.closingTime,
+              isClosed: event.isClosed,
+            );
+          }
+          return e;
+        }).toList();
+        emit(
+          currentState.copyWith(
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message instead of local constant
+            isSuccess: true,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onDeleteScheduleException(
+    DeleteScheduleException event,
+    Emitter<BranchScheduleState> emit,
+  ) async {
+    if (state is! BranchScheduleLoaded) return;
+
+    final currentState = state as BranchScheduleLoaded;
+
+    // Emit loading state for exceptions section
+    emit(currentState.copyWith(loadingSection: LoadingSection.exceptions));
+
+    final result = await _repository.deleteScheduleException(event.exceptionId);
+
+    result.fold(
+      (error) {
+        emit(currentState.copyWith(message: error.message, isSuccess: false));
+      },
+      (message) {
+        _scheduleExceptions = _scheduleExceptions
+            .where((e) => e.id != event.exceptionId)
+            .toList();
+        emit(
+          currentState.copyWith(
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message
+            isSuccess: true,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onToggleScheduleExceptionStatus(
+    ToggleScheduleExceptionStatus event,
+    Emitter<BranchScheduleState> emit,
+  ) async {
+    if (state is! BranchScheduleLoaded) return;
+
+    final currentState = state as BranchScheduleLoaded;
+
+    // Emit loading state for exceptions section
+    emit(currentState.copyWith(loadingSection: LoadingSection.exceptions));
+
+    final result = event.activate
+        ? await _repository.activateScheduleException(event.exceptionId)
+        : await _repository.deactivateScheduleException(event.exceptionId);
+
+    result.fold(
+      (error) {
+        emit(currentState.copyWith(message: error.message, isSuccess: false));
+      },
+      (message) {
+        // Backend returns success message without updated entity,
+        // so we update the exception locally with the event value
+        _scheduleExceptions = _scheduleExceptions.map((e) {
+          if (e.id == event.exceptionId) {
+            return e.copyWith(active: event.activate);
+          }
+          return e;
+        }).toList();
+        emit(
+          currentState.copyWith(
+            exceptions: _scheduleExceptions,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );

@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
-import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/network/refresh_token_data_source.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
+import 'package:motogo_frontend/src/core/utils/app_logger.dart';
 
 /// Dio interceptor that handles authentication and token refresh.
 ///
@@ -50,7 +49,7 @@ class AuthInterceptor extends Interceptor {
       return handler.next(err);
     }
 
-    debugPrint(DebugMessages.tokenRefreshStart);
+    AppLogger.auth(DebugMessages.tokenRefreshStart);
 
     // Try to refresh the token
     final refreshSuccess = await _attemptTokenRefresh();
@@ -61,12 +60,12 @@ class AuthInterceptor extends Interceptor {
         final retryResponse = await _retryRequest(err.requestOptions);
         return handler.resolve(retryResponse);
       } catch (retryError) {
-        debugPrint('${DebugMessages.retryFailed}: $retryError');
+        AppLogger.error(DebugMessages.retryFailed, retryError);
         return handler.next(err);
       }
     } else {
       // Refresh failed - session is expired
-      debugPrint(DebugMessages.redirectingToLogin);
+      AppLogger.auth(DebugMessages.redirectingToLogin);
       await _handleSessionExpired();
       return handler.next(err);
     }
@@ -79,7 +78,7 @@ class AuthInterceptor extends Interceptor {
   Future<bool> _attemptTokenRefresh() async {
     // If already refreshing, wait for the result
     if (_isRefreshing) {
-      debugPrint(DebugMessages.tokenRefreshWaiting);
+      AppLogger.auth(DebugMessages.tokenRefreshWaiting);
       return await _refreshCompleter?.future ?? false;
     }
 
@@ -90,7 +89,7 @@ class AuthInterceptor extends Interceptor {
       final refreshToken = UserSessionManager.instance.refreshToken;
 
       if (refreshToken == null) {
-        debugPrint(DebugMessages.noRefreshToken);
+        AppLogger.auth(DebugMessages.noRefreshToken);
         _completeRefresh(false);
         return false;
       }
@@ -106,18 +105,18 @@ class AuthInterceptor extends Interceptor {
           refreshToken: tokenResponse.refreshToken,
         );
 
-        debugPrint(DebugMessages.tokenRefreshSuccess);
+        AppLogger.auth(DebugMessages.tokenRefreshSuccess);
         _completeRefresh(true);
         return true;
       } else {
-        debugPrint(
+        AppLogger.error(
           '${DebugMessages.tokenRefreshFailed}: ${result.left.message}',
         );
         _completeRefresh(false);
         return false;
       }
     } catch (e) {
-      debugPrint('${DebugMessages.tokenRefreshError}: $e');
+      AppLogger.error(DebugMessages.tokenRefreshError, e);
       _completeRefresh(false);
       return false;
     }
@@ -152,9 +151,11 @@ class AuthInterceptor extends Interceptor {
   }
 
   /// Handles session expiration by clearing session and redirecting to login.
+  /// Note: We don't show a SnackBar here - the error propagates to the UI
+  /// which is responsible for displaying the appropriate error message.
+  /// This prevents duplicate SnackBars when errors are handled by BlocConsumers.
   Future<void> _handleSessionExpired() async {
     await UserSessionManager.instance.clearSession();
     NavigationService.navigateToLogin();
-    NavigationService.showSnackBar(FallbackMessages.sessionExpired);
   }
 }

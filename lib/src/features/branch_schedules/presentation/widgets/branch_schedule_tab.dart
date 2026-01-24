@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_event.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_state.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/schedule_days_accordion.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/schedule_exception_list.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/schedule_status_card.dart';
 
 /// Tab widget for managing branch schedules.
@@ -194,6 +195,14 @@ class _BranchScheduleContent extends StatelessWidget {
             branchId: branchId,
             daysCatalog: state.daysCatalog,
             detailsByDay: state.detailsByDay,
+            isLoading: state.isDetailsLoading,
+          ),
+          const SizedBox(height: 24),
+          // Schedule exceptions section
+          ScheduleExceptionList(
+            branchId: branchId,
+            exceptions: state.exceptions,
+            isLoading: state.isExceptionsLoading,
           ),
         ],
       ),

@@ -189,10 +189,6 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                         return BranchCard(
                           branch: branch,
                           onTap: () async {
-                            debugPrint(
-                              '=== TAP DETECTED on branch: ${branch.name} ===',
-                            );
-                            // Await result - true means branch was deleted or updated
                             final result = await Navigator.push<dynamic>(
                               context,
                               MaterialPageRoute(
@@ -200,12 +196,7 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                                     BranchDetailPage(branch: branch),
                               ),
                             );
-                            debugPrint(
-                              '=== Returned from detail with result: $result ===',
-                            );
-                            // Refresh if there was any modification (BranchEntity or true for deletion)
                             if (result != null && context.mounted) {
-                              debugPrint('=== Triggering RefreshBranches ===');
                               context.read<MyBranchesBloc>().add(
                                 RefreshBranches(),
                               );

@@ -101,6 +101,12 @@ import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/b
 import 'package:motogo_frontend/src/features/branch_schedules/data/repositories/branch_schedule_repository_impl.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
 
+// Features - Register Motorcycle
+import 'package:motogo_frontend/src/features/register_motorcycle/data/datasources/motorcycle_datasource.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/data/repositories/motorcycle_repository_impl.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -268,6 +274,17 @@ abstract class InjectorApp {
     container.registerFactory<BranchScheduleRepository>(
       (c) =>
           BranchScheduleRepositoryImpl(c.resolve<BranchScheduleDataSource>()),
+    );
+
+    // Register Motorcycle - uses DioClient
+    container.registerFactory<MotorcycleDataSource>(
+      (c) => MotorcycleDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<MotorcycleRepository>(
+      (c) => MotorcycleRepositoryImpl(c.resolve<MotorcycleDataSource>()),
+    );
+    container.registerFactory<RegisterMotorcycleUseCase>(
+      (c) => RegisterMotorcycleUseCase(c.resolve<MotorcycleRepository>()),
     );
   }
 

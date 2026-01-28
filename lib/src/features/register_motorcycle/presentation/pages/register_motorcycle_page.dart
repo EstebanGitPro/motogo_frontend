@@ -54,7 +54,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                 behavior: SnackBarBehavior.floating,
               ),
             );
-            Navigator.pop(context, true); // Return true to indicate success
+            Navigator.pop(context, true);
           } else if (state is RegisterMotorcycleFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -89,27 +89,16 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Header illustration
                         _buildHeader(),
                         const SizedBox(height: 24),
-
-                        // License plate field (required)
                         _buildLicensePlateField(),
                         const SizedBox(height: 16),
-
-                        // Year field (optional)
                         _buildYearField(),
                         const SizedBox(height: 16),
-
-                        // Mileage field (optional)
                         _buildMileageField(),
                         const SizedBox(height: 16),
-
-                        // Notes field (optional)
                         _buildNotesField(),
                         const SizedBox(height: 32),
-
-                        // Submit button
                         _buildSubmitButton(context, state),
                       ],
                     ),
@@ -253,7 +242,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
       ),
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(7), // Up to 9,999,999 km
+        LengthLimitingTextInputFormatter(7),
       ],
       validator: (value) {
         if (value == null || value.isEmpty) {

@@ -28,7 +28,7 @@ class UserHomePage extends StatefulWidget {
 class _UserHomePageState extends State<UserHomePage> {
   final _searchController = TextEditingController();
   String _selectedFilter = MotorcycleConstants.filterAll;
-  bool _hasMotorcycles = false; // TODO: Load from backend
+  bool _hasMotorcycles = false;
 
   @override
   void dispose() {
@@ -57,25 +57,13 @@ class _UserHomePageState extends State<UserHomePage> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
       ),
       drawer: _buildDrawer(context),
       body: Stack(
         children: [
-          // Map placeholder
           _buildMapPlaceholder(),
-
-          // Filter chips
           Positioned(top: 16, left: 16, right: 16, child: _buildFilterChips()),
-
-          // Promotional card (Option C) - shown when no motorcycles registered
           if (!_hasMotorcycles)
             Positioned(
               bottom: 100,
@@ -84,14 +72,11 @@ class _UserHomePageState extends State<UserHomePage> {
               child: _buildPromoCard(),
             ),
 
-          // Geolocation FAB
           Positioned(
             bottom: 24,
             right: 16,
             child: FloatingActionButton(
-              onPressed: () {
-                // TODO: Center map on user location
-              },
+              onPressed: () {},
               backgroundColor: Colors.blue[600],
               foregroundColor: Colors.white,
               child: const Icon(Icons.navigation),
@@ -340,10 +325,7 @@ class _UserHomePageState extends State<UserHomePage> {
               MotorcycleConstants.menuAbout,
               style: TextStyle(fontSize: 16),
             ),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: Navigate to About page
-            },
+            onTap: () => Navigator.pop(context),
           ),
         ],
       ),
@@ -356,7 +338,6 @@ class _UserHomePageState extends State<UserHomePage> {
       MaterialPageRoute(builder: (context) => const RegisterMotorcyclePage()),
     );
 
-    // Refresh state if motorcycle was registered
     if (result == true && mounted) {
       setState(() {
         _hasMotorcycles = true;

@@ -84,10 +84,10 @@ class AdminConstants {
   static const String errorParsingResponse =
       'Error al procesar respuesta del servidor';
 
-  // Roles
-  static const String roleAdmin = 'ADMIN';
-  static const String roleRepresentative = 'REPRESENTATIVE';
-  static const String roleMotorcyclist = 'MOTORCYCLIST';
+  // Roles (lowercase, matching backend response)
+  static const String roleAdmin = 'admin';
+  static const String roleRepresentative = 'representative';
+  static const String roleMotorcyclist = 'user';
 
   // Drawer header
   static const String drawerTitle = 'Menú Principal';

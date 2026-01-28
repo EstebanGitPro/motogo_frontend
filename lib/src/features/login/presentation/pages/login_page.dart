@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
             );
 
             // Conditional routing based on user role
-            final userRole = state.user.role.toUpperCase();
+            final userRole = state.user.role.toLowerCase();
             final Widget targetPage = switch (userRole) {
               AdminConstants.roleAdmin => const AdminHomePage(),
               AdminConstants.roleMotorcyclist => const UserHomePage(),

@@ -5,10 +5,10 @@ import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/data/models/motorcycle_model.dart';
 
-/// DataSource for motorcycle operations.
+/// DataSource for motorcycle registration.
 ///
-/// Handles REST API communication for motorcycle CRUD operations.
-/// Requires MOTORCYCLIST role for registration.
+/// Handles REST API communication for motorcycle registration.
+/// Requires MOTORCYCLIST role.
 abstract class MotorcycleDataSource {
   /// Registers a new motorcycle for the current user.
   /// Endpoint: POST /motorcycles

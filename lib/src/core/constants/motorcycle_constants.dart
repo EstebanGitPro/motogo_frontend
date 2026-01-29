@@ -79,4 +79,12 @@ class MotorcycleConstants {
   static const String confirmLogoutTitle = 'Cerrar Sesión';
   static const String confirmLogoutMessage =
       '¿Estás seguro de que quieres cerrar sesión?';
+
+  // Reference selector
+  static const String selectReferenceOptional =
+      'Seleccionar referencia (opcional)';
+  static const String searchBrandOrModel = 'Buscar marca o modelo...';
+  static const String noReferencesFound = 'No se encontraron referencias';
+  static const String retryButton = 'Reintentar';
+  static const String noCategory = 'Sin categoría';
 }

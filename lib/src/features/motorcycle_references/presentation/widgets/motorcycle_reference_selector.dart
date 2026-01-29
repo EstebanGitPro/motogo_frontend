@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/motorcycle_references/domain/entities/motorcycle_reference_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_references/domain/usecases/get_motorcycle_references_usecase.dart';
@@ -115,7 +116,7 @@ class _MotorcycleReferenceSelectorState
                           style: const TextStyle(fontSize: 16),
                         )
                       : Text(
-                          'Seleccionar referencia (opcional)',
+                          MotorcycleConstants.selectReferenceOptional,
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -174,7 +175,7 @@ class _MotorcycleReferenceSelectorState
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Buscar marca o modelo...',
+                hintText: MotorcycleConstants.searchBrandOrModel,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -220,7 +221,7 @@ class _MotorcycleReferenceSelectorState
                 _loadReferences();
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
+              label: const Text(MotorcycleConstants.retryButton),
             ),
           ],
         ),
@@ -232,7 +233,7 @@ class _MotorcycleReferenceSelectorState
       child: _filteredReferences.isEmpty
           ? const Padding(
               padding: EdgeInsets.all(16),
-              child: Text('No se encontraron referencias'),
+              child: Text(MotorcycleConstants.noReferencesFound),
             )
           : ListView.builder(
               shrinkWrap: true,
@@ -250,7 +251,7 @@ class _MotorcycleReferenceSelectorState
                     ),
                   ),
                   subtitle: Text(
-                    '${ref.category ?? 'Sin categoría'} - ${ref.engineDisplacementCc ?? 0}cc',
+                    '${ref.category ?? MotorcycleConstants.noCategory} - ${ref.engineDisplacementCc ?? 0}cc',
                     style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                   ),
                   selected: isSelected,

@@ -36,7 +36,7 @@ class MotorcycleConstants {
 
   // Register form labels
   static const String licensePlateLabel = 'Placa';
-  static const String licensePlateHint = 'Ej: MRC35E o XYZ 123';
+  static const String licensePlateHint = 'Ej: ABC35E';
   static const String yearLabel = 'Año';
   static const String yearHint = 'Ej: 2023';
   static const String currentMileageLabel = 'Kilómetros Actuales';

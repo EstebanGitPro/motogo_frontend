@@ -7,6 +7,7 @@ class MotorcycleModel extends MotorcycleEntity {
   const MotorcycleModel({
     super.id,
     required super.licensePlate,
+    super.referenceId,
     super.year,
     super.currentMileage,
     super.ownerNotes,
@@ -17,6 +18,7 @@ class MotorcycleModel extends MotorcycleEntity {
     return MotorcycleModel(
       id: entity.id,
       licensePlate: entity.licensePlate,
+      referenceId: entity.referenceId,
       year: entity.year,
       currentMileage: entity.currentMileage,
       ownerNotes: entity.ownerNotes,
@@ -30,6 +32,7 @@ class MotorcycleModel extends MotorcycleEntity {
     return MotorcycleModel(
       id: json['id']?.toString(),
       licensePlate: json['license_plate'] ?? '',
+      referenceId: json['reference_id']?.toString(),
       year: json['year'] as int?,
       currentMileage: json['current_mileage'] as int?,
       ownerNotes: json['owner_notes']?.toString(),
@@ -41,6 +44,10 @@ class MotorcycleModel extends MotorcycleEntity {
   /// Only includes non-null fields to avoid sending unnecessary data.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> json = {'license_plate': licensePlate};
+
+    if (referenceId != null) {
+      json['reference_id'] = referenceId;
+    }
 
     if (year != null) {
       json['year'] = year;
@@ -62,6 +69,7 @@ class MotorcycleModel extends MotorcycleEntity {
     return MotorcycleEntity(
       id: id,
       licensePlate: licensePlate,
+      referenceId: referenceId,
       year: year,
       currentMileage: currentMileage,
       ownerNotes: ownerNotes,
@@ -72,6 +80,7 @@ class MotorcycleModel extends MotorcycleEntity {
   MotorcycleModel copyWith({
     String? id,
     String? licensePlate,
+    String? referenceId,
     int? year,
     int? currentMileage,
     String? ownerNotes,
@@ -79,6 +88,7 @@ class MotorcycleModel extends MotorcycleEntity {
     return MotorcycleModel(
       id: id ?? this.id,
       licensePlate: licensePlate ?? this.licensePlate,
+      referenceId: referenceId ?? this.referenceId,
       year: year ?? this.year,
       currentMileage: currentMileage ?? this.currentMileage,
       ownerNotes: ownerNotes ?? this.ownerNotes,

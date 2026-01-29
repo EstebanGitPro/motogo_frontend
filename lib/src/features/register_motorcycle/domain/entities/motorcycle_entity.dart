@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 class MotorcycleEntity extends Equatable {
   final String? id;
   final String licensePlate;
+  final String? referenceId;
   final int? year;
   final int? currentMileage;
   final String? ownerNotes;
@@ -13,6 +14,7 @@ class MotorcycleEntity extends Equatable {
   const MotorcycleEntity({
     this.id,
     required this.licensePlate,
+    this.referenceId,
     this.year,
     this.currentMileage,
     this.ownerNotes,
@@ -22,6 +24,7 @@ class MotorcycleEntity extends Equatable {
   List<Object?> get props => [
     id,
     licensePlate,
+    referenceId,
     year,
     currentMileage,
     ownerNotes,
@@ -31,6 +34,7 @@ class MotorcycleEntity extends Equatable {
   MotorcycleEntity copyWith({
     String? id,
     String? licensePlate,
+    String? referenceId,
     int? year,
     int? currentMileage,
     String? ownerNotes,
@@ -38,6 +42,7 @@ class MotorcycleEntity extends Equatable {
     return MotorcycleEntity(
       id: id ?? this.id,
       licensePlate: licensePlate ?? this.licensePlate,
+      referenceId: referenceId ?? this.referenceId,
       year: year ?? this.year,
       currentMileage: currentMileage ?? this.currentMileage,
       ownerNotes: ownerNotes ?? this.ownerNotes,

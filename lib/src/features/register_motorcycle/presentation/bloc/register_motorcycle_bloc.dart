@@ -29,6 +29,7 @@ class RegisterMotorcycleBloc
 
     final result = await _registerMotorcycleUseCase(
       licensePlate: event.licensePlate,
+      referenceId: event.referenceId,
       year: event.year,
       currentMileage: event.currentMileage,
       ownerNotes: event.ownerNotes,

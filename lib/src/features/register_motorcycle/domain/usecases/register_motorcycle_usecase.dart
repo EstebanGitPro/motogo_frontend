@@ -15,7 +15,8 @@ class RegisterMotorcycleUseCase {
   /// Executes the registration of a motorcycle.
   ///
   /// Parameters:
-  /// - [licensePlate]: Required. Colombian format plate (e.g., ABC123)
+  /// - [licensePlate]: Required. Colombian format plate (e.g., ABC12D or ABC123)
+  /// - [referenceId]: Optional. ID of the motorcycle reference from catalog
   /// - [year]: Optional. Year of manufacture
   /// - [currentMileage]: Optional. Current odometer reading
   /// - [ownerNotes]: Optional. Personal notes from the owner
@@ -23,12 +24,14 @@ class RegisterMotorcycleUseCase {
   /// Returns success message on success, or [ErrorModel] on failure.
   Future<Either<ErrorModel, String>> call({
     required String licensePlate,
+    String? referenceId,
     int? year,
     int? currentMileage,
     String? ownerNotes,
   }) {
     final motorcycle = MotorcycleEntity(
       licensePlate: licensePlate,
+      referenceId: referenceId,
       year: year,
       currentMileage: currentMileage,
       ownerNotes: ownerNotes,

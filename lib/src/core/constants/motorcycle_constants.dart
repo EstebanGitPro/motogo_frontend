@@ -36,7 +36,7 @@ class MotorcycleConstants {
 
   // Register form labels
   static const String licensePlateLabel = 'Placa';
-  static const String licensePlateHint = 'Ej: ABC123';
+  static const String licensePlateHint = 'Ej: MRC35E o XYZ 123';
   static const String yearLabel = 'Año';
   static const String yearHint = 'Ej: 2023';
   static const String currentMileageLabel = 'Kilómetros Actuales';
@@ -51,7 +51,7 @@ class MotorcycleConstants {
   // Validation messages
   static const String licensePlateRequired = 'La placa es requerida';
   static const String licensePlateInvalid =
-      'Formato de placa inválido (ej: ABC123)';
+      'Formato inválido. Moto: ABC12D, Carro: ABC123';
 
   // Button texts
   static const String registerButton = 'Registrar Motocicleta';

@@ -175,17 +175,23 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         fillColor: Colors.white,
       ),
       inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')),
-        LengthLimitingTextInputFormatter(6),
+        FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 ]')),
+        LengthLimitingTextInputFormatter(7), // Allow for space in car plates
         UpperCaseTextFormatter(),
       ],
       validator: (value) {
         if (value == null || value.isEmpty) {
           return MotorcycleConstants.licensePlateRequired;
         }
-        // Colombian plate format: 3 letters + 3 numbers (e.g., ABC123)
-        final plateRegex = RegExp(r'^[A-Z]{3}[0-9]{3}$');
-        if (!plateRegex.hasMatch(value)) {
+        // Remove spaces for validation
+        final cleanValue = value.replaceAll(' ', '');
+        // Colombian plate formats:
+        // - Motorcycle: 3 letters + 2 numbers + 1 letter (e.g., MRC35E)
+        // - Car: 3 letters + 3 numbers (e.g., XYZ123)
+        final motorcyclePlateRegex = RegExp(r'^[A-Z]{3}[0-9]{2}[A-Z]$');
+        final carPlateRegex = RegExp(r'^[A-Z]{3}[0-9]{3}$');
+        if (!motorcyclePlateRegex.hasMatch(cleanValue) &&
+            !carPlateRegex.hasMatch(cleanValue)) {
           return MotorcycleConstants.licensePlateInvalid;
         }
         return null;

@@ -107,6 +107,30 @@ import 'package:motogo_frontend/src/features/register_motorcycle/data/repositori
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
 
+// Features - My Motorcycles
+import 'package:motogo_frontend/src/features/my_motorcycles/data/datasources/my_motorcycles_datasource.dart';
+import 'package:motogo_frontend/src/features/my_motorcycles/data/repositories/my_motorcycles_repository_impl.dart';
+import 'package:motogo_frontend/src/features/my_motorcycles/domain/repositories/my_motorcycles_repository.dart';
+import 'package:motogo_frontend/src/features/my_motorcycles/domain/usecases/get_my_motorcycles_usecase.dart';
+
+// Features - Edit Motorcycle
+import 'package:motogo_frontend/src/features/edit_motorcycle/data/datasources/edit_motorcycle_datasource.dart';
+import 'package:motogo_frontend/src/features/edit_motorcycle/domain/usecases/update_motorcycle_usecase.dart';
+
+// Features - Delete Motorcycle
+import 'package:motogo_frontend/src/features/delete_motorcycle/data/datasources/delete_motorcycle_datasource.dart';
+import 'package:motogo_frontend/src/features/delete_motorcycle/domain/repositories/delete_motorcycle_repository.dart';
+import 'package:motogo_frontend/src/features/delete_motorcycle/domain/usecases/delete_motorcycle_usecase.dart';
+
+// Features - User Home
+import 'package:motogo_frontend/src/features/user_home/data/datasources/nearby_branches_datasource.dart';
+import 'package:motogo_frontend/src/features/user_home/data/repositories/nearby_branches_repository_impl.dart';
+import 'package:motogo_frontend/src/features/user_home/domain/repositories/nearby_branches_repository.dart';
+import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
+
+// Core - Location Service
+import 'package:motogo_frontend/src/core/services/location_service.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -285,6 +309,53 @@ abstract class InjectorApp {
     );
     container.registerFactory<RegisterMotorcycleUseCase>(
       (c) => RegisterMotorcycleUseCase(c.resolve<MotorcycleRepository>()),
+    );
+
+    // My Motorcycles - list user's motorcycles
+    container.registerFactory<MyMotorcyclesDataSource>(
+      (c) => MyMotorcyclesDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<MyMotorcyclesRepository>(
+      (c) => MyMotorcyclesRepositoryImpl(c.resolve<MyMotorcyclesDataSource>()),
+    );
+    container.registerFactory<GetMyMotorcyclesUseCase>(
+      (c) => GetMyMotorcyclesUseCase(c.resolve<MyMotorcyclesRepository>()),
+    );
+
+    // Edit Motorcycle - update motorcycle
+    container.registerFactory<EditMotorcycleDataSource>(
+      (c) => EditMotorcycleDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<UpdateMotorcycleUseCase>(
+      (c) => UpdateMotorcycleUseCase(c.resolve<EditMotorcycleDataSource>()),
+    );
+
+    // Delete Motorcycle - soft delete motorcycle
+    container.registerFactory<DeleteMotorcycleDataSource>(
+      (c) => DeleteMotorcycleDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DeleteMotorcycleRepository>(
+      (c) => DeleteMotorcycleRepositoryImpl(
+        c.resolve<DeleteMotorcycleDataSource>(),
+      ),
+    );
+    container.registerFactory<DeleteMotorcycleUseCase>(
+      (c) => DeleteMotorcycleUseCase(c.resolve<DeleteMotorcycleRepository>()),
+    );
+
+    // User Home - Nearby Branches
+    container.registerFactory<NearbyBranchesDataSource>(
+      (c) => NearbyBranchesDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<NearbyBranchesRepository>(
+      (c) =>
+          NearbyBranchesRepositoryImpl(c.resolve<NearbyBranchesDataSource>()),
+    );
+    container.registerFactory<GetNearbyBranchesUseCase>(
+      (c) => GetNearbyBranchesUseCase(c.resolve<NearbyBranchesRepository>()),
+    );
+    container.registerSingleton<LocationService>(
+      (c) => LocationService.instance,
     );
   }
 

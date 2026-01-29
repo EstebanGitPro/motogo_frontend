@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_event.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_state.dart';
@@ -41,9 +39,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegisterMotorcycleBloc(
-        InjectorApp.resolve<RegisterMotorcycleUseCase>(),
-      ),
+      create: (context) => RegisterMotorcycleBloc(),
       child: BlocConsumer<RegisterMotorcycleBloc, RegisterMotorcycleState>(
         listener: (context, state) {
           if (state is RegisterMotorcycleSuccess) {

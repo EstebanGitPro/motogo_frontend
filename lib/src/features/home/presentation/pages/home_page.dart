@@ -2,22 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/branch_card.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
-import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
-import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/pages/register_franchise_page.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
@@ -34,7 +30,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => MyBranchesBloc(
-        InjectorApp.resolve<GetBranchesUseCase>(),
         listFranchisesUseCase: InjectorApp.resolve<ListFranchisesUseCase>(),
       )..add(LoadBranches()),
       child: const _HomeView(),
@@ -63,8 +58,7 @@ class _HomeViewState extends State<_HomeView> {
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
-          create: (context) =>
-              RegisterBranchBloc(InjectorApp.resolve<RegisterBranchUseCase>()),
+          create: (context) => RegisterBranchBloc(),
           child: const RegisterBranchPage(),
         ),
       ),
@@ -280,9 +274,7 @@ class _HomeViewState extends State<_HomeView> {
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
-          create: (context) => RegisterFranchiseBloc(
-            InjectorApp.resolve<RegisterFranchiseUseCase>(),
-          ),
+          create: (context) => RegisterFranchiseBloc(),
           child: RegisterFranchisePage(availableBranches: availableBranches),
         ),
       ),
@@ -302,18 +294,8 @@ class _HomeViewState extends State<_HomeView> {
       context,
       MaterialPageRoute(
         builder: (context) => BlocProvider(
-          create: (context) => ManageFranchiseBloc(
-            getFranchiseUseCase: InjectorApp.resolve<GetFranchiseUseCase>(),
-            updateFranchiseUseCase:
-                InjectorApp.resolve<UpdateFranchiseUseCase>(),
-            deleteFranchiseUseCase:
-                InjectorApp.resolve<DeleteFranchiseUseCase>(),
-            linkBranchUseCase:
-                InjectorApp.resolve<LinkBranchToFranchiseUseCase>(),
-            unlinkBranchUseCase:
-                InjectorApp.resolve<UnlinkBranchFromFranchiseUseCase>(),
-            getBranchesUseCase: InjectorApp.resolve<GetBranchesUseCase>(),
-          )..add(LoadFranchise(franchiseId)),
+          create: (context) =>
+              ManageFranchiseBloc()..add(LoadFranchise(franchiseId)),
           child: ManageFranchisePage(franchiseId: franchiseId),
         ),
       ),
@@ -388,9 +370,7 @@ class _HomeViewState extends State<_HomeView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider(
-                    create: (context) => ChangePasswordBloc(
-                      InjectorApp.resolve<ChangePasswordUseCase>(),
-                    ),
+                    create: (context) => ChangePasswordBloc(),
                     child: const ChangePasswordPage(),
                   ),
                 ),

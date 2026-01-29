@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_event.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_state.dart';
@@ -11,8 +12,11 @@ class RegisterMotorcycleBloc
     extends Bloc<RegisterMotorcycleEvent, RegisterMotorcycleState> {
   final RegisterMotorcycleUseCase _registerMotorcycleUseCase;
 
-  RegisterMotorcycleBloc(this._registerMotorcycleUseCase)
-    : super(const RegisterMotorcycleInitial()) {
+  RegisterMotorcycleBloc({RegisterMotorcycleUseCase? registerMotorcycleUseCase})
+    : _registerMotorcycleUseCase =
+          registerMotorcycleUseCase ??
+          InjectorApp.resolve<RegisterMotorcycleUseCase>(),
+      super(const RegisterMotorcycleInitial()) {
     on<SubmitMotorcycleRegistration>(_onSubmitRegistration);
     on<ResetMotorcycleForm>(_onResetForm);
   }

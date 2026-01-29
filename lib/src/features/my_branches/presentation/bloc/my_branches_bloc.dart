@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
@@ -6,11 +7,16 @@ import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_br
 
 /// BLoC for managing the branches list state.
 class MyBranchesBloc extends Bloc<MyBranchesEvent, MyBranchesState> {
-  final GetBranchesUseCase getBranchesUseCase;
-  final ListFranchisesUseCase? listFranchisesUseCase;
+  final GetBranchesUseCase _getBranchesUseCase;
+  final ListFranchisesUseCase? _listFranchisesUseCase;
 
-  MyBranchesBloc(this.getBranchesUseCase, {this.listFranchisesUseCase})
-    : super(MyBranchesInitial()) {
+  MyBranchesBloc({
+    GetBranchesUseCase? getBranchesUseCase,
+    ListFranchisesUseCase? listFranchisesUseCase,
+  }) : _getBranchesUseCase =
+           getBranchesUseCase ?? InjectorApp.resolve<GetBranchesUseCase>(),
+       _listFranchisesUseCase = listFranchisesUseCase,
+       super(MyBranchesInitial()) {
     on<LoadBranches>(_onLoadBranches);
     on<RefreshBranches>(_onRefreshBranches);
     on<SearchBranches>(_onSearchBranches);
@@ -32,14 +38,14 @@ class MyBranchesBloc extends Bloc<MyBranchesEvent, MyBranchesState> {
   }
 
   Future<void> _fetchBranches(Emitter<MyBranchesState> emit) async {
-    final result = await getBranchesUseCase.call();
+    final result = await _getBranchesUseCase.call();
 
     // Build franchise names map and collect all branch IDs that belong to franchises
     Map<String, String> franchiseNames = {};
     Set<String> branchesWithFranchise = {};
 
-    if (listFranchisesUseCase != null) {
-      final franchisesResult = await listFranchisesUseCase!.call();
+    if (_listFranchisesUseCase != null) {
+      final franchisesResult = await _listFranchisesUseCase.call();
       franchisesResult.fold(
         (_) {}, // Ignore errors, just don't show badge
         (franchises) {

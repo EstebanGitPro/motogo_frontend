@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
@@ -290,9 +289,7 @@ class _UserHomePageState extends State<UserHomePage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider(
-                    create: (context) => ChangePasswordBloc(
-                      InjectorApp.resolve<ChangePasswordUseCase>(),
-                    ),
+                    create: (context) => ChangePasswordBloc(),
                     child: const ChangePasswordPage(),
                   ),
                 ),

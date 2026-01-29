@@ -1,4 +1,4 @@
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_reference_entity.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/domain/entities/motorcycle_reference_entity.dart';
 
 /// Model for motorcycle reference API responses.
 class MotorcycleReferenceModel {

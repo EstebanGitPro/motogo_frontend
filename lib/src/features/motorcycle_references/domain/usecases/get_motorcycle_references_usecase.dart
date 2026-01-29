@@ -1,7 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/data/datasources/motorcycle_reference_datasource.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_reference_entity.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/data/datasources/motorcycle_reference_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/domain/entities/motorcycle_reference_entity.dart';
 
 /// Use case for getting motorcycle references catalog.
 class GetMotorcycleReferencesUseCase {

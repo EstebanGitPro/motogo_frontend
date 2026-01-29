@@ -103,11 +103,13 @@ import 'package:motogo_frontend/src/features/branch_schedules/domain/repositorie
 
 // Features - Register Motorcycle
 import 'package:motogo_frontend/src/features/register_motorcycle/data/datasources/motorcycle_datasource.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/data/datasources/motorcycle_reference_datasource.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/data/repositories/motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/get_motorcycle_references_usecase.dart';
+
+// Features - Motorcycle References (catalog)
+import 'package:motogo_frontend/src/features/motorcycle_references/data/datasources/motorcycle_reference_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/domain/usecases/get_motorcycle_references_usecase.dart';
 
 // Features - My Motorcycles
 import 'package:motogo_frontend/src/features/my_motorcycles/data/datasources/my_motorcycles_datasource.dart';

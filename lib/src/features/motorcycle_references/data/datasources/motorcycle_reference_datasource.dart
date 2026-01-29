@@ -3,7 +3,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/data/models/motorcycle_reference_model.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/data/models/motorcycle_reference_model.dart';
 
 /// DataSource for fetching motorcycle references catalog.
 abstract class MotorcycleReferenceDataSource {

@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_reference_entity.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/get_motorcycle_references_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/domain/entities/motorcycle_reference_entity.dart';
+import 'package:motogo_frontend/src/features/motorcycle_references/presentation/widgets/motorcycle_reference_selector.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_event.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_state.dart';
@@ -30,57 +29,8 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   final _yearController = TextEditingController();
   final _mileageController = TextEditingController();
   final _notesController = TextEditingController();
-  final _searchController = TextEditingController();
 
-  List<MotorcycleReferenceEntity> _allReferences = [];
-  List<MotorcycleReferenceEntity> _filteredReferences = [];
   MotorcycleReferenceEntity? _selectedReference;
-  bool _isLoadingReferences = true;
-  String? _referencesError;
-  bool _showDropdown = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadReferences();
-    _searchController.addListener(_filterReferences);
-  }
-
-  Future<void> _loadReferences() async {
-    final useCase = InjectorApp.resolve<GetMotorcycleReferencesUseCase>();
-    final result = await useCase();
-
-    if (mounted) {
-      setState(() {
-        result.fold(
-          (error) {
-            _referencesError = error.message;
-            _isLoadingReferences = false;
-          },
-          (references) {
-            _allReferences = references;
-            _filteredReferences = references;
-            _isLoadingReferences = false;
-          },
-        );
-      });
-    }
-  }
-
-  void _filterReferences() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      if (query.isEmpty) {
-        _filteredReferences = _allReferences;
-      } else {
-        _filteredReferences = _allReferences.where((ref) {
-          return ref.displayName.toLowerCase().contains(query) ||
-              ref.brandName.toLowerCase().contains(query) ||
-              ref.model.toLowerCase().contains(query);
-        }).toList();
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -88,7 +38,6 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
     _yearController.dispose();
     _mileageController.dispose();
     _notesController.dispose();
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -126,10 +75,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
               elevation: 1,
             ),
             body: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-                setState(() => _showDropdown = false);
-              },
+              onTap: () => FocusScope.of(context).unfocus(),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -150,7 +96,14 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                           const SizedBox(height: 24),
                           _buildLicensePlateField(),
                           const SizedBox(height: 16),
-                          _buildReferenceSelector(),
+                          MotorcycleReferenceSelector(
+                            onReferenceSelected: (reference) {
+                              setState(() {
+                                _selectedReference = reference;
+                              });
+                            },
+                            initialReference: _selectedReference,
+                          ),
                           const SizedBox(height: 16),
                           _buildYearField(),
                           const SizedBox(height: 16),
@@ -260,168 +213,6 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         }
         return null;
       },
-    );
-  }
-
-  Widget _buildReferenceSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Selected reference or search field
-        GestureDetector(
-          onTap: () {
-            setState(() => _showDropdown = !_showDropdown);
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[400]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.motorcycle_outlined, color: Colors.grey[600]),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _selectedReference != null
-                      ? Text(
-                          _selectedReference!.displayName,
-                          style: const TextStyle(fontSize: 16),
-                        )
-                      : Text(
-                          'Seleccionar referencia (opcional)',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                ),
-                if (_selectedReference != null)
-                  IconButton(
-                    icon: const Icon(Icons.clear, size: 20),
-                    onPressed: () {
-                      setState(() {
-                        _selectedReference = null;
-                        _searchController.clear();
-                      });
-                    },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  )
-                else
-                  Icon(
-                    _showDropdown ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                    color: Colors.grey[600],
-                  ),
-              ],
-            ),
-          ),
-        ),
-
-        // Dropdown content
-        if (_showDropdown)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Search field
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Buscar marca o modelo...',
-                      prefixIcon: const Icon(Icons.search, size: 20),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                      isDense: true,
-                    ),
-                  ),
-                ),
-
-                // References list
-                if (_isLoadingReferences)
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Center(
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  )
-                else if (_referencesError != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      _referencesError!,
-                      style: TextStyle(color: Colors.red[600]),
-                    ),
-                  )
-                else
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: _filteredReferences.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text('No se encontraron referencias'),
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _filteredReferences.length,
-                            itemBuilder: (context, index) {
-                              final ref = _filteredReferences[index];
-                              final isSelected =
-                                  _selectedReference?.id == ref.id;
-                              return ListTile(
-                                title: Text(
-                                  '${ref.brandName} ${ref.model}',
-                                  style: TextStyle(
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  '${ref.category ?? ''} - ${ref.engineDisplacementCc ?? 0}cc',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                selected: isSelected,
-                                selectedTileColor: Colors.blue[50],
-                                onTap: () {
-                                  setState(() {
-                                    _selectedReference = ref;
-                                    _showDropdown = false;
-                                    _searchController.clear();
-                                  });
-                                },
-                              );
-                            },
-                          ),
-                  ),
-              ],
-            ),
-          ),
-      ],
     );
   }
 

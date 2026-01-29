@@ -48,5 +48,16 @@
 	<!-- Mapbox Access Token - Use dart-define at runtime, don't commit real token! -->
 	<key>MBXAccessToken</key>
 	<string>MAPBOX_TOKEN_PLACEHOLDER</string>
+	<!-- Location permissions for geolocator -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>MotoGo necesita tu ubicación para mostrarte talleres y tiendas cercanas</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>MotoGo necesita tu ubicación para mostrarte talleres y tiendas cercanas</string>
+	<!-- Camera permission for image picker -->
+	<key>NSCameraUsageDescription</key>
+	<string>MotoGo necesita acceso a la cámara para tomar fotos de tu moto y perfil de negocio</string>
+	<!-- Photo library permission for image picker -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MotoGo necesita acceso a tu galería para seleccionar fotos de tu moto y perfil de negocio</string>
 </dict>
 </plist>

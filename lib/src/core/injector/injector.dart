@@ -135,6 +135,18 @@ import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearb
 // Core - Location Service
 import 'package:motogo_frontend/src/core/services/location_service.dart';
 
+// Features - Search Motorcycle by Plate (HU47)
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/datasources/search_motorcycle_datasource.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/repositories/search_motorcycle_repository_impl.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/repositories/search_motorcycle_repository.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
+
+// Features - Technical Catalogs (HU40)
+import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/brand_lines_datasource.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/brand_lines_repository.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_brand_lines_usecase.dart';
+
 part 'injector.g.dart';
 
 abstract class InjectorApp {
@@ -370,6 +382,32 @@ abstract class InjectorApp {
     );
     container.registerSingleton<LocationService>(
       (c) => LocationService.instance,
+    );
+
+    // Search Motorcycle by Plate (HU47)
+    container.registerFactory<SearchMotorcycleDataSource>(
+      (c) => SearchMotorcycleDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<SearchMotorcycleRepository>(
+      (c) => SearchMotorcycleRepositoryImpl(
+        c.resolve<SearchMotorcycleDataSource>(),
+      ),
+    );
+    container.registerFactory<SearchMotorcycleByPlateUseCase>(
+      (c) => SearchMotorcycleByPlateUseCase(
+        c.resolve<SearchMotorcycleRepository>(),
+      ),
+    );
+
+    // Technical Catalogs - Brand Lines (HU40)
+    container.registerFactory<BrandLinesDataSource>(
+      (c) => BrandLinesDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<BrandLinesRepository>(
+      (c) => BrandLinesRepositoryImpl(c.resolve<BrandLinesDataSource>()),
+    );
+    container.registerFactory<GetBrandLinesUseCase>(
+      (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
     );
   }
 

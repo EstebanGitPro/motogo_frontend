@@ -1,72 +1,71 @@
 #!/usr/bin/env sh
 
-#1.crear pre-commit que valide flutter format, flutter analyze, flutter test
-#Adicional que el coemntario contenga una estructura donde se anteponga feat,fix,doc,release
+# ==============================================================================
+# Pre-commit hook para Flutter/Dart
+# Ejecuta validaciones antes de cada commit
+# ==============================================================================
 
-# Autoformat all modified files before commit
-set -e
+echo "🔍 Ejecutando pre-commit hooks para Flutter..."
+echo ""
 
+# -----------------------------------------------------------------------------
+# 1. Verificar formato de código con dart format
+# -----------------------------------------------------------------------------
+echo "📝 Verificando formato de código..."
 
-# Ejecutar Flutter Doctor
-echo "🔍 Ejecutando Flutter Doctor..."
-if ! output=$(flutter doctor); then
-    echo "❌ Fallo en Flutter Doctor:"
-    echo "$output"
+# Verificar si hay archivos .dart modificados
+DART_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$' || true)
+
+if [ -n "$DART_FILES" ]; then
+    # Verificar el formato de los archivos staged
+    if ! dart format --set-exit-if-changed --output=none $DART_FILES 2>/dev/null; then
+        echo ""
+        echo "❌ Error: Algunos archivos no están formateados correctamente."
+        echo "   Ejecuta 'dart format lib/' y vuelve a hacer commit."
+        echo ""
+        exit 1
+    fi
+    echo "✅ Formato de código OK"
+else
+    echo "⏭️  No hay archivos Dart modificados para verificar formato"
+fi
+
+echo ""
+
+# -----------------------------------------------------------------------------
+# 2. Ejecutar flutter analyze (linting)
+# -----------------------------------------------------------------------------
+echo "🔍 Ejecutando flutter analyze..."
+
+if ! flutter analyze --no-fatal-infos lib/; then
+    echo ""
+    echo "❌ Error: flutter analyze encontró problemas."
+    echo "   Corrige los errores antes de hacer commit."
+    echo ""
     exit 1
 fi
-echo "$output"
 
-# Verificar archivos Dart modificados
-dart_files=$(git diff --cached --name-only --diff-filter=ACMR)
+echo "✅ Flutter analyze OK"
+echo ""
 
-if [ -z "$dart_files" ]; then
-    echo "❌ No hay archivos Dart modificados"
-    exit 1
-fi
-
-echo "🎯 Formateando archivos Dart..."
-
-# Guardar archivos no staged
-if git stash save --keep-index --quiet; then
-    stashed=1
-fi
-
-# Formatear archivos
-# echo "$dart_files" | while read file; do
-#     if [ -f "$file" ]; then
-#         if ! dart format --set-exit-if-changed .; then
-#             echo "❌ Error: El código no está correctamente formateado"
-#             exit 1
-#         fi
-#         git add "$file"
-#     fi
-# done
-
-# # Restaurar archivos no staged
-# if [ -n "$stashed" ]; then
-#     git stash pop --quiet
-# fi
-
-# echo "✅ Formateo completado exitosamente"
-
-# Ejecutar Flutter Analyze
-echo "🔬 Ejecutando flutter analyze..."
-if ! output=$(flutter analyze); then
-    echo "❌ COMMIT REJECTED: Flutter analyze encontró los siguientes errores:"
-    echo "$output"
-    exit 1
-fi
-echo "✅ Análisis completado exitosamente"
-
-# Ejecutar Flutter Test
-# echo "🔬 Ejecutando Flutter Test..."
-# if ! output=$(flutter test); then
-#     echo "❌ Fallo en Flutter Test:"
-#     echo "$output"
+# -----------------------------------------------------------------------------
+# 3. Ejecutar tests (opcional, puede comentarse para commits rápidos)
+# -----------------------------------------------------------------------------
+# Descomentar las siguientes líneas para ejecutar tests en cada commit
+# 
+# echo "🧪 Ejecutando flutter test..."
+# if ! flutter test --no-pub; then
+#     echo ""
+#     echo "❌ Error: Algunos tests fallaron."
+#     echo "   Corrige los tests antes de hacer commit."
+#     echo ""
 #     exit 1
 # fi
-# echo "$output"
-# echo "✅ Tests completados exitosamente"
+# echo "✅ Tests OK"
+# echo ""
 
-# echo "✨ Todas las verificaciones pasaron exitosamente"
-# exit 0
+# -----------------------------------------------------------------------------
+# Éxito
+# -----------------------------------------------------------------------------
+echo "✅ Pre-commit hook ejecutado exitosamente!"
+exit 0

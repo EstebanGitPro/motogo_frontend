@@ -8,6 +8,7 @@ import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/ad
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_event.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/pages/admin_services_list_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/technical_catalogs_page.dart';
 
 /// Admin Home Page - Main dashboard for administrators.
 ///
@@ -141,11 +142,11 @@ class AdminHomePage extends StatelessWidget {
           isEnabled: false,
         ),
         AdminMenuCard(
-          icon: Icons.settings,
-          title: AdminConstants.cardSettings,
-          subtitle: AdminConstants.cardSettingsSubtitle,
-          iconColor: Colors.grey,
-          isEnabled: false,
+          icon: Icons.category,
+          title: AdminConstants.cardTechnicalCatalogs,
+          subtitle: AdminConstants.cardTechnicalCatalogsSubtitle,
+          iconColor: Colors.green,
+          onTap: () => _navigateToTechnicalCatalogs(context),
         ),
       ],
     );
@@ -236,6 +237,13 @@ class AdminHomePage extends StatelessWidget {
           child: const AdminServicesListPage(),
         ),
       ),
+    );
+  }
+
+  void _navigateToTechnicalCatalogs(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TechnicalCatalogsPage()),
     );
   }
 

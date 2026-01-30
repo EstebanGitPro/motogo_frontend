@@ -105,4 +105,31 @@ class AdminConstants {
   static const String serviceActivated = 'Servicio activado';
   static const String serviceDeactivated = 'Servicio desactivado';
   static const String serviceAssociated = 'Servicio asociado';
+
+  // Technical Catalogs (HU40, HU42, HU41, HU1, HU49)
+  static const String cardTechnicalCatalogs = 'Catálogos Técnicos';
+  static const String cardTechnicalCatalogsSubtitle =
+      'Consultar información de motos';
+  static const String technicalCatalogsTitle = 'Catálogos Técnicos';
+
+  // Brand Lines (HU40)
+  static const String catalogBrandLines = 'Líneas por Marca';
+  static const String catalogBrandLinesSubtitle = 'Ver modelos de cada marca';
+  static const String brandLinesTitle = 'Líneas por Marca';
+  static const String selectBrandPrompt = 'Selecciona una marca:';
+  static const String linesFoundCount = 'líneas encontradas';
+  static const String noLinesFound = 'No se encontraron líneas para esta marca';
+  static const String loadingBrands = 'Cargando marcas...';
+  static const String loadingLines = 'Cargando líneas...';
+
+  // Future catalogs (disabled for now)
+  static const String catalogBrands = 'Marcas';
+  static const String catalogBrandsSubtitle = 'Lista de marcas disponibles';
+  static const String catalogCategories = 'Categorías';
+  static const String catalogCategoriesSubtitle = 'Tipos de motocicletas';
+  static const String catalogEngineRanges = 'Rangos de Cilindraje';
+  static const String catalogEngineRangesSubtitle = 'Rangos de motor';
+  static const String catalogLineCategories = 'Línea Categoría';
+  static const String catalogLineCategoriesSubtitle = 'Categorías de líneas';
+  static const String comingSoon = 'Próximamente';
 }

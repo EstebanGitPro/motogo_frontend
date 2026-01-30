@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
+import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
@@ -22,6 +23,7 @@ import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/pages/manage_franchise_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/pages/search_motorcycle_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -342,6 +344,22 @@ class _HomeViewState extends State<_HomeView> {
             title: const Text('Inicio', style: TextStyle(fontSize: 16)),
             onTap: () {
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.search, color: Colors.blue),
+            title: const Text(
+              MotorcycleConstants.menuSearchByPlate,
+              style: TextStyle(fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SearchMotorcyclePage(),
+                ),
+              );
             },
           ),
           const Divider(),

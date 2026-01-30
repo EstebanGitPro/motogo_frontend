@@ -81,10 +81,18 @@ class MotorcycleConstants {
       '¿Estás seguro de que quieres cerrar sesión?';
 
   // Reference selector
-  static const String selectReferenceOptional =
-      'Seleccionar referencia (opcional)';
+  static const String selectReferenceOptional = 'Seleccionar referencia';
   static const String searchBrandOrModel = 'Buscar marca o modelo...';
   static const String noReferencesFound = 'No se encontraron referencias';
   static const String retryButton = 'Reintentar';
   static const String noCategory = 'Sin categoría';
+
+  // Search motorcycle by plate (HU47)
+  static const String menuSearchByPlate = 'Buscar Moto por Placa';
+  static const String searchByPlateTitle = 'Buscar por Placa';
+  static const String searchByPlateHint = 'Ej: ABC12D';
+  static const String searchByPlateButton = 'Buscar';
+  static const String searchByPlateNoResults =
+      'No se encontró ninguna moto con esa placa';
+  static const String searchByPlateLoading = 'Buscando...';
 }

@@ -1,14 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/branch_schedule_tab.dart';
 import 'package:motogo_frontend/src/features/delete_branch/domain/usecases/delete_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/edit_branch_page.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_info_card.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_location_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_services_tab.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/widgets/branch_tab_bar.dart';
-import 'package:motogo_frontend/src/features/branch_schedules/presentation/widgets/branch_schedule_tab.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 /// Page displaying detailed information about a branch.
@@ -159,7 +161,7 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
     );
 
     if (confirmed == true && mounted) {
-      _deleteBranch();
+      unawaited(_deleteBranch());
     }
   }
 

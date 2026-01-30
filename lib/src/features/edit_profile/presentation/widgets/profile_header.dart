@@ -32,19 +32,23 @@ class ProfileHeader extends StatelessWidget {
             child: Icon(icon, color: primaryColor, size: isMobile ? 35 : 40),
           ),
           const SizedBox(height: 16),
-          Text(title,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                    fontSize: isMobile ? 24 : 28,
-                  )),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+              fontSize: isMobile ? 24 : 28,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(subtitle,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
-                    fontSize: isMobile ? 16 : 18,
-                  ),
-              textAlign: TextAlign.center),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Colors.grey[600],
+              fontSize: isMobile ? 16 : 18,
+            ),
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -52,11 +56,14 @@ class ProfileHeader extends StatelessWidget {
               color: primaryColor.withAlpha(25),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(roleDisplayName,
-                style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600)),
+            child: Text(
+              roleDisplayName,
+              style: TextStyle(
+                color: primaryColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),

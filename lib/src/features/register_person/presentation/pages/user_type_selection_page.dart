@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
+import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 
 class UserTypeSelectionPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;
@@ -66,7 +66,10 @@ class UserTypeSelectionPage extends StatelessWidget {
 
                             // App name
                             Text(
-                              getTranslateText(context: context, key: 'app_name'),
+                              getTranslateText(
+                                context: context,
+                                key: 'app_name',
+                              ),
                               style: Theme.of(context).textTheme.headlineLarge
                                   ?.copyWith(
                                     fontWeight: FontWeight.bold,
@@ -82,7 +85,10 @@ class UserTypeSelectionPage extends StatelessWidget {
 
                             // Main title
                             Text(
-                              getTranslateText(context: context, key: 'user_type_selection_title'),
+                              getTranslateText(
+                                context: context,
+                                key: 'user_type_selection_title',
+                              ),
                               style: Theme.of(context).textTheme.headlineSmall
                                   ?.copyWith(
                                     fontWeight: FontWeight.w700,
@@ -101,7 +107,10 @@ class UserTypeSelectionPage extends StatelessWidget {
                                 horizontal: isMobile ? 16.0 : 24.0,
                               ),
                               child: Text(
-                                getTranslateText(context: context, key: 'user_type_selection_subtitle'),
+                                getTranslateText(
+                                  context: context,
+                                  key: 'user_type_selection_subtitle',
+                                ),
                                 style: Theme.of(context).textTheme.bodyLarge
                                     ?.copyWith(
                                       color: Colors.grey[600],
@@ -120,8 +129,14 @@ class UserTypeSelectionPage extends StatelessWidget {
                                   Expanded(
                                     child: _buildUserTypeCard(
                                       context: context,
-                                      title: getTranslateText(context: context, key: 'motorcyclist_title'),
-                                      subtitle: getTranslateText(context: context, key: 'motorcyclist_subtitle'),
+                                      title: getTranslateText(
+                                        context: context,
+                                        key: 'motorcyclist_title',
+                                      ),
+                                      subtitle: getTranslateText(
+                                        context: context,
+                                        key: 'motorcyclist_subtitle',
+                                      ),
                                       icon: Icons.motorcycle,
                                       iconColor: Colors.blue[600]!,
                                       onTap: () => Navigator.pushNamed(
@@ -135,8 +150,14 @@ class UserTypeSelectionPage extends StatelessWidget {
                                   Expanded(
                                     child: _buildUserTypeCard(
                                       context: context,
-                                      title: getTranslateText(context: context, key: 'representative_title'),
-                                      subtitle: getTranslateText(context: context, key: 'representative_subtitle'),
+                                      title: getTranslateText(
+                                        context: context,
+                                        key: 'representative_title',
+                                      ),
+                                      subtitle: getTranslateText(
+                                        context: context,
+                                        key: 'representative_subtitle',
+                                      ),
                                       icon: Icons.store,
                                       iconColor: Colors.orange[600]!,
                                       onTap: () => Navigator.pushNamed(
@@ -153,8 +174,14 @@ class UserTypeSelectionPage extends StatelessWidget {
                                 children: [
                                   _buildUserTypeCard(
                                     context: context,
-                                    title: getTranslateText(context: context, key: 'motorcyclist_title'),
-                                    subtitle: getTranslateText(context: context, key: 'motorcyclist_subtitle'),
+                                    title: getTranslateText(
+                                      context: context,
+                                      key: 'motorcyclist_title',
+                                    ),
+                                    subtitle: getTranslateText(
+                                      context: context,
+                                      key: 'motorcyclist_subtitle',
+                                    ),
                                     icon: Icons.motorcycle,
                                     iconColor: Colors.blue[600]!,
                                     onTap: () => Navigator.pushNamed(
@@ -166,8 +193,14 @@ class UserTypeSelectionPage extends StatelessWidget {
                                   SizedBox(height: isMobile ? 16 : 20),
                                   _buildUserTypeCard(
                                     context: context,
-                                    title: getTranslateText(context: context, key: 'representative_title'),
-                                    subtitle: getTranslateText(context: context, key: 'representative_subtitle'),
+                                    title: getTranslateText(
+                                      context: context,
+                                      key: 'representative_title',
+                                    ),
+                                    subtitle: getTranslateText(
+                                      context: context,
+                                      key: 'representative_subtitle',
+                                    ),
                                     icon: Icons.store,
                                     iconColor: Colors.orange[600]!,
                                     onTap: () => Navigator.pushNamed(
@@ -186,7 +219,10 @@ class UserTypeSelectionPage extends StatelessWidget {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  getTranslateText(context: context, key: 'already_have_account'),
+                                  getTranslateText(
+                                    context: context,
+                                    key: 'already_have_account',
+                                  ),
                                   style: TextStyle(
                                     fontSize: isMobile ? 16 : 18,
                                     color: Colors.grey[600],
@@ -209,7 +245,10 @@ class UserTypeSelectionPage extends StatelessWidget {
                                     ),
                                   ),
                                   child: Text(
-                                    getTranslateText(context: context, key: 'sign_in'),
+                                    getTranslateText(
+                                      context: context,
+                                      key: 'sign_in',
+                                    ),
                                     style: TextStyle(
                                       color: Colors.blue[600],
                                       fontWeight: FontWeight.bold,

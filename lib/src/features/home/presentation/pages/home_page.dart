@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
+import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_bloc.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_event.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/presentation/pages/manage_franchise_page.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
@@ -17,12 +23,6 @@ import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/r
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/pages/register_franchise_page.dart';
-import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
-import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_bloc.dart';
-import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_event.dart';
-import 'package:motogo_frontend/src/features/manage_franchise/presentation/pages/manage_franchise_page.dart';
-import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
-import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/pages/search_motorcycle_page.dart';
 
 class HomePage extends StatelessWidget {
@@ -82,7 +82,7 @@ class _HomeViewState extends State<_HomeView> {
         elevation: 0,
       ),
       drawer: _buildDrawer(context),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.grey[50]!, Colors.white],

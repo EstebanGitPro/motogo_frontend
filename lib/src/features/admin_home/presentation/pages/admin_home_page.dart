@@ -28,7 +28,7 @@ class AdminHomePage extends StatelessWidget {
         elevation: 0,
       ),
       drawer: _buildDrawer(context),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.grey[50]!, Colors.white],
@@ -127,14 +127,14 @@ class AdminHomePage extends StatelessWidget {
           iconColor: Colors.blue,
           onTap: () => _navigateToServiceCatalog(context),
         ),
-        AdminMenuCard(
+        const AdminMenuCard(
           icon: Icons.bar_chart,
           title: AdminConstants.cardReports,
           subtitle: AdminConstants.cardReportsSubtitle,
           iconColor: Colors.grey,
           isEnabled: false,
         ),
-        AdminMenuCard(
+        const AdminMenuCard(
           icon: Icons.people,
           title: AdminConstants.cardUsers,
           subtitle: AdminConstants.cardUsersSubtitle,

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
+import 'package:motogo_frontend/src/core/constants/login_constants.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 import 'package:motogo_frontend/src/features/admin_home/presentation/pages/admin_home_page.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
-import 'package:motogo_frontend/src/features/user_home/presentation/pages/user_home_page.dart';
-import 'package:motogo_frontend/src/core/constants/login_constants.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/widgets/login_form.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/pages/user_home_page.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onSwitchToRegister;
@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
                 behavior: SnackBarBehavior.floating,
-                duration: Duration(
+                duration: const Duration(
                   seconds: LoginConstants.snackbarDurationSeconds,
                 ),
               ),
@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                 content: Text(state.message),
                 backgroundColor: Colors.green,
                 behavior: SnackBarBehavior.floating,
-                duration: Duration(
+                duration: const Duration(
                   seconds: LoginConstants.successSnackbarDurationSeconds,
                 ),
               ),

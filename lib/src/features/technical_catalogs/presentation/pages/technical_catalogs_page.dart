@@ -36,7 +36,7 @@ class TechnicalCatalogsPage extends StatelessWidget {
           const SizedBox(height: 12),
 
           // HU42 - Brands (Coming Soon)
-          _CatalogCard(
+          const _CatalogCard(
             icon: Icons.label,
             title: AdminConstants.catalogBrands,
             subtitle: AdminConstants.catalogBrandsSubtitle,
@@ -45,7 +45,7 @@ class TechnicalCatalogsPage extends StatelessWidget {
           const SizedBox(height: 12),
 
           // HU1 - Categories (Coming Soon)
-          _CatalogCard(
+          const _CatalogCard(
             icon: Icons.category,
             title: AdminConstants.catalogCategories,
             subtitle: AdminConstants.catalogCategoriesSubtitle,
@@ -54,7 +54,7 @@ class TechnicalCatalogsPage extends StatelessWidget {
           const SizedBox(height: 12),
 
           // HU41 - Line Categories (Coming Soon)
-          _CatalogCard(
+          const _CatalogCard(
             icon: Icons.folder,
             title: AdminConstants.catalogLineCategories,
             subtitle: AdminConstants.catalogLineCategoriesSubtitle,
@@ -63,7 +63,7 @@ class TechnicalCatalogsPage extends StatelessWidget {
           const SizedBox(height: 12),
 
           // HU49 - Engine Ranges (Coming Soon)
-          _CatalogCard(
+          const _CatalogCard(
             icon: Icons.settings,
             title: AdminConstants.catalogEngineRanges,
             subtitle: AdminConstants.catalogEngineRangesSubtitle,

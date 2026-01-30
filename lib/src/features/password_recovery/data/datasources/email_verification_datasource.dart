@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
-import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_message_mapper.dart';
+import 'package:motogo_frontend/src/core/errors/error_model.dart';
 
 /// DataSource for email recovery verification.
 ///
@@ -33,7 +34,7 @@ class EmailRecoveryVerificationDataSource {
       final status = decoded['status'] as String?;
 
       if (status == 'success') {
-        return Right(true);
+        return const Right(true);
       } else {
         return Left(_handleDioError(response));
       }

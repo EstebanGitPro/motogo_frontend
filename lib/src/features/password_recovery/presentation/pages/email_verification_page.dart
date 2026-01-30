@@ -54,7 +54,6 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
                             children: [
                               const Spacer(),
 
-                       
                               Container(
                                 height: isMobile ? 80 : 100,
                                 width: isMobile ? 80 : 100,
@@ -73,7 +72,6 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               SizedBox(height: isMobile ? 24 : 32),
 
-                      
                               Text(
                                 'Recuperar contraseña',
                                 style: Theme.of(context).textTheme.headlineSmall
@@ -87,7 +85,6 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               SizedBox(height: isMobile ? 12 : 16),
 
-                      
                               Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 8 : 16,
@@ -106,12 +103,10 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               SizedBox(height: isMobile ? 32 : 40),
 
-                    
                               const EmailVerificationWidget(),
 
                               SizedBox(height: isMobile ? 24 : 32),
 
-                      
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -127,7 +122,6 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
 
                               const Spacer(),
 
-                      
                               Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: isMobile ? 8 : 16,

@@ -314,7 +314,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         builder: (context, state) {
           final isLoading = state is RegisterBranchLoading || _isUploadingImage;
 
-          return Container(
+          return DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.grey[50]!, Colors.white],

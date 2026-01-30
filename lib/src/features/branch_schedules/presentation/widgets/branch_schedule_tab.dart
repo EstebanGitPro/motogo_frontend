@@ -225,7 +225,7 @@ class _BranchScheduleContent extends StatelessWidget {
               children: [
                 Icon(Icons.date_range, color: Colors.blue[600]),
                 const SizedBox(width: 8),
-                Flexible(
+                const Flexible(
                   child: Text(
                     ScheduleConstants.editValidityTitle,
                     overflow: TextOverflow.ellipsis,

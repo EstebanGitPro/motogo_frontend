@@ -102,12 +102,9 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
+              const Text(
                 '🔍 ${MotorcycleConstants.searchByPlateTitle}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               TextFormField(

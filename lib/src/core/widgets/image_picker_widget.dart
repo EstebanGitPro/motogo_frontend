@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Widget for selecting and previewing an image.
 ///
@@ -215,7 +214,7 @@ class ImagePickerWidget extends StatelessWidget {
                       Positioned(
                         top: 8,
                         right: 8,
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(20),
@@ -256,7 +255,7 @@ class ImagePickerWidget extends StatelessWidget {
                       Positioned(
                         top: 8,
                         right: 8,
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(20),

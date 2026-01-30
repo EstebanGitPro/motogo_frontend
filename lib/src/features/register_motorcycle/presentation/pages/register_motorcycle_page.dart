@@ -76,7 +76,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
             ),
             body: GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
-              child: Container(
+              child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.grey[50]!, Colors.white],

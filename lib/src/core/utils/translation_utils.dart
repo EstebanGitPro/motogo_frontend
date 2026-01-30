@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 /// Utility class for handling translations throughout the app
 class TranslationUtils {
   /// Get translated text using Easy Localization
-  /// 
+  ///
   /// [context] - BuildContext required for accessing translations
   /// [key] - Translation key from the JSON file
   /// [args] - Optional list of arguments for string interpolation
   /// [namedArgs] - Optional map of named arguments for string interpolation
   /// [gender] - Optional gender for gender-specific translations
-  /// 
+  ///
   /// Returns the translated string or the key if translation is not found
   static String getTranslateText({
     required BuildContext context,

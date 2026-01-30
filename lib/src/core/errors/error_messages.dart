@@ -8,6 +8,7 @@
 /// - Amigables y empáticos con el usuario
 /// - Claros sobre qué pasó
 /// - Con sugerencias de qué hacer
+library;
 
 // ============ ERRORES DE CONEXIÓN ============
 

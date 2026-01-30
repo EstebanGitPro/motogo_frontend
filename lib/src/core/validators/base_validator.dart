@@ -3,12 +3,12 @@ import 'package:motogo_frontend/src/core/constants/validation_messages.dart';
 /// Clase base para todos los validadores
 abstract class BaseValidator {
   final String? customMessage;
-  
+
   const BaseValidator({this.customMessage});
-  
+
   /// Método principal que todas las clases deben implementar
   String? validate(String? value);
-  
+
   /// Método auxiliar para retornar mensaje personalizado o por defecto
   String? getMessage(String defaultMessage) {
     return customMessage ?? defaultMessage;
@@ -18,9 +18,9 @@ abstract class BaseValidator {
 /// Clase para combinar múltiples validadores
 class ValidatorComposer extends BaseValidator {
   final List<BaseValidator> validators;
-  
+
   const ValidatorComposer(this.validators, {super.customMessage});
-  
+
   @override
   String? validate(String? value) {
     for (final validator in validators) {
@@ -36,7 +36,7 @@ class ValidatorComposer extends BaseValidator {
 /// Validador para campos requeridos
 class RequiredValidator extends BaseValidator {
   const RequiredValidator({super.customMessage});
-  
+
   @override
   String? validate(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -49,9 +49,9 @@ class RequiredValidator extends BaseValidator {
 /// Validador para longitud mínima
 class MinLengthValidator extends BaseValidator {
   final int minLength;
-  
+
   const MinLengthValidator(this.minLength, {super.customMessage});
-  
+
   @override
   String? validate(String? value) {
     if (value == null || value.length < minLength) {
@@ -64,9 +64,9 @@ class MinLengthValidator extends BaseValidator {
 /// Validador para longitud máxima
 class MaxLengthValidator extends BaseValidator {
   final int maxLength;
-  
+
   const MaxLengthValidator(this.maxLength, {super.customMessage});
-  
+
   @override
   String? validate(String? value) {
     if (value != null && value.length > maxLength) {
@@ -79,9 +79,9 @@ class MaxLengthValidator extends BaseValidator {
 /// Validador para expresiones regulares
 class RegexValidator extends BaseValidator {
   final RegExp pattern;
-  
+
   const RegexValidator(this.pattern, {super.customMessage});
-  
+
   @override
   String? validate(String? value) {
     if (value != null && !pattern.hasMatch(value)) {

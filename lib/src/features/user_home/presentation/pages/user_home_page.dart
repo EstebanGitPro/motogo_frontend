@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:motogo_frontend/src/core/config/secrets.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
@@ -14,11 +13,12 @@ import 'package:motogo_frontend/src/features/change_password/presentation/pages/
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pages/register_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/my_motorcycles_page.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pages/register_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
 ///
@@ -52,6 +52,8 @@ class _UserHomeViewState extends State<_UserHomeView> {
   PointAnnotationManager? _annotationManager;
   Timer? _radiusDebounceTimer;
   double _sliderRadius = 5.0;
+  Cancelable? _tapListener;
+  final Map<String, String> _annotationToBranch = {};
 
   @override
   void initState() {
@@ -64,6 +66,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
   @override
   void dispose() {
     _radiusDebounceTimer?.cancel();
+    _tapListener?.cancel();
     super.dispose();
   }
 
@@ -239,7 +242,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
   }
 
   Widget _buildMapPlaceholder(String message) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(color: Colors.grey[200]),
       child: Center(
         child: Column(
@@ -508,8 +511,8 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     await _annotationManager!.deleteAll();
 
-    // Map to track annotation IDs to branch IDs
-    final annotationToBranch = <String, String>{};
+    // Clear and rebuild annotation to branch mapping
+    _annotationToBranch.clear();
 
     for (final branch in branches) {
       // Color by type: workshop=blue, store=green
@@ -530,19 +533,18 @@ class _UserHomeViewState extends State<_UserHomeView> {
       );
 
       final annotation = await _annotationManager!.create(options);
-      annotationToBranch[annotation.id] = branch.id;
+      _annotationToBranch[annotation.id] = branch.id;
     }
 
-    // Set up click listener for markers
-    _annotationManager!.addOnPointAnnotationClickListener(
-      _MarkerClickListener(
-        annotationToBranch: annotationToBranch,
-        onMarkerClicked: (branchId) {
-          if (mounted) {
-            context.read<UserHomeBloc>().add(SelectBranch(branchId));
-          }
-        },
-      ),
+    // Set up tap listener using new tapEvents API
+    _tapListener?.cancel();
+    _tapListener = _annotationManager!.tapEvents(
+      onTap: (annotation) {
+        final branchId = _annotationToBranch[annotation.id];
+        if (branchId != null && mounted) {
+          context.read<UserHomeBloc>().add(SelectBranch(branchId));
+        }
+      },
     );
   }
 
@@ -843,24 +845,5 @@ class _UserHomeViewState extends State<_UserHomeView> {
         );
       },
     );
-  }
-}
-
-/// Listener for marker click events on the map
-class _MarkerClickListener extends OnPointAnnotationClickListener {
-  final Map<String, String> annotationToBranch;
-  final void Function(String branchId) onMarkerClicked;
-
-  _MarkerClickListener({
-    required this.annotationToBranch,
-    required this.onMarkerClicked,
-  });
-
-  @override
-  void onPointAnnotationClick(PointAnnotation annotation) {
-    final branchId = annotationToBranch[annotation.id];
-    if (branchId != null) {
-      onMarkerClicked(branchId);
-    }
   }
 }

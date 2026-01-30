@@ -282,7 +282,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
             // Date range toggle (only for new exceptions)
             if (!_isEditing) ...[
               SwitchListTile(
-                title: Text(ScheduleConstants.dateRangeToggle),
+                title: const Text(ScheduleConstants.dateRangeToggle),
                 value: _isDateRange,
                 onChanged: (value) {
                   setState(() {
@@ -291,7 +291,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
                   });
                 },
                 contentPadding: EdgeInsets.zero,
-                activeColor: Colors.orange[600],
+                activeThumbColor: Colors.orange[600],
               ),
             ],
 
@@ -300,7 +300,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: Icon(Icons.event, color: Colors.orange[600]),
-                title: Text(ScheduleConstants.exceptionEndDateLabel),
+                title: const Text(ScheduleConstants.exceptionEndDateLabel),
                 subtitle: Text(
                   _selectedEndDate != null
                       ? _formatDisplayDate(_selectedEndDate!)
@@ -328,7 +328,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
 
             // Closed toggle
             SwitchListTile(
-              title: Text(ScheduleConstants.closedThisDay),
+              title: const Text(ScheduleConstants.closedThisDay),
               value: _isClosed,
               onChanged: (value) => setState(() => _isClosed = value),
               contentPadding: EdgeInsets.zero,

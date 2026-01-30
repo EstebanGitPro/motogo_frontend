@@ -34,12 +34,11 @@ class RegisterPersonRepositoryImp implements RegisterPersonRepository {
         password,
         role,
       );
-      
+
       return result.fold(
         (error) => Left(error),
         (personModel) => Right(personModel),
       );
-      
     } on EmailAlreadyExistsException {
       return Left(
         ErrorModel(message: 'El email ya está registrado', isError: true),

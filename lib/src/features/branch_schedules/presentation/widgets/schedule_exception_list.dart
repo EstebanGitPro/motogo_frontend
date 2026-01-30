@@ -90,9 +90,9 @@ class ScheduleExceptionList extends StatelessWidget {
         // Loading overlay
         if (isLoading)
           Positioned.fill(
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Center(
@@ -185,12 +185,12 @@ class ScheduleExceptionList extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Text(ScheduleConstants.deleteExceptionTitle),
-        content: Text(ScheduleConstants.deleteExceptionMessage),
+        title: const Text(ScheduleConstants.deleteExceptionTitle),
+        content: const Text(ScheduleConstants.deleteExceptionMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: Text(ScheduleConstants.cancel),
+            child: const Text(ScheduleConstants.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -203,7 +203,7 @@ class ScheduleExceptionList extends StatelessWidget {
               );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: Text(ScheduleConstants.deleteExceptionConfirm),
+            child: const Text(ScheduleConstants.deleteExceptionConfirm),
           ),
         ],
       ),

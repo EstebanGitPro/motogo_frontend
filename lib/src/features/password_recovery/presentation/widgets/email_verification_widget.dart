@@ -38,15 +38,17 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
               keyboardType: TextInputType.emailAddress,
               validator: (value) =>
                   value == null || value.trim().isEmpty || !value.contains('@')
-                      ? 'Introduce un email válido'
-                      : null,
+                  ? 'Introduce un email válido'
+                  : null,
             ),
             const SizedBox(height: 24),
-            BlocConsumer<EmailRecoveryVerificationBloc, EmailRecoveryVerificationState>(
+            BlocConsumer<
+              EmailRecoveryVerificationBloc,
+              EmailRecoveryVerificationState
+            >(
               listener: (context, state) {
-                
                 ScaffoldMessenger.of(context).clearSnackBars();
-                
+
                 if (state is EmailRecoveryVerificationSuccess) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -73,10 +75,10 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       context.read<EmailRecoveryVerificationBloc>().add(
-                            EmailRecoveryVerificationSubmitted(
-                              email: _emailCtrl.text.trim(),
-                            ),
-                          );
+                        EmailRecoveryVerificationSubmitted(
+                          email: _emailCtrl.text.trim(),
+                        ),
+                      );
                     }
                   },
                 );

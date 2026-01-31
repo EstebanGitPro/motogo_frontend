@@ -11,6 +11,7 @@ import 'package:motogo_frontend/src/core/services/location_service.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/my_motorcycles_page.dart';
@@ -785,6 +786,9 @@ class _UserHomeViewState extends State<_UserHomeView> {
                                   backgroundColor: Colors.green,
                                 ),
                               );
+                              context.read<EditProfileBloc>().add(
+                                const EditProfileReset(),
+                              );
                               context.read<LoginBloc>().add(LoginLogout());
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/login',
@@ -834,6 +838,9 @@ class _UserHomeViewState extends State<_UserHomeView> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(dialogContext).pop();
+                    context.read<EditProfileBloc>().add(
+                      const EditProfileReset(),
+                    );
                     context.read<LoginBloc>().add(LoginLogout());
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),

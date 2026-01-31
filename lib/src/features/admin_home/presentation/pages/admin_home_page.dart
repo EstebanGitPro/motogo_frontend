@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admi
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_bloc.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_event.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/pages/admin_services_list_page.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/technical_catalogs_page.dart';
 
@@ -263,6 +264,7 @@ class AdminHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 Navigator.of(context).pop(); // Close drawer
+                context.read<EditProfileBloc>().add(const EditProfileReset());
                 context.read<LoginBloc>().add(LoginLogout());
                 Navigator.of(
                   context,

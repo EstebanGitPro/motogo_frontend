@@ -23,6 +23,7 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
       (event, emit) => _onSaved(event, emit, updatePersonUsecase),
     );
     on<EditProfileCacheCleared>(_onCacheCleared);
+    on<EditProfileReset>(_onReset);
   }
 
   Future<void> _onLoaded(
@@ -121,6 +122,12 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     Emitter<EditProfileState> emit,
   ) async {
     emit(state.copyWith(isFromCache: false));
+  }
+
+  /// Resetea el estado del bloc al estado inicial.
+  /// Llamar cuando el usuario cierra sesión para limpiar los datos anteriores.
+  void _onReset(EditProfileReset event, Emitter<EditProfileState> emit) {
+    emit(const EditProfileState());
   }
 
   /// Obtiene el usuario desde el cache del UserSessionManager

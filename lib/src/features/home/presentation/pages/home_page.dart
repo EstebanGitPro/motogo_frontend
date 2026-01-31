@@ -8,6 +8,7 @@ import 'package:motogo_frontend/src/features/change_password/presentation/bloc/c
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
@@ -636,6 +637,9 @@ class _HomeViewState extends State<_HomeView> {
                                 ),
                               );
                               // Clear session and redirect to login
+                              context.read<EditProfileBloc>().add(
+                                const EditProfileReset(),
+                              );
                               context.read<LoginBloc>().add(LoginLogout());
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 '/login',
@@ -687,6 +691,9 @@ class _HomeViewState extends State<_HomeView> {
                 TextButton(
                   onPressed: () {
                     Navigator.of(dialogContext).pop();
+                    context.read<EditProfileBloc>().add(
+                      const EditProfileReset(),
+                    );
                     context.read<LoginBloc>().add(LoginLogout());
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),

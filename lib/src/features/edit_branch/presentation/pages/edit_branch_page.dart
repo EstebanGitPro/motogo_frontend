@@ -14,7 +14,6 @@ import 'package:motogo_frontend/src/core/validators/validators.dart';
 import 'package:motogo_frontend/src/core/widgets/button_widget.dart';
 import 'package:motogo_frontend/src/core/widgets/image_picker_widget.dart';
 import 'package:motogo_frontend/src/core/widgets/input_widgat.dart';
-import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_event.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_state.dart';
@@ -81,9 +80,7 @@ class _EditBranchPageState extends State<EditBranchPage> {
   @override
   void initState() {
     super.initState();
-    _editBranchBloc = EditBranchBloc(
-      InjectorApp.resolve<UpdateBranchUseCase>(),
-    );
+    _editBranchBloc = EditBranchBloc();
     _hydrateFromBranch();
     _loadBrands();
     _loadDepartments();
@@ -356,7 +353,7 @@ class _EditBranchPageState extends State<EditBranchPage> {
           builder: (context, state) {
             final isLoading = state is EditBranchLoading || _isUploadingImage;
 
-            return Container(
+            return DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Colors.grey[50]!, Colors.white],

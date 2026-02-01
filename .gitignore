@@ -84,3 +84,6 @@ ios/Flutter/Generated.xcconfig
 *.env.local
 secrets.json
 .vscode/launch.json
+
+# Coverage reports
+coverage/

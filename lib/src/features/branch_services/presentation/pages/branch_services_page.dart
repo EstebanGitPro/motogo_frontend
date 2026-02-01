@@ -63,7 +63,7 @@ class BranchServicesPage extends StatelessWidget {
           child: Column(
             children: [
               // Filter chips
-              Container(
+              ColoredBox(
                 color: Colors.white,
                 child: BlocBuilder<BranchServicesBloc, BranchServicesState>(
                   buildWhen: (prev, curr) =>

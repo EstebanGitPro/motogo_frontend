@@ -4,46 +4,20 @@ import 'package:motogo_frontend/src/features/register_branch/domain/entities/bra
 ///
 /// Maps to the `branches` table and handles API communication.
 class BranchModel extends BranchEntity {
-  final String? id;
-  final String name;
-  final String establishmentType;
-  final String? franchiseId;
-  final String? profileImageUrl;
-  final String status;
-  final List<String> brands;
-  final String address;
-  final String cityId;
-  final String? cityName;
-  final String departmentId;
-  final String? departmentName;
-
   const BranchModel({
-    this.id,
-    required this.name,
-    required this.establishmentType,
-    this.franchiseId,
-    this.profileImageUrl,
-    this.status = BranchStatus.active,
-    this.brands = const [],
-    required this.address,
-    required this.cityId,
-    this.cityName,
-    required this.departmentId,
-    this.departmentName,
-  }) : super(
-         id: id,
-         name: name,
-         establishmentType: establishmentType,
-         franchiseId: franchiseId,
-         profileImageUrl: profileImageUrl,
-         status: status,
-         brands: brands,
-         address: address,
-         cityId: cityId,
-         cityName: cityName,
-         departmentId: departmentId,
-         departmentName: departmentName,
-       );
+    super.id,
+    required super.name,
+    required super.establishmentType,
+    super.franchiseId,
+    super.profileImageUrl,
+    super.status = BranchStatus.active,
+    super.brands = const [],
+    required super.address,
+    required super.cityId,
+    super.cityName,
+    required super.departmentId,
+    super.departmentName,
+  });
 
   /// Creates a model from domain entity.
   factory BranchModel.fromEntity(BranchEntity entity) {

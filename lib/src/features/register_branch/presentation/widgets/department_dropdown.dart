@@ -36,7 +36,7 @@ class DepartmentDropdown extends StatelessWidget {
         : null;
 
     return DropdownButtonFormField<String>(
-      value: effectiveValue,
+      initialValue: effectiveValue,
       decoration: InputDecoration(
         labelText: 'Departamento',
         hintText: 'Selecciona un departamento',

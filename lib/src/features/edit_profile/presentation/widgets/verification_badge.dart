@@ -1,4 +1,3 @@
-
 // 4. Badge de verificación
 import 'package:flutter/material.dart';
 
@@ -11,7 +10,9 @@ class VerificationBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isVerified ? Colors.green.withAlpha(25) : Colors.orange.withAlpha(25),
+        color: isVerified
+            ? Colors.green.withAlpha(25)
+            : Colors.orange.withAlpha(25),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isVerified ? Colors.green : Colors.orange,

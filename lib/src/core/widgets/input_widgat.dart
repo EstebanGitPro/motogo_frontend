@@ -56,15 +56,11 @@ class CustomInputWidget extends StatelessWidget {
         suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(
-            color: borderColor ?? Colors.grey[300]!,
-          ),
+          borderSide: BorderSide(color: borderColor ?? Colors.grey[300]!),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(
-            color: borderColor ?? Colors.grey[300]!,
-          ),
+          borderSide: BorderSide(color: borderColor ?? Colors.grey[300]!),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -75,24 +71,17 @@ class CustomInputWidget extends StatelessWidget {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(
-            color: errorBorderColor,
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: errorBorderColor, width: 1.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: BorderSide(
-            color: errorBorderColor,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: errorBorderColor, width: 2),
         ),
         filled: true,
         fillColor: fillColor ?? Colors.grey[50],
-        contentPadding: contentPadding ?? const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 16,
-        ),
+        contentPadding:
+            contentPadding ??
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       validator: validator,
     );

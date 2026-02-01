@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
@@ -49,8 +48,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
     String franchiseId,
   ) async {
     try {
-      debugPrint('[Franchise] Getting franchise: $franchiseId');
-
       final response = await _dioClient.get('/franchises/$franchiseId');
       final responseData = response.data;
 
@@ -81,8 +78,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
   @override
   Future<Either<ErrorModel, List<FranchiseModel>>> listFranchises() async {
     try {
-      debugPrint('[Franchise] Listing franchises');
-
       final response = await _dioClient.get('/franchises');
       final responseData = response.data;
 
@@ -100,7 +95,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
             final franchises = franchiseList
                 .map((e) => FranchiseModel.fromJson(e as Map<String, dynamic>))
                 .toList();
-            debugPrint('[Franchise] Parsed ${franchises.length} franchises');
             return Right(franchises);
           }
         }
@@ -126,7 +120,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
   ) async {
     try {
       final body = franchise.toJson();
-      debugPrint('[Franchise] Updating franchise $franchiseId: $body');
 
       final response = await _dioClient.put(
         '/franchises/$franchiseId',
@@ -161,8 +154,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
   @override
   Future<Either<ErrorModel, String>> deleteFranchise(String franchiseId) async {
     try {
-      debugPrint('[Franchise] Deleting franchise: $franchiseId');
-
       final response = await _dioClient.delete('/franchises/$franchiseId');
       final responseData = response.data;
 
@@ -191,11 +182,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
     String franchiseId,
   ) async {
     try {
-      debugPrint(
-        '[Franchise] Linking branch $branchId to franchise $franchiseId',
-      );
-
-      // POST /franchises/:id/branches
       final response = await _dioClient.post(
         '/franchises/$franchiseId/branches',
         data: {'branch_id': branchId},
@@ -227,11 +213,6 @@ class FranchiseDataSourceImpl implements FranchiseDataSource {
     String franchiseId,
   ) async {
     try {
-      debugPrint(
-        '[Franchise] Unlinking branch $branchId from franchise $franchiseId',
-      );
-
-      // DELETE /franchises/:id/branches/:branchId
       final response = await _dioClient.delete(
         '/franchises/$franchiseId/branches/$branchId',
       );

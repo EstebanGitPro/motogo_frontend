@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
-import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
@@ -18,7 +17,6 @@ class MyBranchesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => MyBranchesBloc(
-        InjectorApp.resolve<GetBranchesUseCase>(),
         listFranchisesUseCase: InjectorApp.resolve<ListFranchisesUseCase>(),
       )..add(LoadBranches()),
       child: const _MyBranchesView(),
@@ -189,10 +187,6 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                         return BranchCard(
                           branch: branch,
                           onTap: () async {
-                            debugPrint(
-                              '=== TAP DETECTED on branch: ${branch.name} ===',
-                            );
-                            // Await result - true means branch was deleted or updated
                             final result = await Navigator.push<dynamic>(
                               context,
                               MaterialPageRoute(
@@ -200,12 +194,7 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                                     BranchDetailPage(branch: branch),
                               ),
                             );
-                            debugPrint(
-                              '=== Returned from detail with result: $result ===',
-                            );
-                            // Refresh if there was any modification (BranchEntity or true for deletion)
                             if (result != null && context.mounted) {
-                              debugPrint('=== Triggering RefreshBranches ===');
                               context.read<MyBranchesBloc>().add(
                                 RefreshBranches(),
                               );

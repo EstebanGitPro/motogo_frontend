@@ -127,15 +127,15 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
+              const PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    const Icon(Icons.delete, color: Colors.red, size: 20),
-                    const SizedBox(width: 8),
+                    Icon(Icons.delete, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
                     Text(
                       FranchiseConstants.deleteFranchiseMenu,
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.red),
                     ),
                   ],
                 ),

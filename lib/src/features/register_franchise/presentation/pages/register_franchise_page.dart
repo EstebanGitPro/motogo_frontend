@@ -199,9 +199,9 @@ class _RegisterFranchisePageState extends State<RegisterFranchisePage> {
                       const SizedBox(height: 24),
 
                       // Branch selection section
-                      Text(
+                      const Text(
                         FranchiseConstants.associateBranchesTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),

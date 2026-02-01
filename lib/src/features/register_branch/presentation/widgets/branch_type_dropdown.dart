@@ -64,7 +64,7 @@ class BranchTypeDropdown extends StatelessWidget {
         : null;
 
     return DropdownButtonFormField<String>(
-      value: effectiveValue,
+      initialValue: effectiveValue,
       decoration: _buildDecoration(),
       items: branchTypes.map((type) {
         return DropdownMenuItem(value: type.code, child: Text(type.label));

@@ -89,8 +89,8 @@ class RegisterRepresentativePage extends StatelessWidget {
                 maxWidth: MediaQuery.of(context).size.width > 800
                     ? 600
                     : (MediaQuery.of(context).size.width > 600
-                        ? 500
-                        : double.infinity),
+                          ? 500
+                          : double.infinity),
               ),
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -115,7 +115,7 @@ class RegisterRepresentativePage extends StatelessWidget {
                       ),
                       primaryColor: Colors.orange,
                       icon: Icons.store,
-                      extraContent: RepresentativeInfoBox(),
+                      extraContent: const RepresentativeInfoBox(),
                     ),
                   ],
                 ),

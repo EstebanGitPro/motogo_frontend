@@ -8,8 +8,10 @@ part 'email_verification_event.dart';
 part 'email_verification_state.dart';
 
 class EmailRecoveryVerificationBloc
-    extends Bloc<EmailRecoveryVerificationEvent, EmailRecoveryVerificationState> {
-  EmailRecoveryVerificationBloc() : super(EmailRecoveryVerificationInitial()) {
+    extends
+        Bloc<EmailRecoveryVerificationEvent, EmailRecoveryVerificationState> {
+  EmailRecoveryVerificationBloc()
+    : super(const EmailRecoveryVerificationInitial()) {
     final VerifyRecoveryEmailUseCase verifyEmailUseCase =
         InjectorApp.resolve<VerifyRecoveryEmailUseCase>();
 
@@ -23,13 +25,13 @@ class EmailRecoveryVerificationBloc
     Emitter<EmailRecoveryVerificationState> emit,
     VerifyRecoveryEmailUseCase useCase,
   ) async {
-    emit(EmailRecoveryVerificationLoading());
+    emit(const EmailRecoveryVerificationLoading());
 
     final result = await useCase.call(event.email);
 
     result.fold(
       (failure) => emit(EmailRecoveryVerificationFailure(failure)),
-      (_) => emit(EmailRecoveryVerificationSuccess()),
+      (_) => emit(const EmailRecoveryVerificationSuccess()),
     );
   }
 }

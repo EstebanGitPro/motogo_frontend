@@ -26,13 +26,13 @@ class ServiceToggleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -65,7 +65,7 @@ class ServiceToggleCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(serviceType).withOpacity(0.1),
+                      color: _getTypeColor(serviceType).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -105,7 +105,7 @@ class ServiceToggleCard extends StatelessWidget {
             Switch(
               value: isAssociated,
               onChanged: onToggle,
-              activeColor: Colors.blue[600],
+              activeThumbColor: Colors.blue[600],
             ),
           ],
         ),

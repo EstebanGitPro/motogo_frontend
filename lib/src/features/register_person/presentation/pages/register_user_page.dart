@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/widgets/register_form.dart';
-import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 
 class RegisterUserPage extends StatelessWidget {
   final VoidCallback? onSwitchToLogin;

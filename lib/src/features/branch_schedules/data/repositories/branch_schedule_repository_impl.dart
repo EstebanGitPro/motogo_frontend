@@ -4,6 +4,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/b
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
 
 /// Implementation of [BranchScheduleRepository].
@@ -20,10 +21,11 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleEntity>> createSchedule(
+  Future<Either<ErrorModel, (ScheduleEntity, String)>> createSchedule(
     String branchId,
   ) async {
-    return _dataSource.createSchedule(branchId);
+    final result = await _dataSource.createSchedule(branchId);
+    return result.map((record) => (record.$1, record.$2));
   }
 
   @override
@@ -47,17 +49,19 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleEntity>> activateSchedule(
+  Future<Either<ErrorModel, (ScheduleEntity, String)>> activateSchedule(
     String branchId,
   ) async {
-    return _dataSource.activateSchedule(branchId);
+    final result = await _dataSource.activateSchedule(branchId);
+    return result.map((record) => (record.$1, record.$2));
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleEntity>> deactivateSchedule(
+  Future<Either<ErrorModel, (ScheduleEntity, String)>> deactivateSchedule(
     String branchId,
   ) async {
-    return _dataSource.deactivateSchedule(branchId);
+    final result = await _dataSource.deactivateSchedule(branchId);
+    return result.map((record) => (record.$1, record.$2));
   }
 
   @override
@@ -94,19 +98,18 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleDetailEntity>> updateScheduleDetail(
+  Future<Either<ErrorModel, String>> updateScheduleDetail(
     String detailId, {
     required String openingTime,
     required String closingTime,
     required bool isClosed,
   }) async {
-    final result = await _dataSource.updateScheduleDetail(
+    return _dataSource.updateScheduleDetail(
       detailId,
       openingTime: openingTime,
       closingTime: closingTime,
       isClosed: isClosed,
     );
-    return result.map((model) => model.toEntity());
   }
 
   @override
@@ -114,5 +117,71 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
     String detailId,
   ) async {
     return _dataSource.deleteScheduleDetail(detailId);
+  }
+
+  // ========== Schedule Exceptions Implementation (HU20-25) ==========
+
+  @override
+  Future<Either<ErrorModel, List<ScheduleExceptionEntity>>>
+  getScheduleExceptions(String branchId) async {
+    final result = await _dataSource.getScheduleExceptions(branchId);
+    return result.map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
+  Future<Either<ErrorModel, (ScheduleExceptionEntity, String)>>
+  createScheduleException(
+    String branchId, {
+    required String exceptionStartDate,
+    String? exceptionEndDate,
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    final result = await _dataSource.createScheduleException(
+      branchId,
+      exceptionStartDate: exceptionStartDate,
+      exceptionEndDate: exceptionEndDate,
+      openingTime: openingTime,
+      closingTime: closingTime,
+      isClosed: isClosed,
+    );
+    return result.map((record) => (record.$1.toEntity(), record.$2));
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> updateScheduleException(
+    String exceptionId, {
+    required String openingTime,
+    required String closingTime,
+    required bool isClosed,
+  }) async {
+    return _dataSource.updateScheduleException(
+      exceptionId,
+      openingTime: openingTime,
+      closingTime: closingTime,
+      isClosed: isClosed,
+    );
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> deleteScheduleException(
+    String exceptionId,
+  ) async {
+    return _dataSource.deleteScheduleException(exceptionId);
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> activateScheduleException(
+    String exceptionId,
+  ) async {
+    return _dataSource.activateScheduleException(exceptionId);
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> deactivateScheduleException(
+    String exceptionId,
+  ) async {
+    return _dataSource.deactivateScheduleException(exceptionId);
   }
 }

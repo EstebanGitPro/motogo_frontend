@@ -3,9 +3,7 @@ import 'package:motogo_frontend/src/core/validators/base_validator.dart';
 
 /// Validador para correos electrónicos
 class EmailValidator extends BaseValidator {
-  static final RegExp _emailRegex = RegExp(
-    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-  );
+  static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
   const EmailValidator({super.customMessage});
 
@@ -64,7 +62,8 @@ class PasswordValidator extends BaseValidator {
       return getMessage(ValidationMessages.passwordNumber);
     }
 
-    if (requireSpecialChar && !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
+    if (requireSpecialChar &&
+        !RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
       return getMessage(ValidationMessages.passwordSpecialChar);
     }
 
@@ -165,9 +164,7 @@ class IdentityValidator extends BaseValidator {
 
 /// Validador para números de teléfono
 class PhoneValidator extends BaseValidator {
-  static final RegExp _phoneRegex = RegExp(
-    r'^[+]?[0-9]{10,13}$',
-  );
+  static final RegExp _phoneRegex = RegExp(r'^[+]?[0-9]{10,13}$');
 
   const PhoneValidator({super.customMessage});
 

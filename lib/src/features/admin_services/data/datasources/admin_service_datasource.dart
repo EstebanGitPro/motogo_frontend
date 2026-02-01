@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -56,16 +55,6 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
           final servicesList = data['services'] as List<dynamic>?;
 
           if (servicesList != null) {
-            // Debug: Log first service to see is_active format
-            if (servicesList.isNotEmpty) {
-              final first = servicesList.first as Map<String, dynamic>;
-              debugPrint('📋 First service: ${first['name']}');
-              debugPrint('📋 is_active value: ${first['is_active']}');
-              debugPrint(
-                '📋 is_active type: ${first['is_active'].runtimeType}',
-              );
-            }
-
             final services = servicesList
                 .map(
                   (json) =>
@@ -105,20 +94,10 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
         requestBody['is_active'] = isActive;
       }
 
-      // Debug logs
-      debugPrint('🔄 ========== ACTUALIZANDO SERVICIO ==========');
-      debugPrint('🔄 Service ID: $serviceId');
-      debugPrint('🔄 Endpoint: /admin/services/$serviceId');
-      debugPrint('🔄 Request Body: $requestBody');
-      debugPrint('🔄 =============================================');
-
       final response = await _dioClient.put(
         '/admin/services/$serviceId',
         data: requestBody,
       );
-
-      debugPrint('✅ Response status: ${response.statusCode}');
-      debugPrint('✅ Response data: ${response.data}');
 
       final responseData = response.data;
 

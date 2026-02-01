@@ -186,7 +186,7 @@ class _RegisterFormState extends State<RegisterForm> {
               horizontal: isMobile ? 5 : 32,
               vertical: isMobile ? 12 : 24,
             ),
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),

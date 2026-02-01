@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/franchise_constants.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_event.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_state.dart';
@@ -9,8 +10,11 @@ class RegisterFranchiseBloc
     extends Bloc<RegisterFranchiseEvent, RegisterFranchiseState> {
   final RegisterFranchiseUseCase _registerFranchiseUseCase;
 
-  RegisterFranchiseBloc(this._registerFranchiseUseCase)
-    : super(const RegisterFranchiseInitial()) {
+  RegisterFranchiseBloc({RegisterFranchiseUseCase? registerFranchiseUseCase})
+    : _registerFranchiseUseCase =
+          registerFranchiseUseCase ??
+          InjectorApp.resolve<RegisterFranchiseUseCase>(),
+      super(const RegisterFranchiseInitial()) {
     on<SubmitFranchise>(_onSubmitFranchise);
     on<ResetFranchiseForm>(_onResetForm);
   }

@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/entities/admin_service_entity.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_event.dart';
@@ -18,14 +19,21 @@ class AdminServicesBloc extends Bloc<AdminServicesEvent, AdminServicesState> {
   final DeactivateServiceUseCase _deactivateServiceUseCase;
 
   AdminServicesBloc({
-    required GetServicesCatalogUseCase getServicesUseCase,
-    required UpdateServiceUseCase updateServiceUseCase,
-    required ActivateServiceUseCase activateServiceUseCase,
-    required DeactivateServiceUseCase deactivateServiceUseCase,
-  }) : _getServicesUseCase = getServicesUseCase,
-       _updateServiceUseCase = updateServiceUseCase,
-       _activateServiceUseCase = activateServiceUseCase,
-       _deactivateServiceUseCase = deactivateServiceUseCase,
+    GetServicesCatalogUseCase? getServicesUseCase,
+    UpdateServiceUseCase? updateServiceUseCase,
+    ActivateServiceUseCase? activateServiceUseCase,
+    DeactivateServiceUseCase? deactivateServiceUseCase,
+  }) : _getServicesUseCase =
+           getServicesUseCase ??
+           InjectorApp.resolve<GetServicesCatalogUseCase>(),
+       _updateServiceUseCase =
+           updateServiceUseCase ?? InjectorApp.resolve<UpdateServiceUseCase>(),
+       _activateServiceUseCase =
+           activateServiceUseCase ??
+           InjectorApp.resolve<ActivateServiceUseCase>(),
+       _deactivateServiceUseCase =
+           deactivateServiceUseCase ??
+           InjectorApp.resolve<DeactivateServiceUseCase>(),
        super(AdminServicesInitial()) {
     on<LoadServices>(_onLoadServices);
     on<RefreshServices>(_onRefreshServices);

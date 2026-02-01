@@ -144,3 +144,101 @@ class DeleteScheduleDetail extends BranchScheduleEvent {
   @override
   List<Object?> get props => [branchId, detailId];
 }
+
+// ========== Schedule Exception Events (HU20-25) ==========
+
+/// Load schedule exceptions for a branch.
+class LoadScheduleExceptions extends BranchScheduleEvent {
+  final String branchId;
+
+  const LoadScheduleExceptions(this.branchId);
+
+  @override
+  List<Object?> get props => [branchId];
+}
+
+/// Create a new schedule exception.
+class CreateScheduleException extends BranchScheduleEvent {
+  final String branchId;
+  final String exceptionStartDate;
+  final String? exceptionEndDate;
+  final String openingTime;
+  final String closingTime;
+  final bool isClosed;
+
+  const CreateScheduleException({
+    required this.branchId,
+    required this.exceptionStartDate,
+    this.exceptionEndDate,
+    required this.openingTime,
+    required this.closingTime,
+    this.isClosed = false,
+  });
+
+  @override
+  List<Object?> get props => [
+    branchId,
+    exceptionStartDate,
+    exceptionEndDate,
+    openingTime,
+    closingTime,
+    isClosed,
+  ];
+}
+
+/// Update an existing schedule exception.
+/// Note: Dates cannot be modified, only times and is_closed.
+class UpdateScheduleException extends BranchScheduleEvent {
+  final String branchId;
+  final String exceptionId;
+  final String openingTime;
+  final String closingTime;
+  final bool isClosed;
+
+  const UpdateScheduleException({
+    required this.branchId,
+    required this.exceptionId,
+    required this.openingTime,
+    required this.closingTime,
+    this.isClosed = false,
+  });
+
+  @override
+  List<Object?> get props => [
+    branchId,
+    exceptionId,
+    openingTime,
+    closingTime,
+    isClosed,
+  ];
+}
+
+/// Delete a schedule exception.
+class DeleteScheduleException extends BranchScheduleEvent {
+  final String branchId;
+  final String exceptionId;
+
+  const DeleteScheduleException({
+    required this.branchId,
+    required this.exceptionId,
+  });
+
+  @override
+  List<Object?> get props => [branchId, exceptionId];
+}
+
+/// Toggle schedule exception status (activate/deactivate).
+class ToggleScheduleExceptionStatus extends BranchScheduleEvent {
+  final String branchId;
+  final String exceptionId;
+  final bool activate;
+
+  const ToggleScheduleExceptionStatus({
+    required this.branchId,
+    required this.exceptionId,
+    required this.activate,
+  });
+
+  @override
+  List<Object?> get props => [branchId, exceptionId, activate];
+}

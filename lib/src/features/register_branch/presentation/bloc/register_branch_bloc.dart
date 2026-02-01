@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_event.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_state.dart';
@@ -6,10 +7,12 @@ import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/r
 /// BLoC for managing branch registration state.
 class RegisterBranchBloc
     extends Bloc<RegisterBranchEvent, RegisterBranchState> {
-  final RegisterBranchUseCase registerBranchUseCase;
+  final RegisterBranchUseCase _registerBranchUseCase;
 
-  RegisterBranchBloc(this.registerBranchUseCase)
-    : super(RegisterBranchInitial()) {
+  RegisterBranchBloc({RegisterBranchUseCase? registerBranchUseCase})
+    : _registerBranchUseCase =
+          registerBranchUseCase ?? InjectorApp.resolve<RegisterBranchUseCase>(),
+      super(RegisterBranchInitial()) {
     on<RegisterBranchSubmitted>(_onSubmitted);
     on<RegisterBranchReset>(_onReset);
   }
@@ -20,7 +23,7 @@ class RegisterBranchBloc
   ) async {
     emit(RegisterBranchLoading());
 
-    final result = await registerBranchUseCase.call(event.branch);
+    final result = await _registerBranchUseCase.call(event.branch);
 
     result.fold(
       (error) => emit(RegisterBranchFailure(error: error)),

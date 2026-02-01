@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
 
 part 'change_password_event.dart';
@@ -9,8 +10,10 @@ class ChangePasswordBloc
     extends Bloc<ChangePasswordEvent, ChangePasswordState> {
   final ChangePasswordUseCase _changePasswordUseCase;
 
-  ChangePasswordBloc(this._changePasswordUseCase)
-    : super(ChangePasswordInitial()) {
+  ChangePasswordBloc({ChangePasswordUseCase? changePasswordUseCase})
+    : _changePasswordUseCase =
+          changePasswordUseCase ?? InjectorApp.resolve<ChangePasswordUseCase>(),
+      super(ChangePasswordInitial()) {
     on<ChangePasswordSubmitted>(_onChangePasswordSubmitted);
   }
 

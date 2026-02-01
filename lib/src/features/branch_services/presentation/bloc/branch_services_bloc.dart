@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/service_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
 import 'package:motogo_frontend/src/core/constants/service_constants.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_services/data/datasources/branch_services_datasource.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/presentation/bloc/branch_services_event.dart';
@@ -19,10 +20,13 @@ class BranchServicesBloc
   String? _currentBranchId;
 
   BranchServicesBloc({
-    required CatalogsRepository catalogsRepository,
-    required BranchServicesDataSource branchServicesDataSource,
-  }) : _catalogsRepository = catalogsRepository,
-       _branchServicesDataSource = branchServicesDataSource,
+    CatalogsRepository? catalogsRepository,
+    BranchServicesDataSource? branchServicesDataSource,
+  }) : _catalogsRepository =
+           catalogsRepository ?? InjectorApp.resolve<CatalogsRepository>(),
+       _branchServicesDataSource =
+           branchServicesDataSource ??
+           InjectorApp.resolve<BranchServicesDataSource>(),
        super(const BranchServicesInitial()) {
     on<LoadBranchServices>(_onLoadBranchServices);
     on<FilterServicesByType>(_onFilterByType);

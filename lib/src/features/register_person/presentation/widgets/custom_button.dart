@@ -48,18 +48,18 @@ class UserTypeButton extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: isCompact ? 16 : null,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  fontSize: isCompact ? 16 : null,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: isCompact ? 6 : 8),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.grey[600],
-                      fontSize: isCompact ? 13 : null,
-                    ),
+                  color: Colors.grey[600],
+                  fontSize: isCompact ? 13 : null,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],

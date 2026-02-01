@@ -1,12 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/constants/login_constants.dart';
+import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
-
-import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';
 
 part 'login_event.dart';
@@ -37,12 +35,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (result.isLeft) {
         final failure = result.left;
 
-        // DEBUG: Ver qué error está llegando
-        debugPrint('LOGIN ERROR:');
-        debugPrint('  Message: ${failure.message}');
-        debugPrint('  ErrorCode: ${failure.errorCode}');
-        debugPrint('  StatusCode: ${failure.statusCode}');
-
         // Check both errorCode and message for email verification
         final messageLower = failure.message.toLowerCase();
         final needsVerification =
@@ -53,8 +45,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               (keyword) => messageLower.contains(keyword),
             );
 
-        debugPrint('  NeedsVerification: $needsVerification');
-
         if (needsVerification) {
           emit(LoginNeedsVerification(message: failure.message));
         } else {
@@ -62,7 +52,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         }
       } else {
         final loginResult = result.right;
-        debugPrint('✅ LOGIN SUCCESS: ${loginResult.message}');
 
         // Emitir éxito con el mensaje del backend
         emit(

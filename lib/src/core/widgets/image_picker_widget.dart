@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Widget for selecting and previewing an image.
 ///
@@ -42,6 +44,31 @@ class ImagePickerWidget extends StatelessWidget {
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     final picker = ImagePicker();
 
+    // Request camera permission before using camera
+    if (source == ImageSource.camera) {
+      final permissionResult = await CameraPermissionService.instance
+          .requestPermissionWithResult();
+
+      if (permissionResult == CameraPermissionResult.permanentlyDenied) {
+        if (context.mounted) {
+          _showPermissionDeniedDialog(context);
+        }
+        return;
+      }
+
+      if (permissionResult == CameraPermissionResult.denied) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Permiso de cámara denegado'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
     try {
       final pickedFile = await picker.pickImage(
         source: source,
@@ -63,6 +90,31 @@ class ImagePickerWidget extends StatelessWidget {
         );
       }
     }
+  }
+
+  void _showPermissionDeniedDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permiso de cámara requerido'),
+        content: const Text(
+          'Para tomar fotos, necesitas habilitar el permiso de cámara en la configuración de la aplicación.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text('Ir a Configuración'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showPickerOptions(BuildContext context) {
@@ -162,7 +214,7 @@ class ImagePickerWidget extends StatelessWidget {
                       Positioned(
                         top: 8,
                         right: 8,
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(20),
@@ -203,7 +255,7 @@ class ImagePickerWidget extends StatelessWidget {
                       Positioned(
                         top: 8,
                         right: 8,
-                        child: Container(
+                        child: DecoratedBox(
                           decoration: BoxDecoration(
                             color: Colors.black54,
                             borderRadius: BorderRadius.circular(20),

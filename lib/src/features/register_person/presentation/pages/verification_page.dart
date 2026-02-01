@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
+import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 
 class VerificationPage extends StatefulWidget {
   final String email;
@@ -104,7 +105,7 @@ class _VerificationPageState extends State<VerificationPage> {
                               height: isMobile ? 100 : 120,
                               width: isMobile ? 100 : 120,
                               decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
+                                color: Colors.green.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(60),
                               ),
                               child: Icon(
@@ -184,12 +185,12 @@ class _VerificationPageState extends State<VerificationPage> {
                               decoration: BoxDecoration(
                                 color: Theme.of(
                                   context,
-                                ).primaryColor.withOpacity(0.05),
+                                ).primaryColor.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: Theme.of(
                                     context,
-                                  ).primaryColor.withOpacity(0.2),
+                                  ).primaryColor.withValues(alpha: 0.2),
                                 ),
                               ),
                               child: Text(

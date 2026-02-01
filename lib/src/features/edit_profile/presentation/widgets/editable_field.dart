@@ -40,8 +40,11 @@ class EditableField extends StatelessWidget {
           fontSize: isMobile ? 16 : 18,
         ),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon,
-                color: enabled ? Colors.grey[600] : Colors.grey[400], size: 22)
+            ? Icon(
+                prefixIcon,
+                color: enabled ? Colors.grey[600] : Colors.grey[400],
+                size: 22,
+              )
             : null,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

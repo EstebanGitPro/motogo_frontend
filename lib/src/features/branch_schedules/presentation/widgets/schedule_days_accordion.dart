@@ -15,12 +15,14 @@ class ScheduleDaysAccordion extends StatefulWidget {
   final String branchId;
   final List<DayEntity> daysCatalog;
   final Map<int, List<ScheduleDetailEntity>> detailsByDay;
+  final bool isLoading;
 
   const ScheduleDaysAccordion({
     super.key,
     required this.branchId,
     required this.daysCatalog,
     required this.detailsByDay,
+    this.isLoading = false,
   });
 
   @override
@@ -134,55 +136,80 @@ class _ScheduleDaysAccordionState extends State<ScheduleDaysAccordion> {
       );
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
-                  Text(
-                    ScheduleConstants.daysOfAttention,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
-                    ),
+    return Stack(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.grey[50],
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        ScheduleConstants.daysOfAttention,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                // Days accordion list
+                ...widget.daysCatalog.map((day) {
+                  // dayNumber comes from the catalog's value (1-7 for Monday-Sunday)
+                  final dayNumber = int.tryParse(day.value) ?? 1;
+                  final timeSlots = widget.detailsByDay[dayNumber] ?? [];
+
+                  return DayAccordionTile(
+                    day: day,
+                    dayNumber: dayNumber,
+                    timeSlots: timeSlots,
+                    isExpanded: _expandedDayNumber == dayNumber,
+                    onToggleExpand: () => _onToggleDay(dayNumber),
+                    onAddTimeSlot: () => _onAddTimeSlot(day, dayNumber),
+                    onEditTimeSlot: (detail) => _onEditTimeSlot(detail, day),
+                    onDeleteTimeSlot: _onDeleteTimeSlot,
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+        // Loading overlay
+        if (widget.isLoading)
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
               ),
             ),
-            // Days accordion list
-            ...widget.daysCatalog.map((day) {
-              // dayNumber comes from the catalog's value (1-7 for Monday-Sunday)
-              final dayNumber = int.tryParse(day.value) ?? 1;
-              final timeSlots = widget.detailsByDay[dayNumber] ?? [];
-
-              return DayAccordionTile(
-                day: day,
-                dayNumber: dayNumber,
-                timeSlots: timeSlots,
-                isExpanded: _expandedDayNumber == dayNumber,
-                onToggleExpand: () => _onToggleDay(dayNumber),
-                onAddTimeSlot: () => _onAddTimeSlot(day, dayNumber),
-                onEditTimeSlot: (detail) => _onEditTimeSlot(detail, day),
-                onDeleteTimeSlot: _onDeleteTimeSlot,
-              );
-            }),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 }

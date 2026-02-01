@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
+import 'package:motogo_frontend/src/features/admin_home/presentation/pages/admin_home_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
-import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/home/presentation/pages/home_page.dart';
-import 'package:motogo_frontend/src/features/admin_home/presentation/pages/admin_home_page.dart';
+import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
+import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
+import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_representative_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_user_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/pages/email_verification_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +24,10 @@ void main() async {
   await Firebase.initializeApp();
 
   InjectorApp.setup();
+
+  // Load stored session (tokens + user data) from SecureStorage
+  // This is critical for AuthInterceptor to have access to the refresh token
+  await UserSessionManager.instance.loadSession();
 
   runApp(
     EasyLocalization(

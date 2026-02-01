@@ -75,7 +75,7 @@ class _EditServicePageState extends State<EditServicePage> {
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.grey[50]!, Colors.white],
@@ -213,7 +213,9 @@ class _EditServicePageState extends State<EditServicePage> {
 
   Widget _buildDropdownField() {
     return DropdownButtonFormField<String>(
-      value: _serviceTypes.contains(_selectedType) ? _selectedType : null,
+      initialValue: _serviceTypes.contains(_selectedType)
+          ? _selectedType
+          : null,
       decoration: InputDecoration(
         labelText: AdminConstants.serviceTypeLabel,
         prefixIcon: const Icon(Icons.category, color: Colors.blue),
@@ -296,7 +298,7 @@ class _EditServicePageState extends State<EditServicePage> {
                 _onFieldChanged();
               },
               activeTrackColor: Colors.green[200],
-              activeColor: Colors.green,
+              activeThumbColor: Colors.green,
             ),
           ],
         ),

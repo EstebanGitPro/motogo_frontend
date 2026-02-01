@@ -16,7 +16,7 @@ class BackendErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -43,8 +43,8 @@ class BackendErrorWidget extends StatelessWidget {
               ),
             ],
           ),
-          
-          if (errorModel.description != null && 
+
+          if (errorModel.description != null &&
               errorModel.description != errorModel.message) ...[
             const SizedBox(height: 8),
             Text(
@@ -54,7 +54,7 @@ class BackendErrorWidget extends StatelessWidget {
               ),
             ),
           ],
-          
+
           if (showDetails && errorModel.errorCode != null) ...[
             const SizedBox(height: 8),
             Text(
@@ -65,7 +65,7 @@ class BackendErrorWidget extends StatelessWidget {
               ),
             ),
           ],
-          
+
           if (errorModel.fieldErrors != null) ...[
             const SizedBox(height: 12),
             Text(
@@ -76,17 +76,19 @@ class BackendErrorWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            ...errorModel.fieldErrors!.entries.map((entry) => Padding(
-              padding: const EdgeInsets.only(left: 8, top: 2),
-              child: Text(
-                '• ${entry.key}: ${entry.value}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.red.shade700,
+            ...errorModel.fieldErrors!.entries.map(
+              (entry) => Padding(
+                padding: const EdgeInsets.only(left: 8, top: 2),
+                child: Text(
+                  '• ${entry.key}: ${entry.value}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.red.shade700,
+                  ),
                 ),
               ),
-            )),
+            ),
           ],
-          
+
           if (onRetry != null) ...[
             const SizedBox(height: 12),
             Align(
@@ -127,7 +129,9 @@ class BackendErrorWidget extends StatelessWidget {
                     builder: (context) => AlertDialog(
                       title: const Text('Detalles del Error'),
                       content: SingleChildScrollView(
-                        child: Text(errorModel.description ?? 'Sin detalles adicionales'),
+                        child: Text(
+                          errorModel.description ?? 'Sin detalles adicionales',
+                        ),
                       ),
                       actions: [
                         TextButton(

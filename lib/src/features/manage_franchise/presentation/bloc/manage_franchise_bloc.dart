@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_event.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_state.dart';
@@ -18,18 +19,28 @@ class ManageFranchiseBloc
   String? _currentFranchiseId;
 
   ManageFranchiseBloc({
-    required GetFranchiseUseCase getFranchiseUseCase,
-    required UpdateFranchiseUseCase updateFranchiseUseCase,
-    required DeleteFranchiseUseCase deleteFranchiseUseCase,
-    required LinkBranchToFranchiseUseCase linkBranchUseCase,
-    required UnlinkBranchFromFranchiseUseCase unlinkBranchUseCase,
-    required GetBranchesUseCase getBranchesUseCase,
-  }) : _getFranchiseUseCase = getFranchiseUseCase,
-       _updateFranchiseUseCase = updateFranchiseUseCase,
-       _deleteFranchiseUseCase = deleteFranchiseUseCase,
-       _linkBranchUseCase = linkBranchUseCase,
-       _unlinkBranchUseCase = unlinkBranchUseCase,
-       _getBranchesUseCase = getBranchesUseCase,
+    GetFranchiseUseCase? getFranchiseUseCase,
+    UpdateFranchiseUseCase? updateFranchiseUseCase,
+    DeleteFranchiseUseCase? deleteFranchiseUseCase,
+    LinkBranchToFranchiseUseCase? linkBranchUseCase,
+    UnlinkBranchFromFranchiseUseCase? unlinkBranchUseCase,
+    GetBranchesUseCase? getBranchesUseCase,
+  }) : _getFranchiseUseCase =
+           getFranchiseUseCase ?? InjectorApp.resolve<GetFranchiseUseCase>(),
+       _updateFranchiseUseCase =
+           updateFranchiseUseCase ??
+           InjectorApp.resolve<UpdateFranchiseUseCase>(),
+       _deleteFranchiseUseCase =
+           deleteFranchiseUseCase ??
+           InjectorApp.resolve<DeleteFranchiseUseCase>(),
+       _linkBranchUseCase =
+           linkBranchUseCase ??
+           InjectorApp.resolve<LinkBranchToFranchiseUseCase>(),
+       _unlinkBranchUseCase =
+           unlinkBranchUseCase ??
+           InjectorApp.resolve<UnlinkBranchFromFranchiseUseCase>(),
+       _getBranchesUseCase =
+           getBranchesUseCase ?? InjectorApp.resolve<GetBranchesUseCase>(),
        super(const ManageFranchiseLoading()) {
     on<LoadFranchise>(_onLoadFranchise);
     on<UnlinkBranchEvent>(_onUnlinkBranch);

@@ -41,7 +41,7 @@ class _AdminServicesListPageState extends State<AdminServicesListPage> {
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.grey[50]!, Colors.white],
@@ -179,7 +179,7 @@ class _AdminServicesListPageState extends State<AdminServicesListPage> {
           const SizedBox(height: 12),
           // Type filter dropdown
           DropdownButtonFormField<String?>(
-            value: _selectedType,
+            initialValue: _selectedType,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -273,6 +273,7 @@ class _AdminServicesListPageState extends State<AdminServicesListPage> {
   }
 
   void _navigateToEdit(BuildContext context, AdminServiceEntity service) async {
+    final bloc = context.read<AdminServicesBloc>();
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -281,7 +282,7 @@ class _AdminServicesListPageState extends State<AdminServicesListPage> {
     );
 
     if (result == true && mounted) {
-      context.read<AdminServicesBloc>().add(RefreshServices());
+      bloc.add(RefreshServices());
     }
   }
 }

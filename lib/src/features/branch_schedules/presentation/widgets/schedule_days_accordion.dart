@@ -138,7 +138,7 @@ class _ScheduleDaysAccordionState extends State<ScheduleDaysAccordion> {
 
     return Stack(
       children: [
-        Container(
+        DecoratedBox(
           decoration: BoxDecoration(
             color: Colors.grey[50],
             borderRadius: BorderRadius.circular(12),
@@ -195,9 +195,9 @@ class _ScheduleDaysAccordionState extends State<ScheduleDaysAccordion> {
         // Loading overlay
         if (widget.isLoading)
           Positioned.fill(
-            child: Container(
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Center(

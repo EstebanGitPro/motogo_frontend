@@ -90,10 +90,7 @@ class ValidatorUtils {
   }
 
   /// Crea un validador personalizado con expresión regular
-  static BaseValidator regex(
-    RegExp pattern, {
-    String? customMessage,
-  }) {
+  static BaseValidator regex(RegExp pattern, {String? customMessage}) {
     return RegexValidator(pattern, customMessage: customMessage);
   }
 }

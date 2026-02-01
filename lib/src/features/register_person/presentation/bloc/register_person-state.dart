@@ -15,10 +15,7 @@ class RegisterPersonSuccess extends RegisterPersonState {
   final String email;
   final PersonEntity result;
 
-  const RegisterPersonSuccess({
-    required this.email,
-    required this.result,
-  });
+  const RegisterPersonSuccess({required this.email, required this.result});
 
   @override
   List<Object> get props => [email, result];

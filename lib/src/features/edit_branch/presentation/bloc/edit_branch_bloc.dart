@@ -1,13 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_event.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_state.dart';
 
 /// BLoC for managing branch editing state.
 class EditBranchBloc extends Bloc<EditBranchEvent, EditBranchState> {
-  final UpdateBranchUseCase updateBranchUseCase;
+  final UpdateBranchUseCase _updateBranchUseCase;
 
-  EditBranchBloc(this.updateBranchUseCase) : super(EditBranchInitial()) {
+  EditBranchBloc({UpdateBranchUseCase? updateBranchUseCase})
+    : _updateBranchUseCase =
+          updateBranchUseCase ?? InjectorApp.resolve<UpdateBranchUseCase>(),
+      super(EditBranchInitial()) {
     on<EditBranchSubmitted>(_onSubmitted);
     on<EditBranchReset>(_onReset);
   }
@@ -18,7 +22,10 @@ class EditBranchBloc extends Bloc<EditBranchEvent, EditBranchState> {
   ) async {
     emit(EditBranchLoading());
 
-    final result = await updateBranchUseCase.call(event.branchId, event.branch);
+    final result = await _updateBranchUseCase.call(
+      event.branchId,
+      event.branch,
+    );
 
     result.fold(
       (error) => emit(EditBranchFailure(error: error)),

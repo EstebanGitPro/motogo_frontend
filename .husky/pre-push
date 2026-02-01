@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Flag para deshabilitar coverage temporalmente
-SKIP_COVERAGE=true
+SKIP_COVERAGE=false
 
 if [ "$SKIP_COVERAGE" = true ]; then
     echo "⚠️ Coverage omitido para commits iniciales"
@@ -16,24 +16,34 @@ echo "🔍 Ejecutando Flutter Coverage..."
 if output=$(flutter test --coverage); then
    echo "$output"
    
-   # Generar el informe HTML y extraer porcentaje
-   coverage=$(genhtml coverage/lcov.info -o coverage/html | grep "lines" | awk '{print $2}' | tr -d '.' | cut -d'%' -f1)
+   # Generar el informe HTML y extraer porcentaje total
+   genhtml_output=$(genhtml coverage/lcov.info -o coverage/html 2>&1)
+   
+   # Extraer solo la línea del resumen total (última línea con "lines")
+   # Formato esperado: "  lines......: 81.7% (1234 of 1510 lines)"
+   coverage=$(echo "$genhtml_output" | grep -E "^\s*lines" | tail -1 | sed 's/.*: //' | sed 's/%.*//' | tr -d '.')
    
    if [ -z "$coverage" ]; then
        echo "❌ Error al obtener la cobertura"
+       echo "Output de genhtml:"
+       echo "$genhtml_output"
        exit 1
    fi
 
-   echo "📊 Porcentaje de cobertura: $coverage%"
+   # Convertir a formato legible (817 -> 81.7)
+   coverage_display=$(echo "scale=1; $coverage / 10" | bc)
+   echo "📊 Porcentaje de cobertura: ${coverage_display}%"
 
-   # Verificar umbral de 85%
-   if [ "$coverage" -lt 450 ]; then
-       echo "❌ La cobertura ($coverage%) es inferior al 85%"
+   # Verificar umbral de 80%
+   if [ "$coverage" -lt 800 ]; then
+       echo "❌ La cobertura (${coverage_display}%) es inferior al 80%"
        exit 1
    fi
 
-   # Abrir el informe
-   xdg-open coverage/html/index.html || echo "⚠️ Abra manualmente: coverage/html/index.html"
+   echo "✅ Cobertura OK (≥80%)"
+
+   # Abrir el informe (macOS compatible)
+   open coverage/html/index.html 2>/dev/null || echo "⚠️ Abra manualmente: coverage/html/index.html"
    
    echo "✅ Coverage ejecutado exitosamente!"
    exit 0

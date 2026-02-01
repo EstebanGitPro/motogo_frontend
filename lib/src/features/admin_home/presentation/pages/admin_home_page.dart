@@ -7,7 +7,9 @@ import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admi
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_bloc.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_event.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/pages/admin_services_list_page.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/technical_catalogs_page.dart';
 
 /// Admin Home Page - Main dashboard for administrators.
 ///
@@ -27,7 +29,7 @@ class AdminHomePage extends StatelessWidget {
         elevation: 0,
       ),
       drawer: _buildDrawer(context),
-      body: Container(
+      body: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.grey[50]!, Colors.white],
@@ -126,14 +128,14 @@ class AdminHomePage extends StatelessWidget {
           iconColor: Colors.blue,
           onTap: () => _navigateToServiceCatalog(context),
         ),
-        AdminMenuCard(
+        const AdminMenuCard(
           icon: Icons.bar_chart,
           title: AdminConstants.cardReports,
           subtitle: AdminConstants.cardReportsSubtitle,
           iconColor: Colors.grey,
           isEnabled: false,
         ),
-        AdminMenuCard(
+        const AdminMenuCard(
           icon: Icons.people,
           title: AdminConstants.cardUsers,
           subtitle: AdminConstants.cardUsersSubtitle,
@@ -141,11 +143,11 @@ class AdminHomePage extends StatelessWidget {
           isEnabled: false,
         ),
         AdminMenuCard(
-          icon: Icons.settings,
-          title: AdminConstants.cardSettings,
-          subtitle: AdminConstants.cardSettingsSubtitle,
-          iconColor: Colors.grey,
-          isEnabled: false,
+          icon: Icons.category,
+          title: AdminConstants.cardTechnicalCatalogs,
+          subtitle: AdminConstants.cardTechnicalCatalogsSubtitle,
+          iconColor: Colors.green,
+          onTap: () => _navigateToTechnicalCatalogs(context),
         ),
       ],
     );
@@ -239,6 +241,13 @@ class AdminHomePage extends StatelessWidget {
     );
   }
 
+  void _navigateToTechnicalCatalogs(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const TechnicalCatalogsPage()),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -255,6 +264,7 @@ class AdminHomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 Navigator.of(context).pop(); // Close drawer
+                context.read<EditProfileBloc>().add(const EditProfileReset());
                 context.read<LoginBloc>().add(LoginLogout());
                 Navigator.of(
                   context,

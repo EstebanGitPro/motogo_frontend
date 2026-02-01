@@ -36,8 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   bloc: ^8.0.3
   equatable: ^2.0.7
-  http: ^1.4.0
-  dio: ^5.4.0
+  http: ^1.6.0
+  dio: ^5.9.1
   flutter_bloc: ^8.0.1
   kiwi: ^5.0.1
   kiwi_generator: ^4.2.1
@@ -63,6 +63,7 @@ dependencies:
   intl: ^0.20.2
   mapbox_maps_flutter: ^2.17.0
   permission_handler: ^12.0.1
+  geolocator: ^14.0.2
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,7 @@ dev_dependencies:
   husky: ^0.1.7
   build_runner: ^2.4.13
   mockito: ^5.4.4
+  lints: ^5.1.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

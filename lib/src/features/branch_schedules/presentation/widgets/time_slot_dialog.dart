@@ -151,7 +151,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
         children: [
           // Closed toggle
           SwitchListTile(
-            title: Text(ScheduleConstants.closedAllDay),
+            title: const Text(ScheduleConstants.closedAllDay),
             value: _isClosed,
             onChanged: (value) => setState(() => _isClosed = value),
             contentPadding: EdgeInsets.zero,

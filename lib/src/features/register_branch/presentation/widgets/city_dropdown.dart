@@ -42,7 +42,7 @@ class CityDropdown extends StatelessWidget {
         : null;
 
     return DropdownButtonFormField<String>(
-      value: effectiveValue,
+      initialValue: effectiveValue,
       decoration: InputDecoration(
         labelText: 'Ciudad',
         hintText: 'Selecciona una ciudad',

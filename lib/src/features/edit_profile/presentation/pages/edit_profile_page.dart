@@ -333,7 +333,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                Text(
+                                const Text(
                                   'Editar mis datos',
                                   style: TextStyle(
                                     fontSize: 24,

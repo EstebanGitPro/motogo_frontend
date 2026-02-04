@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:motogo_frontend/src/core/constants/image_picker_constants.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -65,7 +66,7 @@ class ImagePickerWidget extends StatelessWidget {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Permiso de cámara denegado'),
+              content: Text(ImagePickerConstants.permissionDenied),
               backgroundColor: Colors.orange,
             ),
           );
@@ -89,7 +90,7 @@ class ImagePickerWidget extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al seleccionar imagen: $e'),
+            content: Text('${ImagePickerConstants.selectImageError}: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -101,21 +102,19 @@ class ImagePickerWidget extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Permiso de cámara requerido'),
-        content: const Text(
-          'Para tomar fotos, necesitas habilitar el permiso de cámara en la configuración de la aplicación.',
-        ),
+        title: const Text(ImagePickerConstants.permissionTitle),
+        content: const Text(ImagePickerConstants.permissionMessage),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: const Text(ImagePickerConstants.cancelButton),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               openAppSettings();
             },
-            child: const Text('Ir a Configuración'),
+            child: const Text(ImagePickerConstants.goToSettings),
           ),
         ],
       ),
@@ -136,7 +135,7 @@ class ImagePickerWidget extends StatelessWidget {
             children: [
               ListTile(
                 leading: const Icon(Icons.photo_camera, color: Colors.blue),
-                title: const Text('Tomar foto'),
+                title: const Text(ImagePickerConstants.takePhoto),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(context, ImageSource.camera);
@@ -144,7 +143,7 @@ class ImagePickerWidget extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library, color: Colors.green),
-                title: const Text('Elegir de galería'),
+                title: const Text(ImagePickerConstants.chooseFromGallery),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(context, ImageSource.gallery);
@@ -154,7 +153,7 @@ class ImagePickerWidget extends StatelessWidget {
               if (selectedImage != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
-                  title: const Text('Eliminar imagen'),
+                  title: const Text(ImagePickerConstants.removeImage),
                   onTap: () {
                     Navigator.pop(context);
                     onImageChanged(null);
@@ -167,7 +166,7 @@ class ImagePickerWidget extends StatelessWidget {
                   onExistingImageRemoved != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
-                  title: const Text('Eliminar imagen'),
+                  title: const Text(ImagePickerConstants.removeImage),
                   onTap: () {
                     Navigator.pop(context);
                     onExistingImageRemoved!();
@@ -198,128 +197,145 @@ class ImagePickerWidget extends StatelessWidget {
           onTap: enabled && !isUploading
               ? () => _showPickerOptions(context)
               : null,
-          child: Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: selectedImage != null
-                    ? Colors.blue[400]!
-                    : Colors.grey[300]!,
-                width: selectedImage != null ? 2 : 1,
-              ),
-            ),
-            child: isUploading
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 8),
-                        Text('Subiendo imagen...'),
-                      ],
-                    ),
-                  )
-                : selectedImage != null
-                ? Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(11),
-                        child: Image.file(selectedImage!, fit: BoxFit.cover),
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            onPressed: enabled
-                                ? () => _showPickerOptions(context)
-                                : null,
-                            tooltip: 'Cambiar imagen',
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : existingImageUrl != null && existingImageUrl!.isNotEmpty
-                ? Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(11),
-                        child: Image.network(
-                          existingImageUrl!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Center(
-                            child: Icon(
-                              Icons.broken_image,
-                              size: 40,
-                              color: Colors.grey[400],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            onPressed: enabled
-                                ? () => _showPickerOptions(context)
-                                : null,
-                            tooltip: 'Cambiar imagen',
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.add_a_photo_outlined,
-                        size: 40,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        hint,
-                        style: TextStyle(color: Colors.grey[500], fontSize: 13),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '(Opcional)',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Responsive height: 20% of screen height with min/max bounds
+              final screenHeight = MediaQuery.of(context).size.height;
+              final responsiveHeight = (screenHeight * 0.18).clamp(
+                120.0,
+                200.0,
+              );
+              return Container(
+                height: responsiveHeight,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: selectedImage != null
+                        ? Colors.blue[400]!
+                        : Colors.grey[300]!,
+                    width: selectedImage != null ? 2 : 1,
                   ),
-          ),
-        ),
+                ),
+                child: isUploading
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 8),
+                            Text(ImagePickerConstants.uploadingImage),
+                          ],
+                        ),
+                      )
+                    : selectedImage != null
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(11),
+                            child: Image.file(
+                              selectedImage!,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                onPressed: enabled
+                                    ? () => _showPickerOptions(context)
+                                    : null,
+                                tooltip: ImagePickerConstants.changeImage,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : existingImageUrl != null && existingImageUrl!.isNotEmpty
+                    ? Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(11),
+                            child: Image.network(
+                              existingImageUrl!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 40,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                onPressed: enabled
+                                    ? () => _showPickerOptions(context)
+                                    : null,
+                                tooltip: ImagePickerConstants.changeImage,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_a_photo_outlined,
+                            size: 40,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            hint,
+                            style: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            ImagePickerConstants.optionalLabel,
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+              ); // End Container
+            }, // End builder
+          ), // End LayoutBuilder
+        ), // End GestureDetector
       ],
     );
   }

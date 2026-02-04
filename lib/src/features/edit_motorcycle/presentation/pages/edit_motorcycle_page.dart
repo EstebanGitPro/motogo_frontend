@@ -131,7 +131,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Editar Moto'),
+          title: const Text(MotorcycleConstants.editMotorcycleTitle),
           backgroundColor: Colors.blue[600],
           foregroundColor: Colors.white,
         ),
@@ -175,7 +175,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'La placa no se puede modificar',
+                  MotorcycleConstants.plateReadonlyMessage,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -189,7 +189,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   controller: _yearController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Año (opcional)',
+                    labelText: MotorcycleConstants.yearOptionalLabel,
                     prefixIcon: const Icon(Icons.calendar_today),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -199,7 +199,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                     if (value != null && value.isNotEmpty) {
                       final year = int.tryParse(value);
                       if (year == null || year < 1900 || year > 2030) {
-                        return 'Ingresa un año válido';
+                        return MotorcycleConstants.invalidYear;
                       }
                     }
                     return null;
@@ -212,7 +212,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   controller: _mileageController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Kilometraje actual (opcional)',
+                    labelText: MotorcycleConstants.mileageOptionalLabel,
                     prefixIcon: const Icon(Icons.speed),
                     suffixText: 'km',
                     border: OutlineInputBorder(
@@ -223,7 +223,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                     if (value != null && value.isNotEmpty) {
                       final mileage = int.tryParse(value);
                       if (mileage == null || mileage < 0) {
-                        return 'Ingresa un kilometraje válido';
+                        return MotorcycleConstants.invalidMileage;
                       }
                     }
                     return null;
@@ -237,8 +237,8 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   maxLines: 3,
                   maxLength: 200,
                   decoration: InputDecoration(
-                    labelText: 'Notas (opcional)',
-                    hintText: 'Ej: Mi moto del trabajo',
+                    labelText: MotorcycleConstants.notesOptionalLabel,
+                    hintText: MotorcycleConstants.notesOptionalHint,
                     prefixIcon: const Icon(Icons.notes),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -272,7 +272,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                               ),
                             )
                           : const Text(
-                              'Guardar Cambios',
+                              MotorcycleConstants.saveChangesButton,
                               style: TextStyle(fontSize: 16),
                             ),
                     );

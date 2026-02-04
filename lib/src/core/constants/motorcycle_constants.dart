@@ -100,4 +100,15 @@ class MotorcycleConstants {
   static const String profileImageLabel = 'Imagen de tu Moto';
   static const String profileImageHint = 'Toca para cambiar la imagen';
   static const String profileImageUploadError = 'Error al subir imagen';
+
+  // Edit Motorcycle page
+  static const String editMotorcycleTitle = 'Editar Moto';
+  static const String saveChangesButton = 'Guardar Cambios';
+  static const String plateReadonlyMessage = 'La placa no se puede modificar';
+  static const String yearOptionalLabel = 'Año (opcional)';
+  static const String mileageOptionalLabel = 'Kilometraje actual (opcional)';
+  static const String notesOptionalLabel = 'Notas (opcional)';
+  static const String notesOptionalHint = 'Ej: Mi moto del trabajo';
+  static const String invalidYear = 'Ingresa un año válido';
+  static const String invalidMileage = 'Ingresa un kilometraje válido';
 }

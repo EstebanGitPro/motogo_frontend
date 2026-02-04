@@ -6,7 +6,7 @@ class BranchDetailConstants {
   static const String pageTitle = 'Detalle del Taller';
 
   // Sections
-  static const String sectionContact = 'Contact';
+  static const String sectionContact = 'Contacto';
   static const String sectionSchedule = 'Horario de Atención';
   static const String sectionServices = 'Servicios Disponibles';
 

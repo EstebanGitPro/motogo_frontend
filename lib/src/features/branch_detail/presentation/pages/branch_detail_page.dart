@@ -117,17 +117,24 @@ class _BranchDetailView extends StatelessWidget {
   }
 
   Widget _buildHeader(BranchDetailEntity detail) {
-    return SizedBox(
-      height: 200,
-      width: double.infinity,
-      child:
-          detail.profileImageUrl != null && detail.profileImageUrl!.isNotEmpty
-          ? Image.network(
-              detail.profileImageUrl!,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
-            )
-          : _buildImagePlaceholder(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final headerHeight = (screenHeight * 0.25).clamp(150.0, 250.0);
+        return SizedBox(
+          height: headerHeight,
+          width: double.infinity,
+          child:
+              detail.profileImageUrl != null &&
+                  detail.profileImageUrl!.isNotEmpty
+              ? Image.network(
+                  detail.profileImageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => _buildImagePlaceholder(),
+                )
+              : _buildImagePlaceholder(),
+        );
+      },
     );
   }
 
@@ -339,8 +346,8 @@ class _BranchDetailView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           children: [
-            SizedBox(
-              width: 100,
+            Flexible(
+              flex: 35, // 35% of available space
               child: Text(
                 schedule.dayName +
                     (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),

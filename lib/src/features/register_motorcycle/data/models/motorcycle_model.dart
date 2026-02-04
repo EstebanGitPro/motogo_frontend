@@ -11,6 +11,7 @@ class MotorcycleModel extends MotorcycleEntity {
     super.year,
     super.currentMileage,
     super.ownerNotes,
+    super.profileImageUrl,
   });
 
   /// Creates a model from a domain entity.
@@ -22,6 +23,7 @@ class MotorcycleModel extends MotorcycleEntity {
       year: entity.year,
       currentMileage: entity.currentMileage,
       ownerNotes: entity.ownerNotes,
+      profileImageUrl: entity.profileImageUrl,
     );
   }
 
@@ -36,6 +38,7 @@ class MotorcycleModel extends MotorcycleEntity {
       year: json['year'] as int?,
       currentMileage: json['current_mileage'] as int?,
       ownerNotes: json['owner_notes']?.toString(),
+      profileImageUrl: json['profile_image_url'] as String?,
     );
   }
 
@@ -61,6 +64,10 @@ class MotorcycleModel extends MotorcycleEntity {
       json['owner_notes'] = ownerNotes;
     }
 
+    if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
+      json['profile_image_url'] = profileImageUrl;
+    }
+
     return json;
   }
 
@@ -73,6 +80,7 @@ class MotorcycleModel extends MotorcycleEntity {
       year: year,
       currentMileage: currentMileage,
       ownerNotes: ownerNotes,
+      profileImageUrl: profileImageUrl,
     );
   }
 
@@ -84,6 +92,7 @@ class MotorcycleModel extends MotorcycleEntity {
     int? year,
     int? currentMileage,
     String? ownerNotes,
+    String? profileImageUrl,
   }) {
     return MotorcycleModel(
       id: id ?? this.id,
@@ -92,6 +101,7 @@ class MotorcycleModel extends MotorcycleEntity {
       year: year ?? this.year,
       currentMileage: currentMileage ?? this.currentMileage,
       ownerNotes: ownerNotes ?? this.ownerNotes,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
     );
   }
 }

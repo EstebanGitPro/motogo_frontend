@@ -95,4 +95,9 @@ class MotorcycleConstants {
   static const String searchByPlateNoResults =
       'No se encontró ninguna moto con esa placa';
   static const String searchByPlateLoading = 'Buscando...';
+
+  // Profile image (HU36)
+  static const String profileImageLabel = 'Imagen de tu Moto';
+  static const String profileImageHint = 'Toca para cambiar la imagen';
+  static const String profileImageUploadError = 'Error al subir imagen';
 }

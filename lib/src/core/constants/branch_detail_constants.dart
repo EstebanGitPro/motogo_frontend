@@ -24,7 +24,7 @@ class BranchDetailConstants {
 
   // Buttons
   static const String buttonHowToGet = 'Cómo Llegar';
-  static const String buttonSendDiagnostic = 'Enviar Diagnóstico';
+  static const String buttonSendDiagnostic = 'Pedir Diagnóstico';
 
   // Loading messages
   static const String loadingDetail = 'Cargando información...';

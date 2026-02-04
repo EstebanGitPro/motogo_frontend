@@ -347,7 +347,7 @@ class _BranchDetailView extends StatelessWidget {
         child: Row(
           children: [
             Flexible(
-              flex: 35, // 35% of available space
+              flex: 35,
               child: Text(
                 schedule.dayName +
                     (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),

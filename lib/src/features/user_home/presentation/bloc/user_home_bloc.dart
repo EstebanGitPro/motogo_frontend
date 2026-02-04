@@ -171,7 +171,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     final currentState = state;
     print('DEBUG ChangeRadius - Requested: ${event.radiusKm}km');
     print(
-      'DEBUG ChangeRadius - hasUserLocation: ${currentState is UserHomeLoaded && (currentState as UserHomeLoaded).hasUserLocation}',
+      'DEBUG ChangeRadius - hasUserLocation: ${currentState is UserHomeLoaded && currentState.hasUserLocation}',
     );
     if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
       print(

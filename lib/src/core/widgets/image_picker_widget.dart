@@ -18,6 +18,10 @@ class ImagePickerWidget extends StatelessWidget {
   /// Callback when an image is selected or removed.
   final ValueChanged<File?> onImageChanged;
 
+  /// Callback when user requests to remove an existing (already uploaded) image.
+  /// This is separate from onImageChanged(null) which only clears the local file.
+  final VoidCallback? onExistingImageRemoved;
+
   /// Whether the widget is enabled for interaction.
   final bool enabled;
 
@@ -35,6 +39,7 @@ class ImagePickerWidget extends StatelessWidget {
     required this.selectedImage,
     this.existingImageUrl,
     required this.onImageChanged,
+    this.onExistingImageRemoved,
     this.enabled = true,
     this.isUploading = false,
     this.label = 'Imagen de perfil',
@@ -145,6 +150,7 @@ class ImagePickerWidget extends StatelessWidget {
                   _pickImage(context, ImageSource.gallery);
                 },
               ),
+              // Show delete option for local file selection
               if (selectedImage != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
@@ -152,6 +158,19 @@ class ImagePickerWidget extends StatelessWidget {
                   onTap: () {
                     Navigator.pop(context);
                     onImageChanged(null);
+                  },
+                ),
+              // Show delete option for already uploaded image
+              if (selectedImage == null &&
+                  existingImageUrl != null &&
+                  existingImageUrl!.isNotEmpty &&
+                  onExistingImageRemoved != null)
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text('Eliminar imagen'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onExistingImageRemoved!();
                   },
                 ),
             ],

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:motogo_frontend/src/core/config/secrets.dart';
@@ -19,6 +21,8 @@ import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pa
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/pages/branch_detail_page.dart';
+import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
@@ -55,6 +59,8 @@ class _UserHomeViewState extends State<_UserHomeView> {
   double _sliderRadius = 5.0;
   Cancelable? _tapListener;
   final Map<String, String> _annotationToBranch = {};
+  Uint8List? _workshopMarkerBytes;
+  Uint8List? _storeMarkerBytes;
 
   @override
   void initState() {
@@ -102,6 +108,16 @@ class _UserHomeViewState extends State<_UserHomeView> {
           }
           if (state is UserHomeLoaded) {
             _updateMarkers(state.branches);
+            // Show error message if present
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
           }
           if (state is UserHomeError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -214,6 +230,12 @@ class _UserHomeViewState extends State<_UserHomeView> {
     _mapController = mapController;
     _annotationManager = await mapController.annotations
         .createPointAnnotationManager();
+    if (!mounted) return;
+
+    final currentState = context.read<UserHomeBloc>().state;
+    if (currentState is UserHomeLoaded) {
+      _updateMarkers(currentState.branches);
+    }
 
     // Enable location puck (blue dot for user location)
     await mapController.location.updateSettings(
@@ -292,9 +314,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
     bool isLoading = false;
 
     if (state is UserHomeLoaded) {
-      currentRadius = state.currentRadiusKm;
       isLoading = state.isLoadingBranches;
-      if (_sliderRadius != currentRadius) {
+      // Only sync slider with state when NOT loading AND no debounce timer is active
+      // This prevents resetting the slider while user is actively changing it
+      final hasActiveDebounce = _radiusDebounceTimer?.isActive ?? false;
+      if (!isLoading &&
+          !hasActiveDebounce &&
+          _sliderRadius != state.currentRadiusKm) {
+        currentRadius = state.currentRadiusKm;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) setState(() => _sliderRadius = currentRadius);
         });
@@ -486,6 +513,11 @@ class _UserHomeViewState extends State<_UserHomeView> {
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 const Spacer(),
+                TextButton(
+                  onPressed: () => _navigateToBranchDetail(context, branch),
+                  child: const Text('Ver más'),
+                ),
+                const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: () =>
                       _openGoogleMaps(branch.latitude, branch.longitude),
@@ -496,6 +528,19 @@ class _UserHomeViewState extends State<_UserHomeView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _navigateToBranchDetail(
+    BuildContext context,
+    BranchMarkerEntity branch,
+  ) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            BranchDetailPage(branchId: branch.id, branchName: branch.name),
       ),
     );
   }
@@ -517,20 +562,15 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     for (final branch in branches) {
       // Color by type: workshop=blue, store=green
-      final markerColor = branch.isWorkshop ? 0xFF2196F3 : 0xFF4CAF50;
+      final markerBytes = await _getMarkerBytes(branch.isWorkshop);
 
       final options = PointAnnotationOptions(
         geometry: Point(
           coordinates: Position(branch.longitude, branch.latitude),
         ),
-        iconSize: 1.5,
-        iconColor: markerColor,
-        textField: branch.name,
-        textOffset: [0, 2.0],
-        textSize: 11,
-        textColor: 0xFF333333,
-        textHaloColor: 0xFFFFFFFF,
-        textHaloWidth: 1.5,
+        image: markerBytes,
+        iconSize: 1.0,
+        // No text - just icon. Card shows on tap.
       );
 
       final annotation = await _annotationManager!.create(options);
@@ -547,6 +587,27 @@ class _UserHomeViewState extends State<_UserHomeView> {
         }
       },
     );
+  }
+
+  Future<Uint8List> _getMarkerBytes(bool isWorkshop) async {
+    if (isWorkshop && _workshopMarkerBytes != null) {
+      return _workshopMarkerBytes!;
+    }
+    if (!isWorkshop && _storeMarkerBytes != null) {
+      return _storeMarkerBytes!;
+    }
+
+    final assetPath = isWorkshop
+        ? 'assets/icons/motorcycle_blue.png'
+        : 'assets/icons/motorcycle_green.png';
+    final data = await rootBundle.load(assetPath);
+    final bytes = data.buffer.asUint8List();
+    if (isWorkshop) {
+      _workshopMarkerBytes = bytes;
+    } else {
+      _storeMarkerBytes = bytes;
+    }
+    return bytes;
   }
 
   void _onLocationFabPressed(BuildContext context) async {
@@ -567,6 +628,13 @@ class _UserHomeViewState extends State<_UserHomeView> {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
+  }
+
+  void _navigateToLegal(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LegalPage()),
+    );
   }
 
   Widget _buildDrawer(BuildContext context) {
@@ -682,7 +750,10 @@ class _UserHomeViewState extends State<_UserHomeView> {
               MotorcycleConstants.menuAbout,
               style: TextStyle(fontSize: 16),
             ),
-            onTap: () => Navigator.pop(context),
+            onTap: () {
+              Navigator.pop(context);
+              _navigateToLegal(context);
+            },
           ),
         ],
       ),

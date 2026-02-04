@@ -19,6 +19,7 @@ import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_br
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/branch_card.dart';
+import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
@@ -71,6 +72,13 @@ class _HomeViewState extends State<_HomeView> {
     if (result == true && context.mounted) {
       context.read<MyBranchesBloc>().add(RefreshBranches());
     }
+  }
+
+  void _navigateToLegal(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LegalPage()),
+    );
   }
 
   @override
@@ -420,6 +428,7 @@ class _HomeViewState extends State<_HomeView> {
             title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
             onTap: () {
               Navigator.pop(context);
+              _navigateToLegal(context);
             },
           ),
         ],

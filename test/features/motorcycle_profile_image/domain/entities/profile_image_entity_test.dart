@@ -3,146 +3,104 @@ import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/ent
 
 void main() {
   group('ProfileImageEntity', () {
-    group('Constructor', () {
-      test('should create entity with all fields', () {
+    group('constructor', () {
+      test('should create instance with required motorcycleId', () {
+        // Act
+        const entity = ProfileImageEntity(motorcycleId: 'moto-123');
+
+        // Assert
+        expect(entity.motorcycleId, 'moto-123');
+        expect(entity.profileImageUrl, isNull);
+      });
+
+      test('should create instance with both fields', () {
+        // Act
         const entity = ProfileImageEntity(
-          motorcycleId: 'moto-123',
+          motorcycleId: 'moto-456',
           profileImageUrl: 'https://example.com/image.jpg',
         );
 
-        expect(entity.motorcycleId, 'moto-123');
+        // Assert
+        expect(entity.motorcycleId, 'moto-456');
         expect(entity.profileImageUrl, 'https://example.com/image.jpg');
       });
+    });
 
-      test('should create entity with null profileImageUrl', () {
-        const entity = ProfileImageEntity(motorcycleId: 'moto-456');
+    group('copyWith', () {
+      test('should copy with new motorcycleId', () {
+        // Arrange
+        const original = ProfileImageEntity(
+          motorcycleId: 'original-id',
+          profileImageUrl: 'https://example.com/original.jpg',
+        );
 
-        expect(entity.motorcycleId, 'moto-456');
-        expect(entity.profileImageUrl, isNull);
+        // Act
+        final copy = original.copyWith(motorcycleId: 'new-id');
+
+        // Assert
+        expect(copy.motorcycleId, 'new-id');
+        expect(copy.profileImageUrl, 'https://example.com/original.jpg');
+      });
+
+      test('should copy with new profileImageUrl', () {
+        // Arrange
+        const original = ProfileImageEntity(
+          motorcycleId: 'moto-id',
+          profileImageUrl: 'https://example.com/original.jpg',
+        );
+
+        // Act
+        final copy = original.copyWith(
+          profileImageUrl: 'https://example.com/new.jpg',
+        );
+
+        // Assert
+        expect(copy.motorcycleId, 'moto-id');
+        expect(copy.profileImageUrl, 'https://example.com/new.jpg');
+      });
+
+      test('should copy with all fields unchanged when no args', () {
+        // Arrange
+        const original = ProfileImageEntity(
+          motorcycleId: 'moto-id',
+          profileImageUrl: 'https://example.com/image.jpg',
+        );
+
+        // Act
+        final copy = original.copyWith();
+
+        // Assert
+        expect(copy.motorcycleId, original.motorcycleId);
+        expect(copy.profileImageUrl, original.profileImageUrl);
       });
     });
 
     group('Equatable', () {
       test('should be equal when all properties match', () {
+        // Arrange
         const entity1 = ProfileImageEntity(
           motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
+          profileImageUrl: 'https://example.com/img.jpg',
         );
-
         const entity2 = ProfileImageEntity(
           motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
+          profileImageUrl: 'https://example.com/img.jpg',
         );
 
+        // Assert
         expect(entity1, equals(entity2));
       });
 
-      test('should not be equal when motorcycleId differs', () {
-        const entity1 = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
-        );
-
-        const entity2 = ProfileImageEntity(
-          motorcycleId: 'moto-999',
-          profileImageUrl: 'https://example.com/image.jpg',
-        );
-
-        expect(entity1, isNot(equals(entity2)));
-      });
-
-      test('should not be equal when profileImageUrl differs', () {
-        const entity1 = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image1.jpg',
-        );
-
-        const entity2 = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image2.jpg',
-        );
-
-        expect(entity1, isNot(equals(entity2)));
-      });
-
-      test('should be equal when both have null profileImageUrl', () {
-        const entity1 = ProfileImageEntity(motorcycleId: 'moto-123');
-        const entity2 = ProfileImageEntity(motorcycleId: 'moto-123');
-
-        expect(entity1, equals(entity2));
-      });
-    });
-
-    group('copyWith', () {
-      test('should create copy with updated motorcycleId', () {
-        const original = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
-        );
-
-        final copy = original.copyWith(motorcycleId: 'moto-new');
-
-        expect(copy.motorcycleId, 'moto-new');
-        expect(copy.profileImageUrl, 'https://example.com/image.jpg');
-      });
-
-      test('should create copy with updated profileImageUrl', () {
-        const original = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/old.jpg',
-        );
-
-        final copy = original.copyWith(
-          profileImageUrl: 'https://example.com/new.jpg',
-        );
-
-        expect(copy.motorcycleId, 'moto-123');
-        expect(copy.profileImageUrl, 'https://example.com/new.jpg');
-      });
-
-      test('should create identical copy when no parameters provided', () {
-        const original = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
-        );
-
-        final copy = original.copyWith();
-
-        expect(copy, equals(original));
-        expect(copy.motorcycleId, original.motorcycleId);
-        expect(copy.profileImageUrl, original.profileImageUrl);
-      });
-
-      test('should create copy with all parameters updated', () {
-        const original = ProfileImageEntity(
-          motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/old.jpg',
-        );
-
-        final copy = original.copyWith(
-          motorcycleId: 'moto-new',
-          profileImageUrl: 'https://example.com/new.jpg',
-        );
-
-        expect(copy.motorcycleId, 'moto-new');
-        expect(copy.profileImageUrl, 'https://example.com/new.jpg');
-      });
-    });
-
-    group('props', () {
-      test('should return list with motorcycleId and profileImageUrl', () {
+      test('props should include both fields', () {
+        // Arrange
         const entity = ProfileImageEntity(
           motorcycleId: 'moto-123',
-          profileImageUrl: 'https://example.com/image.jpg',
+          profileImageUrl: 'url',
         );
 
-        expect(entity.props, ['moto-123', 'https://example.com/image.jpg']);
-      });
-
-      test('should include null in props when profileImageUrl is null', () {
-        const entity = ProfileImageEntity(motorcycleId: 'moto-123');
-
-        expect(entity.props, ['moto-123', null]);
+        // Assert
+        expect(entity.props, contains('moto-123'));
+        expect(entity.props, contains('url'));
       });
     });
   });

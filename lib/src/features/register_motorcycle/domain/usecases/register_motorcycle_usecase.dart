@@ -20,6 +20,7 @@ class RegisterMotorcycleUseCase {
   /// - [year]: Optional. Year of manufacture
   /// - [currentMileage]: Optional. Current odometer reading
   /// - [ownerNotes]: Optional. Personal notes from the owner
+  /// - [profileImageUrl]: Optional. URL of the motorcycle's profile image
   ///
   /// Returns success message on success, or [ErrorModel] on failure.
   Future<Either<ErrorModel, String>> call({
@@ -28,6 +29,7 @@ class RegisterMotorcycleUseCase {
     int? year,
     int? currentMileage,
     String? ownerNotes,
+    String? profileImageUrl,
   }) {
     final motorcycle = MotorcycleEntity(
       licensePlate: licensePlate,
@@ -35,6 +37,7 @@ class RegisterMotorcycleUseCase {
       year: year,
       currentMileage: currentMileage,
       ownerNotes: ownerNotes,
+      profileImageUrl: profileImageUrl,
     );
 
     return _repository.registerMotorcycle(motorcycle);

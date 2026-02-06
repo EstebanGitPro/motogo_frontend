@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/franchise_constants.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 import 'package:motogo_frontend/src/features/register_franchise/domain/entities/franchise_entity.dart';
@@ -131,7 +132,7 @@ class _RegisterFranchisePageState extends State<RegisterFranchisePage> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Volver'),
+              child: const Text(CommonConstants.back),
             ),
           ],
         ),

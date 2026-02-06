@@ -33,6 +33,7 @@ class RegisterMotorcycleBloc
       year: event.year,
       currentMileage: event.currentMileage,
       ownerNotes: event.ownerNotes,
+      profileImageUrl: event.profileImageUrl,
     );
 
     result.fold(

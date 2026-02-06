@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/editable_field.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/widgets/read_only_field.dart';
@@ -107,19 +108,19 @@ class _EditProfileViewState extends State<_EditProfileView> {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cambios sin guardar'),
+        title: const Text(CommonConstants.unsavedChangesTitle),
         content: const Text(
           'Tienes cambios sin guardar. ¿Deseas salir sin guardar?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Continuar editando'),
+            child: const Text(CommonConstants.continueEditing),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Salir sin guardar'),
+            child: const Text(CommonConstants.exitWithoutSaving),
           ),
         ],
       ),
@@ -245,7 +246,7 @@ class _EditProfileViewState extends State<_EditProfileView> {
                           const EditProfileLoaded(forceRefresh: true),
                         ),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Reintentar'),
+                        label: const Text(CommonConstants.retry),
                       ),
                     ],
                   ),

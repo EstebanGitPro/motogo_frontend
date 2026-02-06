@@ -9,6 +9,7 @@ import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/ad
 import 'package:motogo_frontend/src/features/admin_services/presentation/pages/admin_services_list_page.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/technical_catalogs_page.dart';
 
 /// Admin Home Page - Main dashboard for administrators.
@@ -209,6 +210,18 @@ class AdminHomePage extends StatelessWidget {
           ),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.info, color: Colors.blue),
+            title: const Text(
+              AdminConstants.menuAbout,
+              style: TextStyle(fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              _navigateToLegal(context);
+            },
+          ),
+          const Divider(),
+          ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text(
               AdminConstants.menuLogout,
@@ -245,6 +258,13 @@ class AdminHomePage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const TechnicalCatalogsPage()),
+    );
+  }
+
+  void _navigateToLegal(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LegalPage()),
     );
   }
 

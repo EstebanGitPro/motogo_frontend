@@ -11,6 +11,7 @@ class AdminConstants {
   static const String menuHome = 'Inicio';
   static const String menuServiceCatalog = 'Catálogo de Servicios';
   static const String menuLogout = 'Cerrar Sesión';
+  static const String menuAbout = 'Acerca de';
 
   // Dashboard cards
   static const String cardServiceCatalog = 'Catálogo de Servicios';

@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
+import 'package:motogo_frontend/src/core/widgets/image_picker_widget.dart';
 import 'package:motogo_frontend/src/features/motorcycle_references/domain/entities/motorcycle_reference_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_references/presentation/widgets/motorcycle_reference_selector.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_event.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_state.dart';
+import 'package:uuid/uuid.dart';
 
 /// Page for registering a new motorcycle.
 ///
@@ -31,6 +37,11 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   final _notesController = TextEditingController();
 
   MotorcycleReferenceEntity? _selectedReference;
+
+  // Image state
+  File? _selectedImage;
+  bool _isUploadingImage = false;
+  String? _uploadedImageUrl;
 
   @override
   void dispose() {
@@ -85,36 +96,45 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                   ),
                 ),
                 child: SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildHeader(),
-                          const SizedBox(height: 24),
-                          _buildLicensePlateField(),
-                          const SizedBox(height: 16),
-                          MotorcycleReferenceSelector(
-                            onReferenceSelected: (reference) {
-                              setState(() {
-                                _selectedReference = reference;
-                              });
-                            },
-                            initialReference: _selectedReference,
+                  child: Builder(
+                    builder: (context) {
+                      final isLoading =
+                          state is RegisterMotorcycleLoading ||
+                          _isUploadingImage;
+                      return SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildHeader(),
+                              const SizedBox(height: 16),
+                              _buildImageSection(isLoading),
+                              const SizedBox(height: 24),
+                              _buildLicensePlateField(),
+                              const SizedBox(height: 16),
+                              MotorcycleReferenceSelector(
+                                onReferenceSelected: (reference) {
+                                  setState(() {
+                                    _selectedReference = reference;
+                                  });
+                                },
+                                initialReference: _selectedReference,
+                              ),
+                              const SizedBox(height: 16),
+                              _buildYearField(),
+                              const SizedBox(height: 16),
+                              _buildMileageField(),
+                              const SizedBox(height: 16),
+                              _buildNotesField(),
+                              const SizedBox(height: 32),
+                              _buildSubmitButton(context, state),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          _buildYearField(),
-                          const SizedBox(height: 16),
-                          _buildMileageField(),
-                          const SizedBox(height: 16),
-                          _buildNotesField(),
-                          const SizedBox(height: 32),
-                          _buildSubmitButton(context, state),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -159,7 +179,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Información Básica',
+                  MotorcycleConstants.basicInfoTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -168,7 +188,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Registra los datos de tu motocicleta',
+                  MotorcycleConstants.basicInfoSubtitle,
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -178,6 +198,24 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
       ),
     );
   }
+
+  Widget _buildImageSection(bool isLoading) {
+    return ImagePickerWidget(
+      selectedImage: _selectedImage,
+      onImageChanged: (file) {
+        setState(() {
+          _selectedImage = file;
+          _uploadedImageUrl = null; // Reset if changed
+        });
+      },
+      enabled: !isLoading,
+      isUploading: _isUploadingImage,
+      label: MotorcycleConstants.profileImageLabel,
+      hint: MotorcycleConstants.profileImageHint,
+    );
+  }
+
+  // Removed - now using ImagePickerWidget
 
   Widget _buildLicensePlateField() {
     return TextFormField(
@@ -239,7 +277,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         }
         final year = int.tryParse(value);
         if (year == null || year < 1950 || year > currentYear + 1) {
-          return 'Año inválido (1950-${currentYear + 1})';
+          return MotorcycleConstants.invalidYearRange(currentYear + 1);
         }
         return null;
       },
@@ -269,7 +307,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         }
         final mileage = int.tryParse(value);
         if (mileage == null || mileage < 0) {
-          return 'Kilometraje inválido';
+          return MotorcycleConstants.invalidMileage;
         }
         return null;
       },
@@ -327,9 +365,56 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
     );
   }
 
-  void _submitForm(BuildContext context) {
+  Future<void> _submitForm(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      context.read<RegisterMotorcycleBloc>().add(
+      // Capture bloc reference before async
+      final bloc = context.read<RegisterMotorcycleBloc>();
+      final scaffoldMessenger = ScaffoldMessenger.of(context);
+      String? profileImageUrl = _uploadedImageUrl;
+
+      // Upload image if selected and not already uploaded
+      if (_selectedImage != null && _uploadedImageUrl == null) {
+        setState(() => _isUploadingImage = true);
+
+        final storageService = InjectorApp.resolve<StorageService>();
+
+        // Generate a temporary ID for the upload path
+        final tempMotorcycleId = const Uuid().v4();
+
+        final uploadResult = await storageService.uploadMotorcycleImage(
+          motorcycleId: tempMotorcycleId,
+          file: _selectedImage!,
+        );
+
+        if (!mounted) return;
+
+        setState(() => _isUploadingImage = false);
+
+        if (uploadResult.isLeft) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
+              ),
+              backgroundColor: Colors.red,
+              action: SnackBarAction(
+                label: MotorcycleConstants.retryButton,
+                textColor: Colors.white,
+                onPressed: () => _submitForm(context),
+              ),
+            ),
+          );
+          return; // This return now properly exits _submitForm()
+        }
+
+        // Upload succeeded - get the URL
+        profileImageUrl = uploadResult.right;
+        _uploadedImageUrl = profileImageUrl;
+      }
+
+      if (!mounted) return;
+
+      bloc.add(
         SubmitMotorcycleRegistration(
           licensePlate: _licensePlateController.text.trim().replaceAll(' ', ''),
           referenceId: _selectedReference?.id,
@@ -342,6 +427,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
           ownerNotes: _notesController.text.trim().isNotEmpty
               ? _notesController.text.trim()
               : null,
+          profileImageUrl: profileImageUrl,
         ),
       );
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/entities/brand_line_entity.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/bloc/brand_lines_bloc.dart';
 
@@ -92,7 +93,7 @@ class _BrandLinesView extends StatelessWidget {
                 context.read<BrandLinesBloc>().add(const LoadBrands());
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
+              label: const Text(CommonConstants.retry),
             ),
           ],
         ),
@@ -112,7 +113,7 @@ class _BrandLinesView extends StatelessWidget {
 
   Widget _buildBrandsList(BuildContext context, List<BrandEntity> brands) {
     if (brands.isEmpty) {
-      return const Center(child: Text('No hay marcas disponibles'));
+      return const Center(child: Text(CommonConstants.noBrandsAvailable));
     }
 
     return Column(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
@@ -19,6 +20,7 @@ import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_br
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_state.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/widgets/branch_card.dart';
+import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/pages/register_branch_page.dart';
@@ -71,6 +73,13 @@ class _HomeViewState extends State<_HomeView> {
     if (result == true && context.mounted) {
       context.read<MyBranchesBloc>().add(RefreshBranches());
     }
+  }
+
+  void _navigateToLegal(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LegalPage()),
+    );
   }
 
   @override
@@ -342,7 +351,10 @@ class _HomeViewState extends State<_HomeView> {
           ),
           ListTile(
             leading: const Icon(Icons.home, color: Colors.blue),
-            title: const Text('Inicio', style: TextStyle(fontSize: 16)),
+            title: const Text(
+              MotorcycleConstants.menuHome,
+              style: TextStyle(fontSize: 16),
+            ),
             onTap: () {
               Navigator.pop(context);
             },
@@ -366,7 +378,10 @@ class _HomeViewState extends State<_HomeView> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.edit, color: Colors.blue),
-            title: const Text('Editar Perfil', style: TextStyle(fontSize: 16)),
+            title: const Text(
+              MotorcycleConstants.menuEditProfile,
+              style: TextStyle(fontSize: 16),
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -380,7 +395,7 @@ class _HomeViewState extends State<_HomeView> {
           ListTile(
             leading: const Icon(Icons.lock, color: Colors.blue),
             title: const Text(
-              'Cambiar Contraseña',
+              MotorcycleConstants.menuChangePassword,
               style: TextStyle(fontSize: 16),
             ),
             onTap: () {
@@ -409,7 +424,10 @@ class _HomeViewState extends State<_HomeView> {
           ),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.blue),
-            title: const Text('Cerrar Sesión', style: TextStyle(fontSize: 16)),
+            title: const Text(
+              MotorcycleConstants.menuLogout,
+              style: TextStyle(fontSize: 16),
+            ),
             onTap: () {
               _showLogoutDialog(context);
             },
@@ -417,9 +435,13 @@ class _HomeViewState extends State<_HomeView> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.info, color: Colors.blue),
-            title: const Text('Acerca de', style: TextStyle(fontSize: 16)),
+            title: const Text(
+              MotorcycleConstants.menuAbout,
+              style: TextStyle(fontSize: 16),
+            ),
             onTap: () {
               Navigator.pop(context);
+              _navigateToLegal(context);
             },
           ),
         ],
@@ -525,7 +547,7 @@ class _HomeViewState extends State<_HomeView> {
               context.read<MyBranchesBloc>().add(LoadBranches());
             },
             icon: const Icon(Icons.refresh),
-            label: const Text('Reintentar'),
+            label: const Text(CommonConstants.retry),
           ),
         ],
       ),
@@ -601,7 +623,7 @@ class _HomeViewState extends State<_HomeView> {
                   onPressed: isDeleting
                       ? null
                       : () => Navigator.pop(dialogContext),
-                  child: const Text('Cancelar'),
+                  child: const Text(CommonConstants.cancel),
                 ),
                 TextButton(
                   onPressed: (!isConfirmValid || isDeleting)
@@ -679,14 +701,14 @@ class _HomeViewState extends State<_HomeView> {
           },
           builder: (context, state) {
             return AlertDialog(
-              title: const Text('Cerrar Sesión'),
+              title: const Text(MotorcycleConstants.confirmLogoutTitle),
               content: const Text(
                 '¿Estás seguro de que quieres cerrar sesión?',
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cancelar'),
+                  child: const Text(CommonConstants.cancel),
                 ),
                 TextButton(
                   onPressed: () {
@@ -697,7 +719,7 @@ class _HomeViewState extends State<_HomeView> {
                     context.read<LoginBloc>().add(LoginLogout());
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text('Cerrar Sesión'),
+                  child: const Text(MotorcycleConstants.menuLogout),
                 ),
               ],
             );

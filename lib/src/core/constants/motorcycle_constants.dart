@@ -7,6 +7,14 @@ class MotorcycleConstants {
   static const String registerMotorcycleTitle = 'Registrar Motocicleta';
   static const String myMotorcyclesTitle = 'Mis Motocicletas';
 
+  // Header section
+  static const String basicInfoTitle = 'Información Básica';
+  static const String basicInfoSubtitle =
+      'Registra los datos de tu motocicleta';
+
+  // Dynamic messages
+  static String invalidYearRange(int maxYear) => 'Año inválido (1950-$maxYear)';
+
   // Menu items
   static const String menuHome = 'Inicio';
   static const String menuMyMotorcycles = 'Mis Motocicletas';
@@ -95,4 +103,27 @@ class MotorcycleConstants {
   static const String searchByPlateNoResults =
       'No se encontró ninguna moto con esa placa';
   static const String searchByPlateLoading = 'Buscando...';
+
+  // Profile image (HU36)
+  static const String profileImageLabel = 'Imagen de tu Moto';
+  static const String profileImageHint = 'Toca para cambiar la imagen';
+  static const String profileImageUploadError = 'Error al subir imagen';
+
+  // Edit Motorcycle page
+  static const String editMotorcycleTitle = 'Editar Moto';
+  static const String saveChangesButton = 'Guardar Cambios';
+  static const String plateReadonlyMessage = 'La placa no se puede modificar';
+  static const String yearOptionalLabel = 'Año (opcional)';
+  static const String mileageOptionalLabel = 'Kilometraje actual (opcional)';
+  static const String notesOptionalLabel = 'Notas (opcional)';
+  static const String notesOptionalHint = 'Ej: Mi moto del trabajo';
+  static const String invalidYear = 'Ingresa un año válido';
+  static const String invalidMileage = 'Ingresa un kilometraje válido';
+
+  // Delete motorcycle dialog
+  static const String deleteMotorcycleTitle = 'Eliminar Moto';
+  static const String deleteMotorcycleButton = 'Eliminar';
+
+  // Menu items (User Home)
+  static const String menuMyMotorcycle = 'Mi Moto';
 }

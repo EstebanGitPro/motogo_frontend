@@ -10,6 +10,7 @@ class MotorcycleEntity extends Equatable {
   final int? year;
   final int? currentMileage;
   final String? ownerNotes;
+  final String? profileImageUrl;
 
   const MotorcycleEntity({
     this.id,
@@ -18,6 +19,7 @@ class MotorcycleEntity extends Equatable {
     this.year,
     this.currentMileage,
     this.ownerNotes,
+    this.profileImageUrl,
   });
 
   @override
@@ -28,6 +30,7 @@ class MotorcycleEntity extends Equatable {
     year,
     currentMileage,
     ownerNotes,
+    profileImageUrl,
   ];
 
   /// Creates a copy of this entity with optional field overrides.
@@ -38,6 +41,7 @@ class MotorcycleEntity extends Equatable {
     int? year,
     int? currentMileage,
     String? ownerNotes,
+    String? profileImageUrl,
   }) {
     return MotorcycleEntity(
       id: id ?? this.id,
@@ -46,6 +50,7 @@ class MotorcycleEntity extends Equatable {
       year: year ?? this.year,
       currentMileage: currentMileage ?? this.currentMileage,
       ownerNotes: ownerNotes ?? this.ownerNotes,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
     );
   }
 }

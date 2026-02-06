@@ -210,7 +210,7 @@ class _BranchDetailPageState extends State<BranchDetailPage> {
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         appBar: AppBar(
-          title: Text('Sede ${_currentBranch.name}'),
+          title: Text('${BranchConstants.branchPrefix}${_currentBranch.name}'),
           backgroundColor: Colors.white,
           foregroundColor: Colors.black87,
           elevation: 0,

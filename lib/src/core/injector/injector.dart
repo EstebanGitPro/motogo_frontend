@@ -97,6 +97,13 @@ import 'package:motogo_frontend/src/features/register_motorcycle/data/datasource
 import 'package:motogo_frontend/src/features/register_motorcycle/data/repositories/motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
+// Features - Motorcycle Profile Image (HU36-39)
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/datasources/profile_image_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/repositories/profile_image_repository_impl.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/repositories/profile_image_repository.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/update_profile_image_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/get_profile_image_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/delete_profile_image_usecase.dart';
 // Features - Register
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
 import 'package:motogo_frontend/src/features/register_person/data/repositories/register_repository_impl.dart';
@@ -117,6 +124,20 @@ import 'package:motogo_frontend/src/features/user_home/data/datasources/nearby_b
 import 'package:motogo_frontend/src/features/user_home/data/repositories/nearby_branches_repository_impl.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/repositories/nearby_branches_repository.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
+// Features - Branch Detail
+import 'package:motogo_frontend/src/features/branch_detail/data/datasources/branch_detail_datasource.dart';
+import 'package:motogo_frontend/src/features/branch_detail/data/repositories/branch_detail_repository_impl.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/repositories/branch_detail_repository.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
+// Features - Request Diagnostic
+import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
+// Features - Motorcycle Evidence
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/repositories/motorcycle_evidence_repository.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
 
 part 'injector.g.dart';
 
@@ -340,6 +361,23 @@ abstract class InjectorApp {
       (c) => DeleteMotorcycleUseCase(c.resolve<DeleteMotorcycleRepository>()),
     );
 
+    // Motorcycle Profile Image - HU36-39
+    container.registerFactory<ProfileImageDataSource>(
+      (c) => ProfileImageDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<ProfileImageRepository>(
+      (c) => ProfileImageRepositoryImpl(c.resolve<ProfileImageDataSource>()),
+    );
+    container.registerFactory<UpdateProfileImageUseCase>(
+      (c) => UpdateProfileImageUseCase(c.resolve<ProfileImageRepository>()),
+    );
+    container.registerFactory<GetProfileImageUseCase>(
+      (c) => GetProfileImageUseCase(c.resolve<ProfileImageRepository>()),
+    );
+    container.registerFactory<DeleteProfileImageUseCase>(
+      (c) => DeleteProfileImageUseCase(c.resolve<ProfileImageRepository>()),
+    );
+
     // User Home - Nearby Branches
     container.registerFactory<NearbyBranchesDataSource>(
       (c) => NearbyBranchesDataSourceImpl(c.resolve<DioClient>()),
@@ -353,6 +391,21 @@ abstract class InjectorApp {
     );
     container.registerSingleton<LocationService>(
       (c) => LocationService.instance,
+    );
+
+    // Branch Detail - uses multiple datasources
+    container.registerFactory<BranchDetailDataSource>(
+      (c) => BranchDetailDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<BranchDetailRepository>(
+      (c) => BranchDetailRepositoryImpl(
+        detailDataSource: c.resolve<BranchDetailDataSource>(),
+        servicesDataSource: c.resolve<BranchServicesDataSource>(),
+        scheduleDataSource: c.resolve<BranchScheduleDataSource>(),
+      ),
+    );
+    container.registerFactory<GetBranchDetailUseCase>(
+      (c) => GetBranchDetailUseCase(c.resolve<BranchDetailRepository>()),
     );
 
     // Search Motorcycle by Plate (HU47)
@@ -379,6 +432,40 @@ abstract class InjectorApp {
     );
     container.registerFactory<GetBrandLinesUseCase>(
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
+    );
+
+    // Request Diagnostic - BLoC
+    container.registerFactory<RequestDiagnosticBloc>(
+      (c) => RequestDiagnosticBloc(
+        getMyMotorcyclesUseCase: c.resolve<GetMyMotorcyclesUseCase>(),
+        uploadEvidenceUseCase: c.resolve<UploadEvidenceUseCase>(),
+        deleteEvidenceUseCase: c.resolve<DeleteEvidenceUseCase>(),
+        getEvidenceUseCase: c.resolve<GetEvidenceUseCase>(),
+      ),
+    );
+
+    // Motorcycle Evidence
+    container.registerFactory<MotorcycleEvidenceDataSource>(
+      (c) => MotorcycleEvidenceDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<MotorcycleEvidenceRepository>(
+      (c) => MotorcycleEvidenceRepositoryImpl(
+        c.resolve<MotorcycleEvidenceDataSource>(),
+      ),
+    );
+    container.registerFactory<UploadEvidenceUseCase>(
+      (c) => UploadEvidenceUseCase(
+        storageService: c.resolve<StorageService>(),
+        repository: c.resolve<MotorcycleEvidenceRepository>(),
+      ),
+    );
+    container.registerFactory<DeleteEvidenceUseCase>(
+      (c) => DeleteEvidenceUseCase(
+        repository: c.resolve<MotorcycleEvidenceRepository>(),
+      ),
+    );
+    container.registerFactory<GetEvidenceUseCase>(
+      (c) => GetEvidenceUseCase(c.resolve<MotorcycleEvidenceRepository>()),
     );
   }
 

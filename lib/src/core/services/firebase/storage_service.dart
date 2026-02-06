@@ -156,6 +156,20 @@ class StorageService {
     );
   }
 
+  /// Uploads a motorcycle profile image.
+  ///
+  /// Uses the standardized path: motorcycles/{motorcycleId}/profile.jpg
+  Future<Either<ErrorModel, String>> uploadMotorcycleImage({
+    required String motorcycleId,
+    required File file,
+  }) {
+    final extension = _getExtension(file.path);
+    return uploadImage(
+      storagePath: 'motorcycles/$motorcycleId/profile.$extension',
+      file: file,
+    );
+  }
+
   /// Uploads multiple images for a user (e.g., motorcycle photos).
   ///
   /// [basePath] - Base path (e.g., 'users/{userId}')

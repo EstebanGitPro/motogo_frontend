@@ -15,6 +15,7 @@ class SubmitMotorcycleRegistration extends RegisterMotorcycleEvent {
   final int? year;
   final int? currentMileage;
   final String? ownerNotes;
+  final String? profileImageUrl;
 
   const SubmitMotorcycleRegistration({
     required this.licensePlate,
@@ -22,6 +23,7 @@ class SubmitMotorcycleRegistration extends RegisterMotorcycleEvent {
     this.year,
     this.currentMileage,
     this.ownerNotes,
+    this.profileImageUrl,
   });
 
   @override
@@ -31,6 +33,7 @@ class SubmitMotorcycleRegistration extends RegisterMotorcycleEvent {
     year,
     currentMileage,
     ownerNotes,
+    profileImageUrl,
   ];
 }
 

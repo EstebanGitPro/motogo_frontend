@@ -1,9 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
+import 'package:motogo_frontend/src/core/widgets/image_picker_widget.dart';
 import 'package:motogo_frontend/src/features/edit_motorcycle/domain/usecases/update_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_motorcycle/presentation/bloc/edit_motorcycle_bloc.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/delete_profile_image_usecase.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
+import 'package:uuid/uuid.dart';
 
 /// Page for editing an existing motorcycle.
 class EditMotorcyclePage extends StatelessWidget {
@@ -38,6 +45,11 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
   late final TextEditingController _mileageController;
   late final TextEditingController _notesController;
 
+  // Image state
+  File? _selectedImage;
+  bool _isUploadingImage = false;
+  String? _uploadedImageUrl;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +65,8 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
     _notesController = TextEditingController(
       text: widget.motorcycle.ownerNotes ?? '',
     );
+    // Initialize with existing image URL if available
+    _uploadedImageUrl = widget.motorcycle.profileImageUrl;
   }
 
   @override
@@ -62,6 +76,38 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
     _mileageController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  /// Delete existing profile image using dedicated endpoint
+  Future<void> _onDeleteExistingImage() async {
+    final motorcycleId = widget.motorcycle.id;
+    if (motorcycleId == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    final deleteUseCase = InjectorApp.resolve<DeleteProfileImageUseCase>();
+    final result = await deleteUseCase.call(motorcycleId: motorcycleId);
+
+    if (!mounted) return;
+
+    result.fold(
+      (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+        );
+      },
+      (message) {
+        setState(() {
+          _uploadedImageUrl = null;
+          _selectedImage = null;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
+        );
+      },
+    );
+
+    setState(() => _isUploadingImage = false);
   }
 
   @override
@@ -85,7 +131,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Editar Moto'),
+          title: const Text(MotorcycleConstants.editMotorcycleTitle),
           backgroundColor: Colors.blue[600],
           foregroundColor: Colors.white,
         ),
@@ -96,12 +142,29 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Image picker section
+                ImagePickerWidget(
+                  selectedImage: _selectedImage,
+                  existingImageUrl: _uploadedImageUrl,
+                  onImageChanged: (file) {
+                    setState(() {
+                      _selectedImage = file;
+                      // Don't reset _uploadedImageUrl - keep it for fallback
+                    });
+                  },
+                  onExistingImageRemoved: _onDeleteExistingImage,
+                  enabled: true,
+                  isUploading: _isUploadingImage,
+                  label: MotorcycleConstants.profileImageLabel,
+                  hint: MotorcycleConstants.profileImageHint,
+                ),
+                const SizedBox(height: 16),
                 // Plate field (read-only)
                 TextFormField(
                   controller: _plateController,
                   enabled: false, // Plate cannot be changed
                   decoration: InputDecoration(
-                    labelText: 'Placa',
+                    labelText: MotorcycleConstants.licensePlateLabel,
                     prefixIcon: const Icon(Icons.badge),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -112,7 +175,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'La placa no se puede modificar',
+                  MotorcycleConstants.plateReadonlyMessage,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -126,7 +189,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   controller: _yearController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Año (opcional)',
+                    labelText: MotorcycleConstants.yearOptionalLabel,
                     prefixIcon: const Icon(Icons.calendar_today),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -136,7 +199,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                     if (value != null && value.isNotEmpty) {
                       final year = int.tryParse(value);
                       if (year == null || year < 1900 || year > 2030) {
-                        return 'Ingresa un año válido';
+                        return MotorcycleConstants.invalidYear;
                       }
                     }
                     return null;
@@ -149,7 +212,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   controller: _mileageController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Kilometraje actual (opcional)',
+                    labelText: MotorcycleConstants.mileageOptionalLabel,
                     prefixIcon: const Icon(Icons.speed),
                     suffixText: 'km',
                     border: OutlineInputBorder(
@@ -160,7 +223,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                     if (value != null && value.isNotEmpty) {
                       final mileage = int.tryParse(value);
                       if (mileage == null || mileage < 0) {
-                        return 'Ingresa un kilometraje válido';
+                        return MotorcycleConstants.invalidMileage;
                       }
                     }
                     return null;
@@ -174,8 +237,8 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   maxLines: 3,
                   maxLength: 200,
                   decoration: InputDecoration(
-                    labelText: 'Notas (opcional)',
-                    hintText: 'Ej: Mi moto del trabajo',
+                    labelText: MotorcycleConstants.notesOptionalLabel,
+                    hintText: MotorcycleConstants.notesOptionalHint,
                     prefixIcon: const Icon(Icons.notes),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -209,7 +272,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                               ),
                             )
                           : const Text(
-                              'Guardar Cambios',
+                              MotorcycleConstants.saveChangesButton,
                               style: TextStyle(fontSize: 16),
                             ),
                     );
@@ -223,8 +286,54 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
     );
   }
 
-  void _onSave() {
+  Future<void> _onSave() async {
     if (_formKey.currentState?.validate() ?? false) {
+      // Capture bloc reference before async
+      final bloc = context.read<EditMotorcycleBloc>();
+      String? profileImageUrl = _uploadedImageUrl;
+
+      // Upload image if a new one was selected
+      if (_selectedImage != null) {
+        setState(() => _isUploadingImage = true);
+
+        final storageService = InjectorApp.resolve<StorageService>();
+
+        // Use existing motorcycle ID or generate temp one
+        final motorcycleId = widget.motorcycle.id ?? const Uuid().v4();
+
+        final uploadResult = await storageService.uploadMotorcycleImage(
+          motorcycleId: motorcycleId,
+          file: _selectedImage!,
+        );
+
+        if (!mounted) return;
+
+        setState(() => _isUploadingImage = false);
+
+        if (uploadResult.isLeft) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
+              ),
+              backgroundColor: Colors.red,
+              action: SnackBarAction(
+                label: MotorcycleConstants.retryButton,
+                textColor: Colors.white,
+                onPressed: _onSave,
+              ),
+            ),
+          );
+          return; // This return now properly exits _onSave()
+        }
+
+        // Upload succeeded - get the URL
+        profileImageUrl = uploadResult.right;
+        _uploadedImageUrl = profileImageUrl;
+      }
+
+      if (!mounted) return;
+
       final updatedMotorcycle = MotorcycleEntity(
         id: widget.motorcycle.id,
         licensePlate: _plateController.text.trim(),
@@ -237,9 +346,15 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
         ownerNotes: _notesController.text.trim().isNotEmpty
             ? _notesController.text.trim()
             : null,
+        profileImageUrl: profileImageUrl,
       );
 
-      context.read<EditMotorcycleBloc>().add(
+      // TODO: Remove after debugging
+      debugPrint(
+        '🏍️ [EditMoto] Saving with profileImageUrl: $profileImageUrl',
+      );
+
+      bloc.add(
         UpdateMotorcycle(
           id: widget.motorcycle.id!,
           motorcycle: updatedMotorcycle,

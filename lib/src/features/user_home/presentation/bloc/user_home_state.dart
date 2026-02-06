@@ -28,6 +28,7 @@ class UserHomeLoaded extends UserHomeState {
   final bool locationPermissionDenied;
   final double currentRadiusKm;
   final bool isLoadingBranches;
+  final String? errorMessage; // Error message to show in snackbar
 
   const UserHomeLoaded({
     this.userLatitude,
@@ -38,6 +39,7 @@ class UserHomeLoaded extends UserHomeState {
     this.locationPermissionDenied = false,
     this.currentRadiusKm = 5.0,
     this.isLoadingBranches = false,
+    this.errorMessage,
   });
 
   /// Creates a copy with updated values.
@@ -50,7 +52,9 @@ class UserHomeLoaded extends UserHomeState {
     bool? locationPermissionDenied,
     double? currentRadiusKm,
     bool? isLoadingBranches,
+    String? errorMessage,
     bool clearSelectedBranch = false,
+    bool clearError = false,
   }) {
     return UserHomeLoaded(
       userLatitude: userLatitude ?? this.userLatitude,
@@ -64,6 +68,7 @@ class UserHomeLoaded extends UserHomeState {
           locationPermissionDenied ?? this.locationPermissionDenied,
       currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,
       isLoadingBranches: isLoadingBranches ?? this.isLoadingBranches,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 
@@ -90,6 +95,7 @@ class UserHomeLoaded extends UserHomeState {
     locationPermissionDenied,
     currentRadiusKm,
     isLoadingBranches,
+    errorMessage,
   ];
 }
 

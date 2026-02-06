@@ -41,6 +41,7 @@ class BranchConstants {
   static const String myBranchesTitle = 'Mis Sedes';
   static const String createBranchTitle = 'Crear Sede';
   static const String editBranchTitle = 'Editar Sede';
+  static const String branchPrefix = 'Sede ';
 
   // Button texts
   static const String createBranchButton = 'Crear Sede';
@@ -54,6 +55,8 @@ class BranchConstants {
   static const String noBranchesMessage =
       'Aún no tienes sedes registradas.\nCrea tu primera sede para empezar.';
   static const String noSearchResults = 'No se encontraron sedes';
+  static const String noRegisteredBranches = 'Aún no tienes sedes registradas';
+  static const String errorUploadingImage = 'Error al subir imagen';
 
   // Image picker
   static const String branchImageLabel = 'Imagen de la Sede';

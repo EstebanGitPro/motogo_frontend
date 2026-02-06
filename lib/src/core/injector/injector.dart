@@ -129,6 +129,15 @@ import 'package:motogo_frontend/src/features/branch_detail/data/datasources/bran
 import 'package:motogo_frontend/src/features/branch_detail/data/repositories/branch_detail_repository_impl.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/repositories/branch_detail_repository.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
+// Features - Request Diagnostic
+import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
+// Features - Motorcycle Evidence
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/repositories/motorcycle_evidence_repository.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
 
 part 'injector.g.dart';
 
@@ -423,6 +432,40 @@ abstract class InjectorApp {
     );
     container.registerFactory<GetBrandLinesUseCase>(
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
+    );
+
+    // Request Diagnostic - BLoC
+    container.registerFactory<RequestDiagnosticBloc>(
+      (c) => RequestDiagnosticBloc(
+        getMyMotorcyclesUseCase: c.resolve<GetMyMotorcyclesUseCase>(),
+        uploadEvidenceUseCase: c.resolve<UploadEvidenceUseCase>(),
+        deleteEvidenceUseCase: c.resolve<DeleteEvidenceUseCase>(),
+        getEvidenceUseCase: c.resolve<GetEvidenceUseCase>(),
+      ),
+    );
+
+    // Motorcycle Evidence
+    container.registerFactory<MotorcycleEvidenceDataSource>(
+      (c) => MotorcycleEvidenceDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<MotorcycleEvidenceRepository>(
+      (c) => MotorcycleEvidenceRepositoryImpl(
+        c.resolve<MotorcycleEvidenceDataSource>(),
+      ),
+    );
+    container.registerFactory<UploadEvidenceUseCase>(
+      (c) => UploadEvidenceUseCase(
+        storageService: c.resolve<StorageService>(),
+        repository: c.resolve<MotorcycleEvidenceRepository>(),
+      ),
+    );
+    container.registerFactory<DeleteEvidenceUseCase>(
+      (c) => DeleteEvidenceUseCase(
+        repository: c.resolve<MotorcycleEvidenceRepository>(),
+      ),
+    );
+    container.registerFactory<GetEvidenceUseCase>(
+      (c) => GetEvidenceUseCase(c.resolve<MotorcycleEvidenceRepository>()),
     );
   }
 

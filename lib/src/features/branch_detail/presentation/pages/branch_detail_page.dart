@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
@@ -7,6 +8,7 @@ import 'package:motogo_frontend/src/features/branch_services/domain/entities/bra
 import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
 import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
+import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page displaying the full detail of a branch/store.
@@ -346,8 +348,8 @@ class _BranchDetailView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
           children: [
-            Flexible(
-              flex: 35,
+            SizedBox(
+              width: 100,
               child: Text(
                 schedule.dayName +
                     (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),
@@ -357,6 +359,7 @@ class _BranchDetailView extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 schedule.isClosed
@@ -492,7 +495,7 @@ class _BranchDetailView extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () => _showComingSoon(context),
+                onPressed: () => _navigateToDiagnostic(context, detail),
                 icon: const Icon(Icons.build),
                 label: const Text(BranchDetailConstants.buttonSendDiagnostic),
                 style: ElevatedButton.styleFrom(
@@ -512,9 +515,7 @@ class _BranchDetailView extends StatelessWidget {
   }
 
   Future<void> _openGoogleMaps(double lat, double lng) async {
-    final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving',
-    );
+    final url = Uri.parse(Config.googleMapsDirectionsUrl(lat, lng));
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
@@ -529,11 +530,14 @@ class _BranchDetailView extends StatelessWidget {
     }
   }
 
-  void _showComingSoon(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(BranchDetailConstants.featureComingSoon),
-        duration: Duration(seconds: 2),
+  void _navigateToDiagnostic(BuildContext context, BranchDetailEntity detail) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestDiagnosticPage(
+          branchName: detail.name,
+          branchPhone: detail.phoneNumber ?? '',
+        ),
       ),
     );
   }

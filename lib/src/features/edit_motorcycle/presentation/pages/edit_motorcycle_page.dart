@@ -164,7 +164,7 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
                   controller: _plateController,
                   enabled: false, // Plate cannot be changed
                   decoration: InputDecoration(
-                    labelText: 'Placa',
+                    labelText: MotorcycleConstants.licensePlateLabel,
                     prefixIcon: const Icon(Icons.badge),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),

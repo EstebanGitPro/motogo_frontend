@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/change_password_constants.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 
 /// Página para cambiar la contraseña del usuario autenticado.
@@ -32,7 +33,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cambiar Contraseña'),
+        title: const Text(ChangePasswordConstants.pageTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -70,7 +71,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 const Icon(Icons.lock_outline, size: 80, color: Colors.blue),
                 const SizedBox(height: 20),
                 const Text(
-                  'Ingresa tu contraseña actual y define una nueva contraseña para tu cuenta.',
+                  ChangePasswordConstants.description,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
@@ -81,7 +82,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   controller: _currentPasswordController,
                   obscureText: _obscureCurrentPassword,
                   decoration: InputDecoration(
-                    labelText: 'Contraseña actual',
+                    labelText: ChangePasswordConstants.currentPasswordLabel,
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -101,7 +102,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu contraseña actual';
+                      return ChangePasswordConstants.currentPasswordRequired;
                     }
                     return null;
                   },
@@ -113,7 +114,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   controller: _newPasswordController,
                   obscureText: _obscureNewPassword,
                   decoration: InputDecoration(
-                    labelText: 'Nueva contraseña',
+                    labelText: ChangePasswordConstants.newPasswordLabel,
                     prefixIcon: const Icon(Icons.lock_open),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -131,20 +132,20 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     helperText:
-                        'Mínimo 8 caracteres, una mayúscula, una minúscula y un número',
+                        ChangePasswordConstants.passwordRequirementsHelper,
                     helperMaxLines: 2,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa una nueva contraseña';
+                      return ChangePasswordConstants.newPasswordRequired;
                     }
                     if (value.length < 8) {
-                      return 'La contraseña debe tener al menos 8 caracteres';
+                      return ChangePasswordConstants.passwordMinLength;
                     }
                     if (!RegExp(
                       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$',
                     ).hasMatch(value)) {
-                      return 'Debe incluir mayúscula, minúscula y número';
+                      return ChangePasswordConstants.passwordRequirements;
                     }
                     return null;
                   },
@@ -156,7 +157,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirmPassword,
                   decoration: InputDecoration(
-                    labelText: 'Confirmar nueva contraseña',
+                    labelText: ChangePasswordConstants.confirmPasswordLabel,
                     prefixIcon: const Icon(Icons.lock_open),
                     suffixIcon: IconButton(
                       icon: Icon(
@@ -176,10 +177,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor confirma tu nueva contraseña';
+                      return ChangePasswordConstants.confirmPasswordRequired;
                     }
                     if (value != _newPasswordController.text) {
-                      return 'Las contraseñas no coinciden';
+                      return ChangePasswordConstants.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -212,7 +213,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                               ),
                             )
                           : const Text(
-                              'Cambiar Contraseña',
+                              ChangePasswordConstants.submitButton,
                               style: TextStyle(fontSize: 16),
                             ),
                     );

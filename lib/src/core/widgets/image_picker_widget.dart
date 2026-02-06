@@ -9,7 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 /// Widget for selecting and previewing an image.
 ///
 /// Allows picking from gallery or camera with preview and remove functionality.
-class ImagePickerWidget extends StatelessWidget {
+class ImagePickerWidget extends StatefulWidget {
   /// The currently selected image file.
   final File? selectedImage;
 
@@ -47,35 +47,49 @@ class ImagePickerWidget extends StatelessWidget {
     this.hint = 'Toca para agregar una imagen',
   });
 
+  @override
+  State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
+}
+
+class _ImagePickerWidgetState extends State<ImagePickerWidget> {
+  bool _isPickingImage = false;
+
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
-    final picker = ImagePicker();
-
-    // Request camera permission before using camera
-    if (source == ImageSource.camera) {
-      final permissionResult = await CameraPermissionService.instance
-          .requestPermissionWithResult();
-
-      if (permissionResult == CameraPermissionResult.permanentlyDenied) {
-        if (context.mounted) {
-          _showPermissionDeniedDialog(context);
-        }
-        return;
-      }
-
-      if (permissionResult == CameraPermissionResult.denied) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(ImagePickerConstants.permissionDenied),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-        return;
-      }
+    if (_isPickingImage) return;
+    if (mounted) {
+      setState(() {
+        _isPickingImage = true;
+      });
     }
 
+    final picker = ImagePicker();
+
     try {
+      // Request camera permission before using camera
+      if (source == ImageSource.camera) {
+        final permissionResult = await CameraPermissionService.instance
+            .requestPermissionWithResult();
+
+        if (permissionResult == CameraPermissionResult.permanentlyDenied) {
+          if (context.mounted) {
+            _showPermissionDeniedDialog(context);
+          }
+          return;
+        }
+
+        if (permissionResult == CameraPermissionResult.denied) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(ImagePickerConstants.permissionDenied),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+          return;
+        }
+      }
+
       final pickedFile = await picker.pickImage(
         source: source,
         imageQuality: 80, // Compress to reduce upload time
@@ -83,8 +97,13 @@ class ImagePickerWidget extends StatelessWidget {
         maxHeight: 1024,
       );
 
+      // Give Android a moment to release camera buffers
+      if (source == ImageSource.camera) {
+        await Future<void>.delayed(const Duration(milliseconds: 600));
+      }
+
       if (pickedFile != null) {
-        onImageChanged(File(pickedFile.path));
+        widget.onImageChanged(File(pickedFile.path));
       }
     } catch (e) {
       if (context.mounted) {
@@ -94,6 +113,12 @@ class ImagePickerWidget extends StatelessWidget {
             backgroundColor: Colors.red,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isPickingImage = false;
+        });
       }
     }
   }
@@ -150,26 +175,26 @@ class ImagePickerWidget extends StatelessWidget {
                 },
               ),
               // Show delete option for local file selection
-              if (selectedImage != null)
+              if (widget.selectedImage != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
                   title: const Text(ImagePickerConstants.removeImage),
                   onTap: () {
                     Navigator.pop(context);
-                    onImageChanged(null);
+                    widget.onImageChanged(null);
                   },
                 ),
               // Show delete option for already uploaded image
-              if (selectedImage == null &&
-                  existingImageUrl != null &&
-                  existingImageUrl!.isNotEmpty &&
-                  onExistingImageRemoved != null)
+              if (widget.selectedImage == null &&
+                  widget.existingImageUrl != null &&
+                  widget.existingImageUrl!.isNotEmpty &&
+                  widget.onExistingImageRemoved != null)
                 ListTile(
                   leading: const Icon(Icons.delete, color: Colors.red),
                   title: const Text(ImagePickerConstants.removeImage),
                   onTap: () {
                     Navigator.pop(context);
-                    onExistingImageRemoved!();
+                    widget.onExistingImageRemoved!();
                   },
                 ),
             ],
@@ -185,7 +210,7 @@ class ImagePickerWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          widget.label,
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[700],
@@ -194,7 +219,7 @@ class ImagePickerWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: enabled && !isUploading
+          onTap: widget.enabled && !widget.isUploading && !_isPickingImage
               ? () => _showPickerOptions(context)
               : null,
           child: LayoutBuilder(
@@ -212,13 +237,13 @@ class ImagePickerWidget extends StatelessWidget {
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: selectedImage != null
+                    color: widget.selectedImage != null
                         ? Colors.blue[400]!
                         : Colors.grey[300]!,
-                    width: selectedImage != null ? 2 : 1,
+                    width: widget.selectedImage != null ? 2 : 1,
                   ),
                 ),
-                child: isUploading
+                child: widget.isUploading
                     ? const Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -229,14 +254,14 @@ class ImagePickerWidget extends StatelessWidget {
                           ],
                         ),
                       )
-                    : selectedImage != null
+                    : widget.selectedImage != null
                     ? Stack(
                         fit: StackFit.expand,
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(11),
                             child: Image.file(
-                              selectedImage!,
+                              widget.selectedImage!,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -254,7 +279,7 @@ class ImagePickerWidget extends StatelessWidget {
                                   color: Colors.white,
                                   size: 20,
                                 ),
-                                onPressed: enabled
+                                onPressed: widget.enabled && !_isPickingImage
                                     ? () => _showPickerOptions(context)
                                     : null,
                                 tooltip: ImagePickerConstants.changeImage,
@@ -263,14 +288,15 @@ class ImagePickerWidget extends StatelessWidget {
                           ),
                         ],
                       )
-                    : existingImageUrl != null && existingImageUrl!.isNotEmpty
+                    : widget.existingImageUrl != null &&
+                      widget.existingImageUrl!.isNotEmpty
                     ? Stack(
                         fit: StackFit.expand,
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(11),
                             child: Image.network(
-                              existingImageUrl!,
+                              widget.existingImageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   Center(
@@ -296,7 +322,7 @@ class ImagePickerWidget extends StatelessWidget {
                                   color: Colors.white,
                                   size: 20,
                                 ),
-                                onPressed: enabled
+                                onPressed: widget.enabled && !_isPickingImage
                                     ? () => _showPickerOptions(context)
                                     : null,
                                 tooltip: ImagePickerConstants.changeImage,
@@ -315,7 +341,7 @@ class ImagePickerWidget extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            hint,
+                            widget.hint,
                             style: TextStyle(
                               color: Colors.grey[500],
                               fontSize: 13,

@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.d
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/department_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
+import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
 import 'package:motogo_frontend/src/core/validators/validators.dart';
@@ -184,7 +185,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
       if (_selectedBrandIds.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Por favor selecciona al menos una marca'),
+            content: Text(BranchConstants.brandRequired),
             backgroundColor: Colors.orange,
           ),
         );
@@ -194,7 +195,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
       if (_selectedCityId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Por favor selecciona departamento y ciudad'),
+            content: Text(BranchConstants.locationRequired),
             backgroundColor: Colors.orange,
           ),
         );
@@ -224,10 +225,12 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
             setState(() => _isUploadingImage = false);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Error al subir imagen: ${error.message}'),
+                content: Text(
+                  '${BranchConstants.errorUploadingImage}: ${error.message}',
+                ),
                 backgroundColor: Colors.red,
                 action: SnackBarAction(
-                  label: 'Reintentar',
+                  label: BranchConstants.retry,
                   textColor: Colors.white,
                   onPressed: _onSubmit,
                 ),
@@ -282,7 +285,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Sede'),
+        title: const Text(BranchConstants.createBranchTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -340,20 +343,20 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
                       },
                       enabled: !isLoading,
                       isUploading: _isUploadingImage,
-                      label: 'Imagen de la Sede',
-                      hint: 'Toca para agregar una imagen',
+                      label: BranchConstants.branchImageLabel,
+                      hint: BranchConstants.branchImageHint,
                     ),
                     const SizedBox(height: 24),
 
                     // Branch name
                     CustomInputWidget(
                       controller: _nameController,
-                      labelText: 'Nombre de la Sede',
-                      hintText: 'Ej: MotoGo Centro',
+                      labelText: BranchConstants.branchNameLabel,
+                      hintText: BranchConstants.branchNameHint,
                       prefixIcon: const Icon(Icons.business_outlined),
                       enabled: !isLoading,
                       validator: ValidatorUtils.required(
-                        customMessage: 'Por favor ingresa el nombre de la sede',
+                        customMessage: BranchConstants.branchNameRequired,
                       ).validate,
                     ),
                     const SizedBox(height: 16),
@@ -376,12 +379,12 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
                     // Address
                     CustomInputWidget(
                       controller: _addressController,
-                      labelText: 'Dirección',
-                      hintText: 'Ej: Calle 123 #45-67',
+                      labelText: BranchConstants.addressLabel,
+                      hintText: BranchConstants.addressHint,
                       prefixIcon: const Icon(Icons.location_on_outlined),
                       enabled: !isLoading,
                       validator: ValidatorUtils.required(
-                        customMessage: 'Por favor ingresa la dirección',
+                        customMessage: BranchConstants.addressRequired,
                       ).validate,
                     ),
                     const SizedBox(height: 16),

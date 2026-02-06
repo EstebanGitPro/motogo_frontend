@@ -179,7 +179,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Información Básica',
+                  MotorcycleConstants.basicInfoTitle,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -188,7 +188,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Registra los datos de tu motocicleta',
+                  MotorcycleConstants.basicInfoSubtitle,
                   style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
@@ -277,7 +277,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         }
         final year = int.tryParse(value);
         if (year == null || year < 1950 || year > currentYear + 1) {
-          return 'Año inválido (1950-${currentYear + 1})';
+          return MotorcycleConstants.invalidYearRange(currentYear + 1);
         }
         return null;
       },
@@ -307,7 +307,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         }
         final mileage = int.tryParse(value);
         if (mileage == null || mileage < 0) {
-          return 'Kilometraje inválido';
+          return MotorcycleConstants.invalidMileage;
         }
         return null;
       },

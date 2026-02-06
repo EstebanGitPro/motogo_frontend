@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
+import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/delete_motorcycle/domain/usecases/delete_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_motorcycle/presentation/pages/edit_motorcycle_page.dart';
@@ -31,7 +33,7 @@ class _MyMotorcyclesView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Motos'),
+        title: const Text(MotorcycleConstants.myMotorcyclesTitle),
         backgroundColor: Colors.blue[600],
         foregroundColor: Colors.white,
       ),
@@ -100,7 +102,7 @@ class _MyMotorcyclesView extends StatelessWidget {
               context.read<MyMotorcyclesBloc>().add(const LoadMyMotorcycles());
             },
             icon: const Icon(Icons.refresh),
-            label: const Text('Reintentar'),
+            label: const Text(CommonConstants.retry),
           ),
         ],
       ),
@@ -135,7 +137,7 @@ class _MyMotorcyclesView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => _navigateToRegister(context),
               icon: const Icon(Icons.add),
-              label: const Text('Registrar Moto'),
+              label: const Text(MotorcycleConstants.registerButton),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue[600],
                 foregroundColor: Colors.white,
@@ -292,19 +294,19 @@ class _MotorcycleCard extends StatelessWidget {
     showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Eliminar Moto'),
+        title: const Text(MotorcycleConstants.deleteMotorcycleTitle),
         content: Text(
           '¿Estás seguro de que deseas eliminar la moto ${motorcycle.licensePlate.toUpperCase()}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancelar'),
+            child: const Text(CommonConstants.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
+            child: const Text(MotorcycleConstants.deleteMotorcycleButton),
           ),
         ],
       ),

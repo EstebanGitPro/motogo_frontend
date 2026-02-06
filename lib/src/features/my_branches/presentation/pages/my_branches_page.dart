@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
@@ -66,7 +67,7 @@ class _MyBranchesViewState extends State<_MyBranchesView>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mis Sedes'),
+        title: const Text(BranchConstants.myBranchesTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -79,7 +80,7 @@ class _MyBranchesViewState extends State<_MyBranchesView>
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search sedes',
+                hintText: BranchConstants.searchPlaceholder,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -140,7 +141,7 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                             context.read<MyBranchesBloc>().add(LoadBranches());
                           },
                           icon: const Icon(Icons.refresh),
-                          label: const Text('Reintentar'),
+                          label: const Text(BranchConstants.retry),
                         ),
                       ],
                     ),
@@ -163,8 +164,8 @@ class _MyBranchesViewState extends State<_MyBranchesView>
                           const SizedBox(height: 16),
                           Text(
                             state.searchQuery.isNotEmpty
-                                ? 'No se encontraron sedes'
-                                : 'Aún no tienes sedes registradas',
+                                ? BranchConstants.noSearchResults
+                                : BranchConstants.noRegisteredBranches,
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontSize: 16,

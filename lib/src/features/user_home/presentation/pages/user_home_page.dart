@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/config/secrets.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
@@ -515,14 +517,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
                 const Spacer(),
                 TextButton(
                   onPressed: () => _navigateToBranchDetail(context, branch),
-                  child: const Text('Ver más'),
+                  child: const Text(CommonConstants.seeMore),
                 ),
                 const SizedBox(width: 8),
                 OutlinedButton.icon(
                   onPressed: () =>
                       _openGoogleMaps(branch.latitude, branch.longitude),
                   icon: const Icon(Icons.directions),
-                  label: const Text('Cómo llegar'),
+                  label: const Text(CommonConstants.howToGetThere),
                 ),
               ],
             ),
@@ -622,9 +624,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
   }
 
   Future<void> _openGoogleMaps(double lat, double lng) async {
-    final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving',
-    );
+    final url = Uri.parse(Config.googleMapsDirectionsUrl(lat, lng));
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
@@ -694,7 +694,10 @@ class _UserHomeViewState extends State<_UserHomeView> {
           ),
           ListTile(
             leading: const Icon(Icons.two_wheeler, color: Colors.blue),
-            title: const Text('Mi Moto', style: TextStyle(fontSize: 16)),
+            title: const Text(
+              MotorcycleConstants.menuMyMotorcycle,
+              style: TextStyle(fontSize: 16),
+            ),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(
@@ -829,7 +832,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
                   onPressed: isDeleting
                       ? null
                       : () => Navigator.pop(dialogContext),
-                  child: const Text('Cancelar'),
+                  child: const Text(CommonConstants.cancel),
                 ),
                 TextButton(
                   onPressed: (!isConfirmValid || isDeleting)
@@ -904,7 +907,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cancelar'),
+                  child: const Text(CommonConstants.cancel),
                 ),
                 TextButton(
                   onPressed: () {
@@ -915,7 +918,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
                     context.read<LoginBloc>().add(LoginLogout());
                   },
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text('Cerrar Sesión'),
+                  child: const Text(MotorcycleConstants.menuLogout),
                 ),
               ],
             );

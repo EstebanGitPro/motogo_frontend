@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:motogo_frontend/src/core/constants/legal_constants.dart';
 
 class LegalPage extends StatelessWidget {
   const LegalPage({super.key});
@@ -9,7 +10,7 @@ class LegalPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Acerca de y Legal'),
+        title: const Text(LegalConstants.pageTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 1,
@@ -20,49 +21,31 @@ class LegalPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSection(
-              title: 'Acerca de',
-              body:
-                  'MotoGo es una plataforma para conectar motociclistas con '
-                  'talleres y tiendas. Este texto es un placeholder y debe '
-                  'ser reemplazado por la descripción oficial del producto.',
+              title: LegalConstants.sectionAbout,
+              body: LegalConstants.aboutBody,
             ),
             _buildSection(
-              title: 'Términos y condiciones de uso',
-              body:
-                  'Contenido pendiente de redacción legal. Debe incluir reglas '
-                  'de uso, responsabilidades, limitaciones y aceptación del '
-                  'usuario.',
+              title: LegalConstants.sectionTermsAndConditions,
+              body: LegalConstants.termsBody,
             ),
             _buildSection(
-              title: 'Política de privacidad',
-              body:
-                  'Contenido pendiente de redacción legal. Debe explicar qué '
-                  'datos se recolectan, con qué finalidad, y cómo se protegen.',
+              title: LegalConstants.sectionPrivacyPolicy,
+              body: LegalConstants.privacyBody,
             ),
             _buildSection(
-              title: 'Tratamiento de datos personales',
-              body:
-                  'Contenido pendiente de redacción legal. Debe incluir la '
-                  'base legal del tratamiento, derechos del titular y canales '
-                  'de contacto.',
+              title: LegalConstants.sectionDataTreatment,
+              body: LegalConstants.dataBody,
             ),
             _buildSection(
-              title: 'Seguridad de la información',
-              body:
-                  'Contenido pendiente de redacción legal. Debe describir las '
-                  'medidas de seguridad y buenas prácticas aplicadas.',
+              title: LegalConstants.sectionSecurity,
+              body: LegalConstants.securityBody,
             ),
             _buildSection(
-              title: 'Licencias y créditos',
-              body:
-                  'Motorcycle icons created by sonnycandra - Flaticon. '
-                  'Fuente: https://www.flaticon.com/free-icons/motorcycle',
+              title: LegalConstants.sectionLicenses,
+              body: LegalConstants.licensesBody,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Última actualización: pendiente de definición.',
-              style: theme.textTheme.bodySmall,
-            ),
+            Text(LegalConstants.lastUpdated, style: theme.textTheme.bodySmall),
           ],
         ),
       ),
@@ -77,16 +60,10 @@ class LegalPage extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          Text(
-            body,
-            style: const TextStyle(fontSize: 14, height: 1.4),
-          ),
+          Text(body, style: const TextStyle(fontSize: 14, height: 1.4)),
         ],
       ),
     );

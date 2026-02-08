@@ -10,16 +10,18 @@ abstract class RequestDiagnosticEvent extends Equatable {
 
 /// Initialize the page with branch info and load user motorcycles.
 class InitializeRequest extends RequestDiagnosticEvent {
+  final String branchId;
   final String branchName;
   final String branchPhone;
 
   const InitializeRequest({
+    required this.branchId,
     required this.branchName,
     required this.branchPhone,
   });
 
   @override
-  List<Object?> get props => [branchName, branchPhone];
+  List<Object?> get props => [branchId, branchName, branchPhone];
 }
 
 /// User selected a motorcycle.
@@ -63,17 +65,12 @@ class RemovePhoto extends RequestDiagnosticEvent {
   List<Object?> get props => [index];
 }
 
-/// User toggled a service type.
-class ToggleServiceType extends RequestDiagnosticEvent {
-  final ServiceType serviceType;
-
-  const ToggleServiceType(this.serviceType);
-
-  @override
-  List<Object?> get props => [serviceType];
+/// User toggled the permission grant switch.
+class TogglePermission extends RequestDiagnosticEvent {
+  const TogglePermission();
 }
 
-/// User submitted the request (upload photos + open WhatsApp).
+/// User submitted the request (create diagnostic + grant permission + open WhatsApp).
 class SubmitRequest extends RequestDiagnosticEvent {
   const SubmitRequest();
 }

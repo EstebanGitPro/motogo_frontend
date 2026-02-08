@@ -70,6 +70,16 @@ import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase
 // Features - Manage Franchise
 import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+// Features - Diagnostic
+import 'package:motogo_frontend/src/features/diagnostic/data/datasource/diagnostic_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic/data/repository/diagnostic_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/repository/diagnostic_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/usecase/create_diagnostic_usecase.dart';
+// Features - Diagnostic Permission
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/datasource/diagnostic_permission_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/repository/diagnostic_permission_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/repository/diagnostic_permission_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
 // Features - Motorcycle Evidence
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
@@ -457,6 +467,31 @@ abstract class InjectorApp {
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
     );
 
+    // Diagnostic Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticDataSource>(
+      (c) => DiagnosticDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticRepository>(
+      (c) => DiagnosticRepositoryImpl(c.resolve<DiagnosticDataSource>()),
+    );
+    container.registerFactory<CreateDiagnosticUseCase>(
+      (c) => CreateDiagnosticUseCase(c.resolve<DiagnosticRepository>()),
+    );
+
+    // Diagnostic Permission Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticPermissionDataSource>(
+      (c) => DiagnosticPermissionDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticPermissionRepository>(
+      (c) => DiagnosticPermissionRepositoryImpl(
+        c.resolve<DiagnosticPermissionDataSource>(),
+      ),
+    );
+    container.registerFactory<GrantPermissionUseCase>(
+      (c) =>
+          GrantPermissionUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+
     // Request Diagnostic - BLoC
     container.registerFactory<RequestDiagnosticBloc>(
       (c) => RequestDiagnosticBloc(
@@ -464,6 +499,8 @@ abstract class InjectorApp {
         uploadEvidenceUseCase: c.resolve<UploadEvidenceUseCase>(),
         deleteEvidenceUseCase: c.resolve<DeleteEvidenceUseCase>(),
         getEvidenceUseCase: c.resolve<GetEvidenceUseCase>(),
+        createDiagnosticUseCase: c.resolve<CreateDiagnosticUseCase>(),
+        grantPermissionUseCase: c.resolve<GrantPermissionUseCase>(),
       ),
     );
 

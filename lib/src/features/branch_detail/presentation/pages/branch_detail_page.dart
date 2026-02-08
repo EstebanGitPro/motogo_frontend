@@ -534,6 +534,7 @@ class _BranchDetailView extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (_) => RequestDiagnosticPage(
+          branchId: detail.id,
           branchName: detail.name,
           branchPhone: detail.phoneNumber ?? '',
         ),

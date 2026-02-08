@@ -622,9 +622,19 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     final message = Uri.encodeComponent(state.messagePreview);
     final url = Uri.parse('https://wa.me/$phone?text=$message');
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
+    try {
+      final launched = await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(RequestDiagnosticConstants.whatsappError),
+          ),
+        );
+      }
+    } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -80,7 +80,7 @@ class _EditBranchPageState extends State<EditBranchPage> {
   @override
   void initState() {
     super.initState();
-    _editBranchBloc = EditBranchBloc();
+    _editBranchBloc = InjectorApp.resolve<EditBranchBloc>();
     _hydrateFromBranch();
     _loadBrands();
     _loadDepartments();

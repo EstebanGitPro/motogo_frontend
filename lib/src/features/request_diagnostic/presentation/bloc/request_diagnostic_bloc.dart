@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/domain/usecases/get_my_motorcycles_usecase.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/domain/enums/service_type.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
-import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 
 part 'request_diagnostic_event.dart';
 part 'request_diagnostic_state.dart';
@@ -78,7 +78,7 @@ class RequestDiagnosticBloc
     if (!shouldLoadEvidence) return;
 
     final evidenceResult = await _getEvidenceUseCase(
-      motorcycleId: motorcycleId!,
+      motorcycleId: motorcycleId,
     );
 
     evidenceResult.fold(
@@ -260,8 +260,8 @@ class RequestDiagnosticBloc
     );
 
     try {
-      if (await photoFile.exists()) {
-        await photoFile.delete();
+      if (photoFile.existsSync()) {
+        photoFile.deleteSync();
       }
     } catch (_) {}
 

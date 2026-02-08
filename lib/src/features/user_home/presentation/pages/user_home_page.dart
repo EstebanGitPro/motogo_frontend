@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,19 +11,18 @@ import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/location_service.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/pages/branch_detail_page.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
+import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/my_motorcycles_page.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pages/register_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
-import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
-import 'package:motogo_frontend/src/features/branch_detail/presentation/pages/branch_detail_page.dart';
-import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
@@ -37,11 +35,8 @@ class UserHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => UserHomeBloc(
-        getNearbyBranchesUseCase:
-            InjectorApp.resolve<GetNearbyBranchesUseCase>(),
-        locationService: InjectorApp.resolve<LocationService>(),
-      )..add(const InitializeMap()),
+      create: (_) =>
+          InjectorApp.resolve<UserHomeBloc>()..add(const InitializeMap()),
       child: const _UserHomeView(),
     );
   }
@@ -720,7 +715,8 @@ class _UserHomeViewState extends State<_UserHomeView> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => BlocProvider(
-                    create: (context) => ChangePasswordBloc(),
+                    create: (context) =>
+                        InjectorApp.resolve<ChangePasswordBloc>(),
                     child: const ChangePasswordPage(),
                   ),
                 ),

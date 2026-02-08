@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
@@ -21,9 +20,8 @@ class BranchScheduleBloc
     extends Bloc<BranchScheduleEvent, BranchScheduleState> {
   final BranchScheduleRepository _repository;
 
-  BranchScheduleBloc({BranchScheduleRepository? repository})
-    : _repository =
-          repository ?? InjectorApp.resolve<BranchScheduleRepository>(),
+  BranchScheduleBloc({required BranchScheduleRepository repository})
+    : _repository = repository,
       super(BranchScheduleInitial()) {
     on<LoadSchedule>(_onLoadSchedule);
     on<CreateSchedule>(_onCreateSchedule);

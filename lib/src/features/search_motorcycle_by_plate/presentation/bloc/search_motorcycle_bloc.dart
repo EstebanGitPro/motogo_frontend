@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
 
@@ -15,10 +14,8 @@ class SearchMotorcycleBloc
     extends Bloc<SearchMotorcycleEvent, SearchMotorcycleState> {
   final SearchMotorcycleByPlateUseCase _searchUseCase;
 
-  SearchMotorcycleBloc({SearchMotorcycleByPlateUseCase? searchUseCase})
-    : _searchUseCase =
-          searchUseCase ??
-          InjectorApp.resolve<SearchMotorcycleByPlateUseCase>(),
+  SearchMotorcycleBloc({required SearchMotorcycleByPlateUseCase searchUseCase})
+    : _searchUseCase = searchUseCase,
       super(const SearchMotorcycleInitial()) {
     on<SearchByPlate>(_onSearchByPlate);
     on<ClearSearch>(_onClearSearch);

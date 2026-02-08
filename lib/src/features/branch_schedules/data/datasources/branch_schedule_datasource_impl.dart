@@ -318,9 +318,6 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
       final path = ScheduleConstants.getScheduleDetailsPath(branchId);
       final response = await _dioClient.get(path);
       final responseData = response.data;
-      // DEBUG: Ver qué devuelve el API de schedules
-      print('DEBUG Schedules - Path: $path');
-      print('DEBUG Schedules - Response: $responseData');
 
       if (responseData is Map<String, dynamic>) {
         final success = responseData['success'] as bool?;

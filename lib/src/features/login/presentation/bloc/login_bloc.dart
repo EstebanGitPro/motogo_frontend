@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/core/constants/login_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';
@@ -11,10 +10,13 @@ part 'login_event.dart';
 part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginInitial()) {
-    final LoginUseCase loginUseCase = InjectorApp.resolve<LoginUseCase>();
+  final LoginUseCase _loginUseCase;
+
+  LoginBloc({required LoginUseCase loginUseCase})
+    : _loginUseCase = loginUseCase,
+      super(LoginInitial()) {
     on<LoginSubmitted>(
-      (event, emit) => _onLoginSubmitted(event, emit, loginUseCase),
+      (event, emit) => _onLoginSubmitted(event, emit, _loginUseCase),
     );
     on<LoginLogout>(_onLogout);
   }

@@ -3,11 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
-import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
-import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
-import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,9 +26,9 @@ class BranchDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BranchDetailBloc(
-        getBranchDetailUseCase: InjectorApp.resolve<GetBranchDetailUseCase>(),
-      )..add(LoadBranchDetail(branchId)),
+      create: (_) =>
+          InjectorApp.resolve<BranchDetailBloc>()
+            ..add(LoadBranchDetail(branchId)),
       child: _BranchDetailView(branchName: branchName),
     );
   }

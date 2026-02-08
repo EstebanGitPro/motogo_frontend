@@ -1,8 +1,8 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
-import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 
 /// Repository interface for branch detail operations.
 ///

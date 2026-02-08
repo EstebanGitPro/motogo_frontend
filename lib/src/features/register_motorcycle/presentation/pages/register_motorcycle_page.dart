@@ -55,7 +55,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegisterMotorcycleBloc(),
+      create: (context) => InjectorApp.resolve<RegisterMotorcycleBloc>(),
       child: BlocConsumer<RegisterMotorcycleBloc, RegisterMotorcycleState>(
         listener: (context, state) {
           if (state is RegisterMotorcycleSuccess) {

@@ -36,10 +36,14 @@ void main() async {
       path: 'assets/lang',
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => RegisterPersonBloc()),
-          BlocProvider(create: (_) => LoginBloc()),
-          BlocProvider(create: (_) => EditProfileBloc()),
-          BlocProvider(create: (_) => EmailRecoveryVerificationBloc()),
+          BlocProvider(
+            create: (_) => InjectorApp.resolve<RegisterPersonBloc>(),
+          ),
+          BlocProvider(create: (_) => InjectorApp.resolve<LoginBloc>()),
+          BlocProvider(create: (_) => InjectorApp.resolve<EditProfileBloc>()),
+          BlocProvider(
+            create: (_) => InjectorApp.resolve<EmailRecoveryVerificationBloc>(),
+          ),
         ],
         child: const MyApp(),
       ),

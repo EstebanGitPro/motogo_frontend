@@ -87,3 +87,7 @@ secrets.json
 
 # Coverage reports
 coverage/
+
+# macOS duplicate files
+*\ 2.*
+*\ 2

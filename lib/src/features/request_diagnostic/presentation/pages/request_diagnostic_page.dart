@@ -5,10 +5,10 @@ import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/domain/enums/service_type.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page for requesting a diagnostic from a branch via WhatsApp.
@@ -178,7 +178,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     return _buildSectionCard(
       title: RequestDiagnosticConstants.sectionMyMoto,
       child: DropdownButtonFormField<MotorcycleEntity>(
-        value: state.selectedMotorcycle,
+        initialValue: state.selectedMotorcycle,
         decoration: InputDecoration(
           labelText: RequestDiagnosticConstants.selectMotorcycle,
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),

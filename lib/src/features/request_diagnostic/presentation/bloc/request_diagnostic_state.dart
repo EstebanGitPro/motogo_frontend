@@ -123,7 +123,7 @@ $photosInfo
       isUploadingPhoto: isUploadingPhoto ?? this.isUploadingPhoto,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      successMessage: successMessage ?? this.successMessage,
+      successMessage: successMessage,
       hasLoadedEvidence: hasLoadedEvidence ?? this.hasLoadedEvidence,
     );
   }

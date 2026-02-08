@@ -9,7 +9,6 @@ abstract class DiagnosticRepository {
     required String motorcycleId,
     required String problemDescription,
     String? branchId,
-    String? serviceType,
   });
 
   /// Lists all diagnostics for a motorcycle.

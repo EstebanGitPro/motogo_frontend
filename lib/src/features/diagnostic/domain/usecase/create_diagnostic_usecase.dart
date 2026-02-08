@@ -12,13 +12,11 @@ class CreateDiagnosticUseCase {
     required String motorcycleId,
     required String problemDescription,
     String? branchId,
-    String? serviceType,
   }) {
     return _repository.createDiagnostic(
       motorcycleId: motorcycleId,
       problemDescription: problemDescription,
       branchId: branchId,
-      serviceType: serviceType,
     );
   }
 }

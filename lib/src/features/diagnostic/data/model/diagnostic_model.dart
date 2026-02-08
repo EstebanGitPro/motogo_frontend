@@ -1,23 +1,52 @@
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 
+/// Model for a single evidence item in a diagnostic response.
+class DiagnosticEvidenceModel {
+  final String id;
+  final String imageUrl;
+  final String createdAt;
+
+  const DiagnosticEvidenceModel({
+    required this.id,
+    required this.imageUrl,
+    required this.createdAt,
+  });
+
+  factory DiagnosticEvidenceModel.fromJson(Map<String, dynamic> json) {
+    return DiagnosticEvidenceModel(
+      id: json['id'] as String? ?? '',
+      imageUrl: json['image_url'] as String? ?? '',
+      createdAt: json['created_at'] as String? ?? '',
+    );
+  }
+
+  DiagnosticEvidenceEntity toEntity() {
+    return DiagnosticEvidenceEntity(
+      id: id,
+      imageUrl: imageUrl,
+      createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
+    );
+  }
+}
+
 /// Model for diagnostic API responses.
 class DiagnosticModel {
   final String id;
   final String motorcycleId;
   final String? branchId;
   final String problemDescription;
-  final String? status;
-  final String? serviceType;
-  final String createdAt;
+  final String date;
+  final bool sentViaWhatsapp;
+  final List<DiagnosticEvidenceModel> evidence;
 
   const DiagnosticModel({
     required this.id,
     required this.motorcycleId,
     this.branchId,
     required this.problemDescription,
-    this.status,
-    this.serviceType,
-    required this.createdAt,
+    required this.date,
+    this.sentViaWhatsapp = false,
+    this.evidence = const [],
   });
 
   factory DiagnosticModel.fromJson(Map<String, dynamic> json) {
@@ -29,9 +58,9 @@ class DiagnosticModel {
       motorcycleId: source['motorcycle_id'] as String? ?? '',
       branchId: source['branch_id'] as String?,
       problemDescription: source['problem_description'] as String? ?? '',
-      status: source['status'] as String?,
-      serviceType: source['service_type'] as String?,
-      createdAt: source['created_at'] as String? ?? '',
+      date: source['date'] as String? ?? '',
+      sentViaWhatsapp: source['sent_via_whatsapp'] as bool? ?? false,
+      evidence: _parseEvidence(source['evidence']),
     );
   }
 
@@ -42,10 +71,18 @@ class DiagnosticModel {
       motorcycleId: json['motorcycle_id'] as String? ?? '',
       branchId: json['branch_id'] as String?,
       problemDescription: json['problem_description'] as String? ?? '',
-      status: json['status'] as String?,
-      serviceType: json['service_type'] as String?,
-      createdAt: json['created_at'] as String? ?? '',
+      date: json['date'] as String? ?? '',
+      sentViaWhatsapp: json['sent_via_whatsapp'] as bool? ?? false,
+      evidence: _parseEvidence(json['evidence']),
     );
+  }
+
+  static List<DiagnosticEvidenceModel> _parseEvidence(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map<String, dynamic>>()
+        .map(DiagnosticEvidenceModel.fromJson)
+        .toList();
   }
 
   DiagnosticEntity toEntity() {
@@ -54,9 +91,9 @@ class DiagnosticModel {
       motorcycleId: motorcycleId,
       branchId: branchId,
       problemDescription: problemDescription,
-      status: status,
-      serviceType: serviceType,
-      createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
+      date: DateTime.tryParse(date) ?? DateTime.now(),
+      sentViaWhatsapp: sentViaWhatsapp,
+      evidence: evidence.map((e) => e.toEntity()).toList(),
     );
   }
 
@@ -65,7 +102,6 @@ class DiagnosticModel {
     return {
       'problem_description': problemDescription,
       if (branchId != null) 'branch_id': branchId,
-      if (serviceType != null) 'service_type': serviceType,
     };
   }
 }

@@ -22,7 +22,6 @@ abstract class DiagnosticDataSource {
     required String motorcycleId,
     required String problemDescription,
     String? branchId,
-    String? serviceType,
   });
 
   /// Lists all diagnostics for a motorcycle.
@@ -68,7 +67,6 @@ class DiagnosticDataSourceImpl implements DiagnosticDataSource {
     required String motorcycleId,
     required String problemDescription,
     String? branchId,
-    String? serviceType,
   }) async {
     try {
       final response = await _dioClient.post(
@@ -76,7 +74,6 @@ class DiagnosticDataSourceImpl implements DiagnosticDataSource {
         data: {
           'problem_description': problemDescription,
           if (branchId != null) 'branch_id': branchId,
-          if (serviceType != null) 'service_type': serviceType,
         },
       );
       final responseData = response.data;

@@ -14,13 +14,11 @@ class DiagnosticRepositoryImpl implements DiagnosticRepository {
     required String motorcycleId,
     required String problemDescription,
     String? branchId,
-    String? serviceType,
   }) async {
     final result = await _dataSource.createDiagnostic(
       motorcycleId: motorcycleId,
       problemDescription: problemDescription,
       branchId: branchId,
-      serviceType: serviceType,
     );
 
     return result.fold(

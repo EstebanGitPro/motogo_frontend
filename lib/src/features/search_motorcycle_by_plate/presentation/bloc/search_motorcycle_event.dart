@@ -22,3 +22,17 @@ class SearchByPlate extends SearchMotorcycleEvent {
 class ClearSearch extends SearchMotorcycleEvent {
   const ClearSearch();
 }
+
+/// Event to set the diagnostic solution (workshop representative).
+class SetDiagnosticSolution extends SearchMotorcycleEvent {
+  final String diagnosticId;
+  final String solution;
+
+  const SetDiagnosticSolution({
+    required this.diagnosticId,
+    required this.solution,
+  });
+
+  @override
+  List<Object?> get props => [diagnosticId, solution];
+}

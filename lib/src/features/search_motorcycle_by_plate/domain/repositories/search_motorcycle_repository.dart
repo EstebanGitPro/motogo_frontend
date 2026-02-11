@@ -13,4 +13,13 @@ abstract class SearchMotorcycleRepository {
   Future<Either<ErrorModel, MotorcycleDetailEntity>> searchByPlate(
     String plate,
   );
+
+  /// Sets the diagnostic solution (workshop representative).
+  ///
+  /// Returns [Right] with success message on success,
+  /// or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, String>> setSolution({
+    required String diagnosticId,
+    required String solution,
+  });
 }

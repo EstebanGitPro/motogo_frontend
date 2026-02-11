@@ -24,7 +24,7 @@ abstract class BranchScheduleDataSource {
   /// [active] - Whether the schedule is active.
   /// [startDate] - Start date of validity (YYYY-MM-DD).
   /// [endDate] - End date of validity (null = indefinite).
-  Future<Either<ErrorModel, ScheduleModel>> updateSchedule(
+  Future<Either<ErrorModel, (ScheduleModel, String)>> updateSchedule(
     String branchId, {
     bool? active,
     DateTime? startDate,
@@ -57,7 +57,8 @@ abstract class BranchScheduleDataSource {
   );
 
   /// Creates a new time slot for a day.
-  Future<Either<ErrorModel, ScheduleDetailModel>> createScheduleDetail(
+  Future<Either<ErrorModel, (ScheduleDetailModel, String)>>
+  createScheduleDetail(
     String branchId, {
     required int dayOfWeek,
     required String openingTime,

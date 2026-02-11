@@ -97,7 +97,7 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleModel>> updateSchedule(
+  Future<Either<ErrorModel, (ScheduleModel, String)>> updateSchedule(
     String branchId, {
     bool? active,
     DateTime? startDate,
@@ -122,13 +122,16 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
+        final message =
+            responseData['message'] as String? ??
+            ScheduleConstants.scheduleUpdated;
         final data = responseData['data'] as Map<String, dynamic>?;
         if (data != null) {
-          return Right(ScheduleModel.fromJson(data));
+          return Right((ScheduleModel.fromJson(data), message));
         }
 
         // Fallback: return with provided values
-        return Right(
+        return Right((
           ScheduleModel(
             id: '',
             branchId: branchId,
@@ -136,7 +139,8 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
             startDate: startDate,
             endDate: endDate,
           ),
-        );
+          message,
+        ));
       }
 
       return Left(
@@ -355,7 +359,8 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleDetailModel>> createScheduleDetail(
+  Future<Either<ErrorModel, (ScheduleDetailModel, String)>>
+  createScheduleDetail(
     String branchId, {
     required int dayOfWeek,
     required String openingTime,
@@ -383,9 +388,12 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
+        final message =
+            responseData['message'] as String? ??
+            ScheduleConstants.timeSlotCreated;
         final data = responseData['data'] as Map<String, dynamic>?;
         if (data != null) {
-          return Right(ScheduleDetailModel.fromJson(data));
+          return Right((ScheduleDetailModel.fromJson(data), message));
         }
       }
 

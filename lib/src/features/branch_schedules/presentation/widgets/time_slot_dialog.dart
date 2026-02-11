@@ -112,7 +112,7 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
     if (!_isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('La hora de apertura debe ser anterior a la de cierre'),
+          content: Text(ScheduleConstants.validationOpeningBeforeClosing),
           backgroundColor: Colors.red,
         ),
       );

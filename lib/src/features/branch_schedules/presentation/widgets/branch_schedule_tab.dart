@@ -346,7 +346,7 @@ class _BranchScheduleContent extends StatelessWidget {
               onPressed: () {
                 context.read<BranchScheduleBloc>().add(LoadSchedule(branchId));
               },
-              child: const Text('Reintentar'),
+              child: const Text(ScheduleConstants.retry),
             ),
           ],
         ),

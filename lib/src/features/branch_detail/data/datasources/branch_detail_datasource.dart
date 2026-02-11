@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart';
+import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -42,7 +44,7 @@ class BranchDetailDataSourceImpl implements BranchDetailDataSource {
 
         return Left(
           ErrorModel(
-            message: 'No se encontró información del taller',
+            message: BranchDetailConstants.workshopNotFound,
             errorCode: 'WORKSHOP_NOT_FOUND',
           ),
         );
@@ -50,7 +52,7 @@ class BranchDetailDataSourceImpl implements BranchDetailDataSource {
 
       return Left(
         ErrorModel(
-          message: 'Respuesta inválida del servidor',
+          message: FallbackMessages.invalidResponse,
           errorCode: 'INVALID_RESPONSE',
         ),
       );

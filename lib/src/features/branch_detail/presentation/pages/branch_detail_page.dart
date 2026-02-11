@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -86,7 +87,7 @@ class _BranchDetailView extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Volver'),
+              child: const Text(BranchDetailConstants.buttonBack),
             ),
           ],
         ),
@@ -105,7 +106,7 @@ class _BranchDetailView extends StatelessWidget {
                 _buildHeader(state.detail),
                 _buildInfoCard(state.detail, state.isOpenNow),
                 _buildContactSection(state.detail),
-                _buildScheduleSection(state.schedules),
+                _buildScheduleSection(state.schedules, state.exceptions),
                 _buildServicesSection(state.services),
                 const SizedBox(height: 100), // Space for bottom buttons
               ],
@@ -212,7 +213,7 @@ class _BranchDetailView extends StatelessWidget {
                 child: Text(
                   detail.fullAddress.isNotEmpty
                       ? detail.fullAddress
-                      : 'Dirección no disponible',
+                      : BranchDetailConstants.addressNotAvailable,
                   style: TextStyle(color: Colors.grey[700], fontSize: 14),
                 ),
               ),
@@ -224,17 +225,23 @@ class _BranchDetailView extends StatelessWidget {
   }
 
   Widget _buildTypeBadge(BranchDetailEntity detail) {
-    final isWorkshop = detail.isWorkshop;
+    final Color badgeColor;
+    if (detail.isWorkshop) {
+      badgeColor = Colors.blue;
+    } else if (detail.isWorkshopStore) {
+      badgeColor = Colors.indigo;
+    } else {
+      badgeColor = Colors.green;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: isWorkshop ? Colors.blue : Colors.green,
+        color: badgeColor,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
-        isWorkshop
-            ? BranchDetailConstants.typeWorkshop
-            : BranchDetailConstants.typeStore,
+        detail.displayTypeLabel,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 12,
@@ -294,7 +301,10 @@ class _BranchDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildScheduleSection(List<ScheduleDetailEntity> schedules) {
+  Widget _buildScheduleSection(
+    List<ScheduleDetailEntity> schedules,
+    List<ScheduleExceptionEntity> exceptions,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -320,14 +330,17 @@ class _BranchDetailView extends StatelessWidget {
                     BranchDetailConstants.noScheduleAvailable,
                     style: TextStyle(color: Colors.grey[600]),
                   )
-                : Column(children: _buildScheduleRows(schedules)),
+                : Column(children: _buildScheduleRows(schedules, exceptions)),
           ),
         ],
       ),
     );
   }
 
-  List<Widget> _buildScheduleRows(List<ScheduleDetailEntity> schedules) {
+  List<Widget> _buildScheduleRows(
+    List<ScheduleDetailEntity> schedules,
+    List<ScheduleExceptionEntity> exceptions,
+  ) {
     // Group by day and sort
     final grouped = <int, ScheduleDetailEntity>{};
     for (final schedule in schedules) {
@@ -338,10 +351,27 @@ class _BranchDetailView extends StatelessWidget {
 
     final sortedDays = grouped.keys.toList()..sort();
     final now = DateTime.now();
+    final todayOnly = DateTime(now.year, now.month, now.day);
+
+    // Check if today has an active closed exception
+    final hasTodayException = exceptions.any((e) {
+      if (!e.active || !e.isClosed) return false;
+      final startDate = DateTime.tryParse(e.exceptionStartDate);
+      final endDate = DateTime.tryParse(e.exceptionEndDate);
+      if (startDate == null || endDate == null) return false;
+      final startOnly = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      );
+      final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
+      return !todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly);
+    });
 
     return sortedDays.map((day) {
       final schedule = grouped[day]!;
       final isToday = day == now.weekday;
+      final showException = isToday && hasTodayException;
 
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
@@ -361,11 +391,17 @@ class _BranchDetailView extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                schedule.isClosed
+                showException
+                    ? BranchDetailConstants.statusClosedException
+                    : schedule.isClosed
                     ? BranchDetailConstants.dayClosed
                     : '${schedule.openingTime} - ${schedule.closingTime}',
                 style: TextStyle(
-                  color: schedule.isClosed ? Colors.grey : Colors.black87,
+                  color: showException
+                      ? Colors.orange[700]
+                      : schedule.isClosed
+                      ? Colors.grey
+                      : Colors.black87,
                   fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                 ),
               ),

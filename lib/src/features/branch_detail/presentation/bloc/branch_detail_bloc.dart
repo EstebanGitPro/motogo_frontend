@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
 
 part 'branch_detail_event.dart';
@@ -35,6 +36,7 @@ class BranchDetailBloc extends Bloc<BranchDetailEvent, BranchDetailState> {
           detail: fullDetail.detail,
           services: fullDetail.services,
           schedules: fullDetail.schedules,
+          exceptions: fullDetail.exceptions,
           isOpenNow: fullDetail.isOpenNow,
         ),
       ),

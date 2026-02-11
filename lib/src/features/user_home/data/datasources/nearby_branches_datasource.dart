@@ -36,7 +36,7 @@ class NearbyBranchesDataSourceImpl implements NearbyBranchesDataSource {
       };
 
       if (type != null && type.isNotEmpty) {
-        queryParams['type'] = type;
+        queryParams['type'] = _mapTypeToBackend(type);
       }
 
       final response = await _dioClient.get(
@@ -70,6 +70,23 @@ class NearbyBranchesDataSourceImpl implements NearbyBranchesDataSource {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
       return DioErrorHandler.handleException(e);
+    }
+  }
+
+  /// Maps frontend type to backend establishment type.
+  ///
+  /// The backend expects WORKSHOP, STORE, or WORKSHOP_STORE.
+  /// The frontend uses taller, tienda, or taller_tienda internally.
+  static String _mapTypeToBackend(String type) {
+    switch (type) {
+      case 'taller':
+        return 'WORKSHOP';
+      case 'tienda':
+        return 'STORE';
+      case 'taller_tienda':
+        return 'WORKSHOP_STORE';
+      default:
+        return type; // Pass through if already in backend format
     }
   }
 }

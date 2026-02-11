@@ -21,9 +21,15 @@ void main() {
     });
 
     test('should return error for invalid email format', () {
-      expect(validator.validate('invalid-email'), ValidationMessages.invalidEmail);
+      expect(
+        validator.validate('invalid-email'),
+        ValidationMessages.invalidEmail,
+      );
       expect(validator.validate('test@'), ValidationMessages.invalidEmail);
-      expect(validator.validate('@domain.com'), ValidationMessages.invalidEmail);
+      expect(
+        validator.validate('@domain.com'),
+        ValidationMessages.invalidEmail,
+      );
     });
 
     test('should use custom message when provided', () {
@@ -50,15 +56,24 @@ void main() {
     });
 
     test('should return error for short password', () {
-      expect(validator.validate('Pass123'), ValidationMessages.passwordMinLength);
+      expect(
+        validator.validate('Pass123'),
+        ValidationMessages.passwordMinLength,
+      );
     });
 
     test('should return error for missing uppercase', () {
-      expect(validator.validate('password123'), ValidationMessages.passwordUppercase);
+      expect(
+        validator.validate('password123'),
+        ValidationMessages.passwordUppercase,
+      );
     });
 
     test('should return error for missing lowercase', () {
-      expect(validator.validate('PASSWORD123'), ValidationMessages.passwordLowercase);
+      expect(
+        validator.validate('PASSWORD123'),
+        ValidationMessages.passwordLowercase,
+      );
     });
 
     test('should return error for missing number', () {
@@ -72,7 +87,10 @@ void main() {
         requireLowercase: false,
         requireNumber: false,
       );
-      expect(customValidator.validate('pass'), ValidationMessages.passwordMinLength);
+      expect(
+        customValidator.validate('pass'),
+        ValidationMessages.passwordMinLength,
+      );
       expect(customValidator.validate('password'), isNull);
     });
   });
@@ -129,7 +147,10 @@ void main() {
     });
 
     test('should return error for non-numeric identity', () {
-      expect(validator.validate('12345abc'), ValidationMessages.identityInvalid);
+      expect(
+        validator.validate('12345abc'),
+        ValidationMessages.identityInvalid,
+      );
       expect(validator.validate('abcdef'), ValidationMessages.identityInvalid);
     });
 
@@ -163,7 +184,10 @@ void main() {
 
     test('should return error for invalid phone format', () {
       expect(validator.validate('123'), ValidationMessages.phoneInvalid);
-      expect(validator.validate('123-456-7890'), ValidationMessages.phoneInvalid);
+      expect(
+        validator.validate('123-456-7890'),
+        ValidationMessages.phoneInvalid,
+      );
       expect(validator.validate('abcdefghij'), ValidationMessages.phoneInvalid);
     });
   });
@@ -176,7 +200,10 @@ void main() {
 
     test('should return error when passwords do not match', () {
       final validator = ConfirmPasswordValidator('password123');
-      expect(validator.validate('different'), ValidationMessages.passwordMismatch);
+      expect(
+        validator.validate('different'),
+        ValidationMessages.passwordMismatch,
+      );
     });
 
     test('should return error for empty confirmation', () {
@@ -201,7 +228,10 @@ void main() {
         const MinLengthValidator(10),
       ];
       final composer = ValidatorComposer(validators);
-      expect(composer.validate('hi'), ValidationMessages.minLengthWithValue(10));
+      expect(
+        composer.validate('hi'),
+        ValidationMessages.minLengthWithValue(10),
+      );
     });
   });
 

@@ -37,68 +37,55 @@ class MockProfileImageRepository extends _i1.Mock
   }
 
   @override
-  _i3.Future<
-      _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>> updateProfileImage(
-    String? motorcycleId,
-    String? imageUrl,
-  ) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>
+  updateProfileImage(String? motorcycleId, String? imageUrl) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #updateProfileImage,
-          [
-            motorcycleId,
-            imageUrl,
-          ],
-        ),
-        returnValue: _i3
-            .Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>(
-          this,
-          Invocation.method(
-            #updateProfileImage,
-            [
-              motorcycleId,
-              imageUrl,
-            ],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>);
+            Invocation.method(#updateProfileImage, [motorcycleId, imageUrl]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>
+                  >(
+                    this,
+                    Invocation.method(#updateProfileImage, [
+                      motorcycleId,
+                      imageUrl,
+                    ]),
+                  ),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>);
 
   @override
-  _i3.Future<
-      _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>> getProfileImage(
-          String? motorcycleId) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>
+  getProfileImage(String? motorcycleId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getProfileImage,
-          [motorcycleId],
-        ),
-        returnValue: _i3
-            .Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>(
-          this,
-          Invocation.method(
-            #getProfileImage,
-            [motorcycleId],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>);
+            Invocation.method(#getProfileImage, [motorcycleId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>
+                  >(this, Invocation.method(#getProfileImage, [motorcycleId])),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ProfileImageEntity>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> deleteProfileImage(
-          String? motorcycleId) =>
+    String? motorcycleId,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteProfileImage,
-          [motorcycleId],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #deleteProfileImage,
-            [motorcycleId],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#deleteProfileImage, [motorcycleId]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#deleteProfileImage, [motorcycleId]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

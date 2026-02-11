@@ -41,24 +41,14 @@ class MockLoginDataSource extends _i1.Mock implements _i2.LoginDataSource {
     String? password,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #loginPerson,
-          [
-            email,
-            password,
-          ],
-        ),
-        returnValue:
-            _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>.value(
-                _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>(
-          this,
-          Invocation.method(
-            #loginPerson,
-            [
-              email,
-              password,
-            ],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>);
+            Invocation.method(#loginPerson, [email, password]),
+            returnValue:
+                _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>.value(
+                  _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>(
+                    this,
+                    Invocation.method(#loginPerson, [email, password]),
+                  ),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>);
 }

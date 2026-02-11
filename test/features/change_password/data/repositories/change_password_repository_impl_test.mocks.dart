@@ -41,27 +41,21 @@ class MockChangePasswordDataSource extends _i1.Mock
     required String? token,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #changePassword,
-          [],
-          {
-            #currentPassword: currentPassword,
-            #newPassword: newPassword,
-            #token: token,
-          },
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #changePassword,
-            [],
-            {
+            Invocation.method(#changePassword, [], {
               #currentPassword: currentPassword,
               #newPassword: newPassword,
               #token: token,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            }),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#changePassword, [], {
+                  #currentPassword: currentPassword,
+                  #newPassword: newPassword,
+                  #token: token,
+                }),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

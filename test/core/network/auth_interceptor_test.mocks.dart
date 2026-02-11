@@ -37,20 +37,17 @@ class MockRefreshTokenDataSource extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>> refreshToken(
-          String? refreshToken) =>
+    String? refreshToken,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #refreshToken,
-          [refreshToken],
-        ),
-        returnValue:
-            _i3.Future<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>.value(
-                _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>(
-          this,
-          Invocation.method(
-            #refreshToken,
-            [refreshToken],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>);
+            Invocation.method(#refreshToken, [refreshToken]),
+            returnValue:
+                _i3.Future<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>.value(
+                  _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>(
+                    this,
+                    Invocation.method(#refreshToken, [refreshToken]),
+                  ),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.TokenResponse>>);
 }

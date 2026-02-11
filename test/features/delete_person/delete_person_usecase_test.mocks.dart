@@ -37,17 +37,13 @@ class MockDeletePersonRepository extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> deleteAccount() =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteAccount,
-          [],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #deleteAccount,
-            [],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#deleteAccount, []),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#deleteAccount, []),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

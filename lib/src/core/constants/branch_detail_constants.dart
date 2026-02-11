@@ -14,6 +14,7 @@ class BranchDetailConstants {
   static const String statusOpen = 'Abierto ahora';
   static const String statusClosed = 'Cerrado';
   static const String statusClosedToday = 'Cerrado hoy';
+  static const String statusClosedException = 'Cerrado (Excepción)';
 
   // Days of the week (with format: "Day: HH:mm - HH:mm")
   static const String dayToday = '(Hoy)';
@@ -52,4 +53,14 @@ class BranchDetailConstants {
   // Type labels
   static const String typeWorkshop = 'TALLER';
   static const String typeStore = 'TIENDA';
+
+  // Datasource fallback messages
+  static const String workshopNotFound =
+      'No se encontró información del taller';
+
+  // Navigation
+  static const String buttonBack = 'Volver';
+
+  // Address fallback
+  static const String addressNotAvailable = 'Dirección no disponible';
 }

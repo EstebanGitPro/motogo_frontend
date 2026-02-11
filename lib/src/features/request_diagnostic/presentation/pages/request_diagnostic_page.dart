@@ -68,6 +68,16 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
             context,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
+        // Handle permission toggle feedback
+        if (state is RequestDiagnosticLoaded &&
+            state.permissionMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.permissionMessage!),
+              backgroundColor: Colors.green[600],
+            ),
+          );
+        }
         // Handle success: open WhatsApp
         if (state is RequestDiagnosticLoaded && state.successMessage != null) {
           _openWhatsApp(context, state);

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/usecase/create_diagnostic_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/list_permissions_usecase.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
@@ -27,6 +28,7 @@ class RequestDiagnosticBloc
   final GetEvidenceUseCase _getEvidenceUseCase;
   final CreateDiagnosticUseCase _createDiagnosticUseCase;
   final GrantPermissionUseCase _grantPermissionUseCase;
+  final ListPermissionsUseCase _listPermissionsUseCase;
 
   /// Maximum number of photos allowed.
   static const int maxPhotos = 4;
@@ -38,12 +40,14 @@ class RequestDiagnosticBloc
     required GetEvidenceUseCase getEvidenceUseCase,
     required CreateDiagnosticUseCase createDiagnosticUseCase,
     required GrantPermissionUseCase grantPermissionUseCase,
+    required ListPermissionsUseCase listPermissionsUseCase,
   }) : _getMyMotorcyclesUseCase = getMyMotorcyclesUseCase,
        _uploadEvidenceUseCase = uploadEvidenceUseCase,
        _deleteEvidenceUseCase = deleteEvidenceUseCase,
        _getEvidenceUseCase = getEvidenceUseCase,
        _createDiagnosticUseCase = createDiagnosticUseCase,
        _grantPermissionUseCase = grantPermissionUseCase,
+       _listPermissionsUseCase = listPermissionsUseCase,
        super(const RequestDiagnosticInitial()) {
     on<InitializeRequest>(_onInitializeRequest);
     on<SelectMotorcycle>(_onSelectMotorcycle);
@@ -117,6 +121,13 @@ class RequestDiagnosticBloc
         );
       },
     );
+
+    // Hydrate permission toggle from backend
+    await _hydratePermissionState(
+      motorcycleId: motorcycleId,
+      branchId: event.branchId,
+      emit: emit,
+    );
   }
 
   Future<void> _onSelectMotorcycle(
@@ -182,6 +193,13 @@ class RequestDiagnosticBloc
           ),
         );
       },
+    );
+
+    // Hydrate permission toggle from backend
+    await _hydratePermissionState(
+      motorcycleId: motorcycleId,
+      branchId: currentState.branchId,
+      emit: emit,
     );
   }
 
@@ -330,17 +348,83 @@ class RequestDiagnosticBloc
     );
   }
 
-  void _onTogglePermission(
+  /// Fetches existing permission state from the backend and updates the toggle.
+  ///
+  /// If no permission row exists for this motorcycle+branch, defaults to false.
+  Future<void> _hydratePermissionState({
+    required String motorcycleId,
+    required String branchId,
+    required Emitter<RequestDiagnosticState> emit,
+  }) async {
+    final currentState = state;
+    if (currentState is! RequestDiagnosticLoaded) return;
+
+    final permResult = await _listPermissionsUseCase(
+      motorcycleId: motorcycleId,
+    );
+
+    if (permResult.isRight) {
+      final permissions = permResult.right;
+      // Find the permission for this specific branch
+      final matchingPerm = permissions
+          .where((p) => p.branchId == branchId)
+          .toList();
+
+      final isActive = matchingPerm.isNotEmpty
+          ? matchingPerm.first.active
+          : false;
+
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(latestState.copyWith(isPermissionGranted: isActive));
+      }
+    }
+    // On error, keep the current default (false)
+  }
+
+  /// Toggles the permission and immediately calls the API to persist the change.
+  ///
+  /// The toggle fires independently from the form submit so the user can
+  /// grant/revoke lookup permission without re-sending the WhatsApp message.
+  Future<void> _onTogglePermission(
     TogglePermission event,
     Emitter<RequestDiagnosticState> emit,
-  ) {
+  ) async {
     final currentState = state;
-    if (currentState is RequestDiagnosticLoaded) {
-      emit(
-        currentState.copyWith(
-          isPermissionGranted: !currentState.isPermissionGranted,
-        ),
-      );
+    if (currentState is! RequestDiagnosticLoaded) return;
+    if (currentState.selectedMotorcycle == null) return;
+    final motorcycleId = currentState.selectedMotorcycle!.id;
+    if (motorcycleId == null) return;
+
+    final newValue = !currentState.isPermissionGranted;
+
+    // Optimistic UI update
+    emit(currentState.copyWith(isPermissionGranted: newValue));
+
+    // Fire API call — non-blocking, but rollback on failure
+    final result = await _grantPermissionUseCase(
+      motorcycleId: motorcycleId,
+      branchId: currentState.branchId,
+      active: newValue,
+    );
+
+    if (result.isLeft) {
+      // Rollback on failure
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(
+          latestState.copyWith(
+            isPermissionGranted: !newValue,
+            errorMessage: result.left.message,
+          ),
+        );
+      }
+    } else {
+      // Show backend success message
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(latestState.copyWith(permissionMessage: result.right.message));
+      }
     }
   }
 
@@ -374,26 +458,7 @@ class RequestDiagnosticBloc
       return;
     }
 
-    // Step 2: Auto-grant permission if switch is on
-    if (currentState.isPermissionGranted) {
-      final permissionResult = await _grantPermissionUseCase(
-        motorcycleId: motorcycleId,
-        branchId: currentState.branchId,
-      );
-
-      if (permissionResult.isLeft) {
-        // Permission failed but diagnostic was created — don't block WhatsApp
-        emit(
-          currentState.copyWith(
-            isSubmitting: false,
-            errorMessage: permissionResult.left.message,
-          ),
-        );
-        return;
-      }
-    }
-
-    // Step 3: Ready for WhatsApp — the page will handle opening it
+    // Step 2: Ready for WhatsApp — the page will handle opening it
     emit(
       currentState.copyWith(
         isSubmitting: false,

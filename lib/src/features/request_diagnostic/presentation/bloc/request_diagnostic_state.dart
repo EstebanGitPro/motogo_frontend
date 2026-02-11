@@ -48,6 +48,7 @@ class RequestDiagnosticLoaded extends RequestDiagnosticState {
   final bool isSubmitting;
   final String? errorMessage;
   final String? successMessage;
+  final String? permissionMessage;
   final bool hasLoadedEvidence;
 
   const RequestDiagnosticLoaded({
@@ -58,11 +59,12 @@ class RequestDiagnosticLoaded extends RequestDiagnosticState {
     this.selectedMotorcycle,
     this.problemDescription = '',
     this.uploadedEvidence = const [],
-    this.isPermissionGranted = true,
+    this.isPermissionGranted = false,
     this.isUploadingPhoto = false,
     this.isSubmitting = false,
     this.errorMessage,
     this.successMessage,
+    this.permissionMessage,
     this.hasLoadedEvidence = false,
   });
 
@@ -108,6 +110,7 @@ $photosInfo
     bool? isSubmitting,
     String? errorMessage,
     String? successMessage,
+    String? permissionMessage,
     bool clearError = false,
     bool? hasLoadedEvidence,
   }) {
@@ -124,6 +127,7 @@ $photosInfo
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       successMessage: successMessage,
+      permissionMessage: permissionMessage,
       hasLoadedEvidence: hasLoadedEvidence ?? this.hasLoadedEvidence,
     );
   }
@@ -142,6 +146,7 @@ $photosInfo
     isSubmitting,
     errorMessage,
     successMessage,
+    permissionMessage,
     hasLoadedEvidence,
   ];
 }

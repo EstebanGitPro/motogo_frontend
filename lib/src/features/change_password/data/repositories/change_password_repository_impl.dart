@@ -1,4 +1,5 @@
 import 'package:either_dart/either.dart';
+import 'package:motogo_frontend/src/core/constants/change_password_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/features/change_password/data/datasources/change_password_data_source.dart';
@@ -17,7 +18,7 @@ class ChangePasswordRepositoryImpl implements ChangePasswordRepository {
     final token = UserSessionManager.instance.accessToken;
 
     if (token == null) {
-      return Left(ErrorModel(message: 'No hay sesión activa'));
+      return Left(ErrorModel(message: ChangePasswordConstants.noActiveSession));
     }
 
     return _dataSource.changePassword(

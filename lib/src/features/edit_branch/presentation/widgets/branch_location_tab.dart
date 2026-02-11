@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
+import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/config/secrets.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/geocoding/data/datasources/geocoding_data_source.dart';
@@ -181,9 +182,7 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
 
     final lat = _geocodingResult!.latitude;
     final lng = _geocodingResult!.longitude;
-    final url = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
-    );
+    final url = Uri.parse(Config.googleMapsSearchUrl(lat, lng));
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);

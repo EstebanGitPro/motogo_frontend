@@ -4,11 +4,13 @@ import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic
 class DiagnosticEvidenceModel {
   final String id;
   final String imageUrl;
+  final String? description;
   final String createdAt;
 
   const DiagnosticEvidenceModel({
     required this.id,
     required this.imageUrl,
+    this.description,
     required this.createdAt,
   });
 
@@ -16,6 +18,7 @@ class DiagnosticEvidenceModel {
     return DiagnosticEvidenceModel(
       id: json['id'] as String? ?? '',
       imageUrl: json['image_url'] as String? ?? '',
+      description: json['description'] as String?,
       createdAt: json['created_at'] as String? ?? '',
     );
   }
@@ -24,6 +27,7 @@ class DiagnosticEvidenceModel {
     return DiagnosticEvidenceEntity(
       id: id,
       imageUrl: imageUrl,
+      description: description,
       createdAt: DateTime.tryParse(createdAt) ?? DateTime.now(),
     );
   }
@@ -35,6 +39,7 @@ class DiagnosticModel {
   final String motorcycleId;
   final String? branchId;
   final String problemDescription;
+  final String? possibleSolution;
   final String date;
   final bool sentViaWhatsapp;
   final List<DiagnosticEvidenceModel> evidence;
@@ -44,6 +49,7 @@ class DiagnosticModel {
     required this.motorcycleId,
     this.branchId,
     required this.problemDescription,
+    this.possibleSolution,
     required this.date,
     this.sentViaWhatsapp = false,
     this.evidence = const [],
@@ -58,6 +64,7 @@ class DiagnosticModel {
       motorcycleId: source['motorcycle_id'] as String? ?? '',
       branchId: source['branch_id'] as String?,
       problemDescription: source['problem_description'] as String? ?? '',
+      possibleSolution: source['possible_solution'] as String?,
       date: source['date'] as String? ?? '',
       sentViaWhatsapp: source['sent_via_whatsapp'] as bool? ?? false,
       evidence: _parseEvidence(source['evidence']),
@@ -71,6 +78,7 @@ class DiagnosticModel {
       motorcycleId: json['motorcycle_id'] as String? ?? '',
       branchId: json['branch_id'] as String?,
       problemDescription: json['problem_description'] as String? ?? '',
+      possibleSolution: json['possible_solution'] as String?,
       date: json['date'] as String? ?? '',
       sentViaWhatsapp: json['sent_via_whatsapp'] as bool? ?? false,
       evidence: _parseEvidence(json['evidence']),
@@ -91,6 +99,7 @@ class DiagnosticModel {
       motorcycleId: motorcycleId,
       branchId: branchId,
       problemDescription: problemDescription,
+      possibleSolution: possibleSolution,
       date: DateTime.tryParse(date) ?? DateTime.now(),
       sentViaWhatsapp: sentViaWhatsapp,
       evidence: evidence.map((e) => e.toEntity()).toList(),

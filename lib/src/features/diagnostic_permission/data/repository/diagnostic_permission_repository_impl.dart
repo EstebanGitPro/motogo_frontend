@@ -2,6 +2,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/data/datasource/diagnostic_permission_datasource.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/entity/diagnostic_permission_entity.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/entity/permission_grant_result.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/repository/diagnostic_permission_repository.dart';
 
 class DiagnosticPermissionRepositoryImpl
@@ -11,18 +12,25 @@ class DiagnosticPermissionRepositoryImpl
   DiagnosticPermissionRepositoryImpl(this._dataSource);
 
   @override
-  Future<Either<ErrorModel, DiagnosticPermissionEntity>> grantPermission({
+  Future<Either<ErrorModel, PermissionGrantResult>> grantPermission({
     required String motorcycleId,
     required String branchId,
+    required bool active,
   }) async {
     final result = await _dataSource.grantPermission(
       motorcycleId: motorcycleId,
       branchId: branchId,
+      active: active,
     );
 
     return result.fold(
       (error) => Left(error),
-      (response) => Right(response.model.toEntity()),
+      (response) => Right(
+        PermissionGrantResult(
+          permission: response.model.toEntity(),
+          message: response.message,
+        ),
+      ),
     );
   }
 

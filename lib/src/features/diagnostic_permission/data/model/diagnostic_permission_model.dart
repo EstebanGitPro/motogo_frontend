@@ -6,6 +6,7 @@ class DiagnosticPermissionModel {
   final String motorcycleId;
   final String branchId;
   final String? branchName;
+  final bool active;
   final String grantedAt;
 
   const DiagnosticPermissionModel({
@@ -13,6 +14,7 @@ class DiagnosticPermissionModel {
     required this.motorcycleId,
     required this.branchId,
     this.branchName,
+    this.active = true,
     required this.grantedAt,
   });
 
@@ -25,6 +27,7 @@ class DiagnosticPermissionModel {
       motorcycleId: source['motorcycle_id'] as String? ?? '',
       branchId: source['branch_id'] as String? ?? '',
       branchName: source['branch_name'] as String?,
+      active: source['active'] as bool? ?? true,
       grantedAt: source['granted_at'] as String? ?? '',
     );
   }
@@ -35,6 +38,7 @@ class DiagnosticPermissionModel {
       motorcycleId: json['motorcycle_id'] as String? ?? '',
       branchId: json['branch_id'] as String? ?? '',
       branchName: json['branch_name'] as String?,
+      active: json['active'] as bool? ?? true,
       grantedAt: json['granted_at'] as String? ?? '',
     );
   }
@@ -45,6 +49,7 @@ class DiagnosticPermissionModel {
       motorcycleId: motorcycleId,
       branchId: branchId,
       branchName: branchName,
+      active: active,
       grantedAt: DateTime.tryParse(grantedAt) ?? DateTime.now(),
     );
   }

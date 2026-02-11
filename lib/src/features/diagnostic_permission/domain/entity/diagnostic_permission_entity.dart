@@ -6,6 +6,7 @@ class DiagnosticPermissionEntity extends Equatable {
   final String motorcycleId;
   final String branchId;
   final String? branchName;
+  final bool active;
   final DateTime grantedAt;
 
   const DiagnosticPermissionEntity({
@@ -13,6 +14,7 @@ class DiagnosticPermissionEntity extends Equatable {
     required this.motorcycleId,
     required this.branchId,
     this.branchName,
+    this.active = true,
     required this.grantedAt,
   });
 
@@ -22,6 +24,7 @@ class DiagnosticPermissionEntity extends Equatable {
     motorcycleId,
     branchId,
     branchName,
+    active,
     grantedAt,
   ];
 }

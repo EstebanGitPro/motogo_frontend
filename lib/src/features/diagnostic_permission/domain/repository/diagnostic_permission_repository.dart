@@ -1,13 +1,15 @@
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/entity/diagnostic_permission_entity.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/entity/permission_grant_result.dart';
 
 /// Repository interface for diagnostic permission operations.
 abstract class DiagnosticPermissionRepository {
   /// Grants a branch permission to access a motorcycle.
-  Future<Either<ErrorModel, DiagnosticPermissionEntity>> grantPermission({
+  Future<Either<ErrorModel, PermissionGrantResult>> grantPermission({
     required String motorcycleId,
     required String branchId,
+    required bool active,
   });
 
   /// Lists all granted permissions for a motorcycle.

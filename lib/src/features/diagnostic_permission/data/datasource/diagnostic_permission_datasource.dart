@@ -21,6 +21,7 @@ abstract class DiagnosticPermissionDataSource {
   Future<Either<ErrorModel, PermissionGrantResponse>> grantPermission({
     required String motorcycleId,
     required String branchId,
+    required bool active,
   });
 
   /// Lists all granted permissions for a motorcycle.
@@ -49,11 +50,12 @@ class DiagnosticPermissionDataSourceImpl
   Future<Either<ErrorModel, PermissionGrantResponse>> grantPermission({
     required String motorcycleId,
     required String branchId,
+    required bool active,
   }) async {
     try {
       final response = await _dioClient.post(
         '/motorcycles/$motorcycleId/permissions',
-        data: {'branch_id': branchId},
+        data: {'branch_id': branchId, 'active': active},
       );
       final responseData = response.data;
 

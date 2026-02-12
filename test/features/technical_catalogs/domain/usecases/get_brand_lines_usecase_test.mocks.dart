@@ -37,23 +37,18 @@ class MockBrandLinesRepository extends _i1.Mock
   }
 
   @override
-  _i3.Future<
-      _i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>> getBrandLines(
-          String? brandId) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>>
+  getBrandLines(String? brandId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #getBrandLines,
-          [brandId],
-        ),
-        returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>>.value(
-            _i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>>(
-          this,
-          Invocation.method(
-            #getBrandLines,
-            [brandId],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>>);
+            Invocation.method(#getBrandLines, [brandId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>
+                  >(this, Invocation.method(#getBrandLines, [brandId])),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandLineEntity>>>);
 }

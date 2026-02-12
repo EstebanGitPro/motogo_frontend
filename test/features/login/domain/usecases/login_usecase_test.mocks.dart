@@ -41,24 +41,14 @@ class MockLoginRepository extends _i1.Mock implements _i2.LoginRepository {
     String? password,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #login,
-          [
-            email,
-            password,
-          ],
-        ),
-        returnValue:
-            _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>.value(
-                _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>(
-          this,
-          Invocation.method(
-            #login,
-            [
-              email,
-              password,
-            ],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>);
+            Invocation.method(#login, [email, password]),
+            returnValue:
+                _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>.value(
+                  _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>(
+                    this,
+                    Invocation.method(#login, [email, password]),
+                  ),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.LoginResult>>);
 }

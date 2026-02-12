@@ -19,4 +19,15 @@ class SearchMotorcycleRepositoryImpl implements SearchMotorcycleRepository {
     final result = await _dataSource.searchByPlate(plate);
     return result.map((model) => model.toEntity());
   }
+
+  @override
+  Future<Either<ErrorModel, String>> setSolution({
+    required String diagnosticId,
+    required String solution,
+  }) {
+    return _dataSource.setSolution(
+      diagnosticId: diagnosticId,
+      solution: solution,
+    );
+  }
 }

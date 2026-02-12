@@ -18,7 +18,7 @@ abstract class BranchScheduleRepository {
   );
 
   /// Updates a schedule with new values.
-  Future<Either<ErrorModel, ScheduleEntity>> updateSchedule(
+  Future<Either<ErrorModel, (ScheduleEntity, String)>> updateSchedule(
     String branchId, {
     bool? active,
     DateTime? startDate,
@@ -51,7 +51,8 @@ abstract class BranchScheduleRepository {
   );
 
   /// Creates a new time slot for a day.
-  Future<Either<ErrorModel, ScheduleDetailEntity>> createScheduleDetail(
+  Future<Either<ErrorModel, (ScheduleDetailEntity, String)>>
+  createScheduleDetail(
     String branchId, {
     required int dayOfWeek,
     required String openingTime,

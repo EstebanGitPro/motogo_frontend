@@ -37,17 +37,13 @@ class MockDeleteMotorcycleRepository extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> deleteMotorcycle(String? id) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteMotorcycle,
-          [id],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #deleteMotorcycle,
-            [id],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#deleteMotorcycle, [id]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#deleteMotorcycle, [id]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

@@ -59,7 +59,7 @@ class ScheduleExceptionCard extends StatelessWidget {
                     ),
                     if (exception.isDateRange) ...[
                       Text(
-                        ' • Rango',
+                        ' • ${ScheduleConstants.exceptionRangeLabel}',
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.orange[600],
@@ -87,39 +87,48 @@ class ScheduleExceptionCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isActive ? Colors.green[50] : Colors.grey[100],
+              color: isPast
+                  ? Colors.orange[50]
+                  : (isActive ? Colors.green[50] : Colors.grey[100]),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              isActive ? 'Activa' : 'Inactiva',
+              isPast
+                  ? ScheduleConstants.exceptionStatusExpired
+                  : (isActive
+                        ? ScheduleConstants.exceptionStatusActive
+                        : ScheduleConstants.exceptionStatusInactive),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: isActive ? Colors.green[700] : Colors.grey[600],
+                color: isPast
+                    ? Colors.orange[700]
+                    : (isActive ? Colors.green[700] : Colors.grey[600]),
               ),
             ),
           ),
           const SizedBox(width: 4),
           // Actions menu
-          if (!isPast)
-            PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, size: 20, color: Colors.grey[600]),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-              onSelected: (value) {
-                switch (value) {
-                  case 'edit':
-                    onEdit();
-                    break;
-                  case 'toggle':
-                    onToggleStatus();
-                    break;
-                  case 'delete':
-                    onDelete();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, size: 20, color: Colors.grey[600]),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+            onSelected: (value) {
+              switch (value) {
+                case 'edit':
+                  onEdit();
+                  break;
+                case 'toggle':
+                  onToggleStatus();
+                  break;
+                case 'delete':
+                  onDelete();
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              // Edit and toggle only for future exceptions
+              if (!isPast) ...[
                 PopupMenuItem<String>(
                   value: 'edit',
                   child: Row(
@@ -144,36 +153,32 @@ class ScheduleExceptionCard extends StatelessWidget {
                         color: Colors.orange[600],
                       ),
                       const SizedBox(width: 8),
-                      Text(isActive ? 'Desactivar' : 'Activar'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem<String>(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete_outline,
-                        size: 18,
-                        color: Colors.red[400],
+                      Text(
+                        isActive
+                            ? ScheduleConstants.toggleDeactivate
+                            : ScheduleConstants.toggleActivate,
                       ),
-                      const SizedBox(width: 8),
-                      const Text(ScheduleConstants.deleteException),
                     ],
                   ),
                 ),
               ],
-            )
-          else
-            // Past date - show lock icon
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.lock_outline,
-                size: 18,
-                color: Colors.grey[400],
+              // Delete always available (past exceptions can be cleaned up)
+              PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Colors.red[400],
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(ScheduleConstants.deleteException),
+                  ],
+                ),
               ),
-            ),
+            ],
+          ),
         ],
       ),
     );

@@ -19,16 +19,19 @@ class LoginDataSource {
   final UserSessionDataSource _userDataSource;
 
   // Dio instance without auth interceptor (login is public endpoint)
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: Config.baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
+  final Dio _dio;
 
-  LoginDataSource(this._userDataSource);
+  LoginDataSource(this._userDataSource, {Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: Config.baseUrl,
+              connectTimeout: const Duration(seconds: 30),
+              receiveTimeout: const Duration(seconds: 30),
+              headers: {'Content-Type': 'application/json'},
+            ),
+          );
 
   /// Realiza el login y guarda la sesión completa en UserSessionManager.
   /// Retorna un LoginResult con el usuario y el mensaje del backend.

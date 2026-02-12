@@ -139,7 +139,8 @@ class BranchInfoCard extends StatelessWidget {
   }
 
   Widget _buildTypeChip() {
-    final displayText = establishmentTypeLabel ?? branch.establishmentType;
+    final displayText =
+        establishmentTypeLabel ?? _mapTypeToLabel(branch.establishmentType);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -148,7 +149,7 @@ class BranchInfoCard extends StatelessWidget {
         border: Border.all(color: Colors.blue[200]!, width: 1),
       ),
       child: Text(
-        displayText.toUpperCase(),
+        displayText,
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -156,6 +157,20 @@ class BranchInfoCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Maps backend establishment type codes to Spanish display labels.
+  static String _mapTypeToLabel(String type) {
+    switch (type.toUpperCase()) {
+      case 'WORKSHOP':
+        return 'Taller';
+      case 'STORE':
+        return 'Tienda';
+      case 'WORKSHOP_STORE':
+        return 'Taller y Tienda';
+      default:
+        return type;
+    }
   }
 
   Widget _buildBrandChip(String brandId) {

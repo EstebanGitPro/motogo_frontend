@@ -349,11 +349,6 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
         profileImageUrl: profileImageUrl,
       );
 
-      // TODO: Remove after debugging
-      debugPrint(
-        '🏍️ [EditMoto] Saving with profileImageUrl: $profileImageUrl',
-      );
-
       bloc.add(
         UpdateMotorcycle(
           id: widget.motorcycle.id!,

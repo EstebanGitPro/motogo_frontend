@@ -22,6 +22,21 @@ class CommonConstants {
 
   // Navigation
   static const String howToGetThere = 'Cómo llegar';
+  static const String cancelRoute = 'Cancelar ruta';
+  static const String openInGoogleMaps = 'Abrir en Google Maps';
+  static const String startNavigation = 'Comenzar';
+  static const String noLocationForNavigation =
+      'No se pudo obtener tu ubicación actual';
+  static const String routeError = 'No se pudo calcular la ruta';
+  static const String loadingRoute = 'Calculando ruta...';
+  static const String estimatedTime = 'min';
+  static const String navigationDisclaimerTitle = 'Aviso de navegación';
+  static const String navigationDisclaimerBody =
+      'La navegación proporcionada es solo una referencia. '
+      'El mapa puede contener errores o información desactualizada. '
+      'Siempre respeta las señales de tránsito, semáforos y normas viales. '
+      'MotoGo no se hace responsable por infracciones de tránsito.';
+  static const String navigationDisclaimerAccept = 'Entendido';
 
   // Image picker
   static const String takePhoto = 'Tomar foto';

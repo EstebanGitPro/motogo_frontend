@@ -23,23 +23,13 @@ import 'package:motogo_frontend/src/core/network/dio_client.dart' as _i3;
 // ignore_for_file: subtype_of_sealed_class
 
 class _FakeDio_0 extends _i1.SmartFake implements _i2.Dio {
-  _FakeDio_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeDio_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 class _FakeResponse_1<T1> extends _i1.SmartFake implements _i2.Response<T1> {
-  _FakeResponse_1(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
+  _FakeResponse_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
 }
 
 /// A class which mocks [DioClient].
@@ -51,22 +41,18 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
   }
 
   @override
-  _i2.Dio get dio => (super.noSuchMethod(
-        Invocation.getter(#dio),
-        returnValue: _FakeDio_0(
-          this,
-          Invocation.getter(#dio),
-        ),
-      ) as _i2.Dio);
+  _i2.Dio get dio =>
+      (super.noSuchMethod(
+            Invocation.getter(#dio),
+            returnValue: _FakeDio_0(this, Invocation.getter(#dio)),
+          )
+          as _i2.Dio);
 
   @override
   set dio(_i2.Dio? _dio) => super.noSuchMethod(
-        Invocation.setter(
-          #dio,
-          _dio,
-        ),
-        returnValueForMissingStub: null,
-      );
+    Invocation.setter(#dio, _dio),
+    returnValueForMissingStub: null,
+  );
 
   @override
   _i4.Future<_i2.Response<T>> get<T>(
@@ -75,26 +61,23 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
     _i2.Options? options,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #get,
-          [path],
-          {
-            #queryParameters: queryParameters,
-            #options: options,
-          },
-        ),
-        returnValue: _i4.Future<_i2.Response<T>>.value(_FakeResponse_1<T>(
-          this,
-          Invocation.method(
-            #get,
-            [path],
-            {
-              #queryParameters: queryParameters,
-              #options: options,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.Response<T>>);
+            Invocation.method(
+              #get,
+              [path],
+              {#queryParameters: queryParameters, #options: options},
+            ),
+            returnValue: _i4.Future<_i2.Response<T>>.value(
+              _FakeResponse_1<T>(
+                this,
+                Invocation.method(
+                  #get,
+                  [path],
+                  {#queryParameters: queryParameters, #options: options},
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response<T>>);
 
   @override
   _i4.Future<_i2.Response<T>> post<T>(
@@ -104,28 +87,31 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
     _i2.Options? options,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #post,
-          [path],
-          {
-            #data: data,
-            #queryParameters: queryParameters,
-            #options: options,
-          },
-        ),
-        returnValue: _i4.Future<_i2.Response<T>>.value(_FakeResponse_1<T>(
-          this,
-          Invocation.method(
-            #post,
-            [path],
-            {
-              #data: data,
-              #queryParameters: queryParameters,
-              #options: options,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.Response<T>>);
+            Invocation.method(
+              #post,
+              [path],
+              {
+                #data: data,
+                #queryParameters: queryParameters,
+                #options: options,
+              },
+            ),
+            returnValue: _i4.Future<_i2.Response<T>>.value(
+              _FakeResponse_1<T>(
+                this,
+                Invocation.method(
+                  #post,
+                  [path],
+                  {
+                    #data: data,
+                    #queryParameters: queryParameters,
+                    #options: options,
+                  },
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response<T>>);
 
   @override
   _i4.Future<_i2.Response<T>> put<T>(
@@ -135,28 +121,31 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
     _i2.Options? options,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #put,
-          [path],
-          {
-            #data: data,
-            #queryParameters: queryParameters,
-            #options: options,
-          },
-        ),
-        returnValue: _i4.Future<_i2.Response<T>>.value(_FakeResponse_1<T>(
-          this,
-          Invocation.method(
-            #put,
-            [path],
-            {
-              #data: data,
-              #queryParameters: queryParameters,
-              #options: options,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.Response<T>>);
+            Invocation.method(
+              #put,
+              [path],
+              {
+                #data: data,
+                #queryParameters: queryParameters,
+                #options: options,
+              },
+            ),
+            returnValue: _i4.Future<_i2.Response<T>>.value(
+              _FakeResponse_1<T>(
+                this,
+                Invocation.method(
+                  #put,
+                  [path],
+                  {
+                    #data: data,
+                    #queryParameters: queryParameters,
+                    #options: options,
+                  },
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response<T>>);
 
   @override
   _i4.Future<_i2.Response<T>> patch<T>(
@@ -166,28 +155,31 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
     _i2.Options? options,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #patch,
-          [path],
-          {
-            #data: data,
-            #queryParameters: queryParameters,
-            #options: options,
-          },
-        ),
-        returnValue: _i4.Future<_i2.Response<T>>.value(_FakeResponse_1<T>(
-          this,
-          Invocation.method(
-            #patch,
-            [path],
-            {
-              #data: data,
-              #queryParameters: queryParameters,
-              #options: options,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.Response<T>>);
+            Invocation.method(
+              #patch,
+              [path],
+              {
+                #data: data,
+                #queryParameters: queryParameters,
+                #options: options,
+              },
+            ),
+            returnValue: _i4.Future<_i2.Response<T>>.value(
+              _FakeResponse_1<T>(
+                this,
+                Invocation.method(
+                  #patch,
+                  [path],
+                  {
+                    #data: data,
+                    #queryParameters: queryParameters,
+                    #options: options,
+                  },
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response<T>>);
 
   @override
   _i4.Future<_i2.Response<T>> delete<T>(
@@ -197,26 +189,29 @@ class MockDioClient extends _i1.Mock implements _i3.DioClient {
     _i2.Options? options,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #delete,
-          [path],
-          {
-            #data: data,
-            #queryParameters: queryParameters,
-            #options: options,
-          },
-        ),
-        returnValue: _i4.Future<_i2.Response<T>>.value(_FakeResponse_1<T>(
-          this,
-          Invocation.method(
-            #delete,
-            [path],
-            {
-              #data: data,
-              #queryParameters: queryParameters,
-              #options: options,
-            },
-          ),
-        )),
-      ) as _i4.Future<_i2.Response<T>>);
+            Invocation.method(
+              #delete,
+              [path],
+              {
+                #data: data,
+                #queryParameters: queryParameters,
+                #options: options,
+              },
+            ),
+            returnValue: _i4.Future<_i2.Response<T>>.value(
+              _FakeResponse_1<T>(
+                this,
+                Invocation.method(
+                  #delete,
+                  [path],
+                  {
+                    #data: data,
+                    #queryParameters: queryParameters,
+                    #options: options,
+                  },
+                ),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Response<T>>);
 }

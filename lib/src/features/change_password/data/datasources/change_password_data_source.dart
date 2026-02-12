@@ -22,14 +22,19 @@ abstract class ChangePasswordDataSource {
 
 class ChangePasswordDataSourceImpl implements ChangePasswordDataSource {
   // Uses its own Dio instance because it receives token as parameter
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: Config.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
+  final Dio _dio;
+
+  ChangePasswordDataSourceImpl({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: Config.baseUrl,
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 15),
+              headers: {'Content-Type': 'application/json'},
+            ),
+          );
 
   @override
   Future<Either<ErrorModel, String>> changePassword({

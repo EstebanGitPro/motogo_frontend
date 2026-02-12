@@ -98,6 +98,41 @@ void main() {
       });
     });
 
+    group('isWorkshopStore', () {
+      test('should return true when type is taller_tienda', () {
+        const entity = BranchMarkerEntity(
+          id: 'id',
+          name: 'name',
+          type: 'taller_tienda',
+          latitude: 0,
+          longitude: 0,
+        );
+        expect(entity.isWorkshopStore, isTrue);
+      });
+
+      test('should return false when type is taller', () {
+        const entity = BranchMarkerEntity(
+          id: 'id',
+          name: 'name',
+          type: 'taller',
+          latitude: 0,
+          longitude: 0,
+        );
+        expect(entity.isWorkshopStore, isFalse);
+      });
+
+      test('should return false when type is tienda', () {
+        const entity = BranchMarkerEntity(
+          id: 'id',
+          name: 'name',
+          type: 'tienda',
+          latitude: 0,
+          longitude: 0,
+        );
+        expect(entity.isWorkshopStore, isFalse);
+      });
+    });
+
     group('formattedDistance', () {
       test('should return empty string when distanceKm is null', () {
         const entity = BranchMarkerEntity(
@@ -169,6 +204,20 @@ void main() {
         );
         expect(entity.displayTypeLabel, 'Tienda');
       });
+
+      test(
+        'should return Taller y Tienda when isWorkshopStore and no typeLabel',
+        () {
+          const entity = BranchMarkerEntity(
+            id: 'id',
+            name: 'name',
+            type: 'taller_tienda',
+            latitude: 0,
+            longitude: 0,
+          );
+          expect(entity.displayTypeLabel, 'Taller y Tienda');
+        },
+      );
     });
 
     group('Equatable', () {

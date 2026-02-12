@@ -5,6 +5,7 @@ import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/delete_motorcycle/domain/usecases/delete_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_motorcycle/presentation/pages/edit_motorcycle_page.dart';
+import 'package:motogo_frontend/src/features/motorcycle_history/presentation/pages/motorcycle_history_page.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/domain/usecases/get_my_motorcycles_usecase.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/bloc/my_motorcycles_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
@@ -187,75 +188,84 @@ class _MotorcycleCard extends StatelessWidget {
       elevation: 3,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Motorcycle icon
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue[50],
-                shape: BoxShape.circle,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => _navigateToHistory(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Motorcycle icon
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.two_wheeler,
+                  size: 32,
+                  color: Colors.blue[600],
+                ),
               ),
-              child: Icon(Icons.two_wheeler, size: 32, color: Colors.blue[600]),
-            ),
-            const SizedBox(width: 16),
-            // Motorcycle details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    motorcycle.licensePlate.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  _buildDetails(),
-                  if (motorcycle.ownerNotes != null &&
-                      motorcycle.ownerNotes!.isNotEmpty) ...[
-                    const SizedBox(height: 6),
+              const SizedBox(width: 16),
+              // Motorcycle details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      '"${motorcycle.ownerNotes}"',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey[600],
+                      motorcycle.licensePlate.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 4),
+                    _buildDetails(),
+                    if (motorcycle.ownerNotes != null &&
+                        motorcycle.ownerNotes!.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        '"${motorcycle.ownerNotes}"',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.grey[600],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-            // Edit button
-            IconButton(
-              icon: Icon(Icons.edit_outlined, color: Colors.blue[600]),
-              onPressed: () async {
-                final result = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditMotorcyclePage(motorcycle: motorcycle),
-                  ),
-                );
-                if (result == true && context.mounted) {
-                  context.read<MyMotorcyclesBloc>().add(
-                    const LoadMyMotorcycles(),
+              // Edit button
+              IconButton(
+                icon: Icon(Icons.edit_outlined, color: Colors.blue[600]),
+                onPressed: () async {
+                  final result = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          EditMotorcyclePage(motorcycle: motorcycle),
+                    ),
                   );
-                }
-              },
-            ),
-            // Delete button
-            IconButton(
-              icon: Icon(Icons.delete_outline, color: Colors.red[600]),
-              onPressed: () => _confirmDelete(context),
-            ),
-          ],
+                  if (result == true && context.mounted) {
+                    context.read<MyMotorcyclesBloc>().add(
+                      const LoadMyMotorcycles(),
+                    );
+                  }
+                },
+              ),
+              // Delete button
+              IconButton(
+                icon: Icon(Icons.delete_outline, color: Colors.red[600]),
+                onPressed: () => _confirmDelete(context),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -288,6 +298,15 @@ class _MotorcycleCard extends StatelessWidget {
       return '${(mileage / 1000).toStringAsFixed(1).replaceAll('.0', '')}k';
     }
     return mileage.toString();
+  }
+
+  void _navigateToHistory(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MotorcycleHistoryPage(motorcycle: motorcycle),
+      ),
+    );
   }
 
   void _confirmDelete(BuildContext context) {

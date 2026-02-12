@@ -70,6 +70,18 @@ import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase
 // Features - Manage Franchise
 import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+// Features - Diagnostic
+import 'package:motogo_frontend/src/features/diagnostic/data/datasource/diagnostic_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic/data/repository/diagnostic_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/repository/diagnostic_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/usecase/create_diagnostic_usecase.dart';
+// Features - Diagnostic Permission
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/datasource/diagnostic_permission_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/repository/diagnostic_permission_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/repository/diagnostic_permission_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/list_permissions_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/revoke_permission_usecase.dart';
 // Features - Motorcycle Evidence
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
@@ -139,6 +151,7 @@ import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/dat
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/repositories/search_motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/repositories/search_motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/set_solution_usecase.dart';
 // Features - Technical Catalogs (HU40)
 import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/brand_lines_datasource.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
@@ -207,6 +220,11 @@ abstract class InjectorApp {
     // UserSession - has its own Dio (receives token as parameter)
     container.registerFactory<UserSessionDataSource>(
       (c) => UserSessionDataSourceImpl(),
+    );
+
+    // Login - has its own Dio (public endpoint, no auth)
+    container.registerFactory<LoginDataSource>(
+      (c) => LoginDataSource(c.resolve<UserSessionDataSource>()),
     );
 
     // FirebaseToken - uses DioClient
@@ -445,6 +463,9 @@ abstract class InjectorApp {
         c.resolve<SearchMotorcycleRepository>(),
       ),
     );
+    container.registerFactory<SetSolutionUseCase>(
+      (c) => SetSolutionUseCase(c.resolve<SearchMotorcycleRepository>()),
+    );
 
     // Technical Catalogs - Brand Lines (HU40)
     container.registerFactory<BrandLinesDataSource>(
@@ -457,6 +478,39 @@ abstract class InjectorApp {
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
     );
 
+    // Diagnostic Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticDataSource>(
+      (c) => DiagnosticDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticRepository>(
+      (c) => DiagnosticRepositoryImpl(c.resolve<DiagnosticDataSource>()),
+    );
+    container.registerFactory<CreateDiagnosticUseCase>(
+      (c) => CreateDiagnosticUseCase(c.resolve<DiagnosticRepository>()),
+    );
+
+    // Diagnostic Permission Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticPermissionDataSource>(
+      (c) => DiagnosticPermissionDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticPermissionRepository>(
+      (c) => DiagnosticPermissionRepositoryImpl(
+        c.resolve<DiagnosticPermissionDataSource>(),
+      ),
+    );
+    container.registerFactory<GrantPermissionUseCase>(
+      (c) =>
+          GrantPermissionUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+    container.registerFactory<RevokePermissionUseCase>(
+      (c) =>
+          RevokePermissionUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+    container.registerFactory<ListPermissionsUseCase>(
+      (c) =>
+          ListPermissionsUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+
     // Request Diagnostic - BLoC
     container.registerFactory<RequestDiagnosticBloc>(
       (c) => RequestDiagnosticBloc(
@@ -464,6 +518,9 @@ abstract class InjectorApp {
         uploadEvidenceUseCase: c.resolve<UploadEvidenceUseCase>(),
         deleteEvidenceUseCase: c.resolve<DeleteEvidenceUseCase>(),
         getEvidenceUseCase: c.resolve<GetEvidenceUseCase>(),
+        createDiagnosticUseCase: c.resolve<CreateDiagnosticUseCase>(),
+        grantPermissionUseCase: c.resolve<GrantPermissionUseCase>(),
+        listPermissionsUseCase: c.resolve<ListPermissionsUseCase>(),
       ),
     );
 
@@ -507,6 +564,7 @@ abstract class InjectorApp {
     container.registerFactory<SearchMotorcycleBloc>(
       (c) => SearchMotorcycleBloc(
         searchUseCase: c.resolve<SearchMotorcycleByPlateUseCase>(),
+        setSolutionUseCase: c.resolve<SetSolutionUseCase>(),
       ),
     );
 
@@ -598,7 +656,6 @@ abstract class InjectorApp {
   @Register.factory(RegisterPersonDataSource)
   @Register.factory(LoginRepository, from: LoginRepositoryImpl)
   @Register.factory(LoginUseCase)
-  @Register.factory(LoginDataSource)
   @Register.factory(GetPersonUsecase)
   @Register.factory(UpdatePersonUsecase)
   @Register.factory(

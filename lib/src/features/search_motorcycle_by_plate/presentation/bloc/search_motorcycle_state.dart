@@ -21,11 +21,29 @@ class SearchMotorcycleLoading extends SearchMotorcycleState {
 /// Success state - motorcycle found.
 class SearchMotorcycleLoaded extends SearchMotorcycleState {
   final MotorcycleDetailEntity motorcycle;
+  final String? solutionMessage;
+  final String? solutionError;
 
-  const SearchMotorcycleLoaded(this.motorcycle);
+  const SearchMotorcycleLoaded(
+    this.motorcycle, {
+    this.solutionMessage,
+    this.solutionError,
+  });
+
+  SearchMotorcycleLoaded copyWith({
+    MotorcycleDetailEntity? motorcycle,
+    String? solutionMessage,
+    String? solutionError,
+  }) {
+    return SearchMotorcycleLoaded(
+      motorcycle ?? this.motorcycle,
+      solutionMessage: solutionMessage,
+      solutionError: solutionError,
+    );
+  }
 
   @override
-  List<Object?> get props => [motorcycle];
+  List<Object?> get props => [motorcycle, solutionMessage, solutionError];
 }
 
 /// Error state - search failed.

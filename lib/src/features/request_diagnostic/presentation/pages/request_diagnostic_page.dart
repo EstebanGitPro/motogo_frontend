@@ -7,20 +7,21 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
-import 'package:motogo_frontend/src/features/request_diagnostic/domain/enums/service_type.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page for requesting a diagnostic from a branch via WhatsApp.
 ///
 /// The user selects their motorcycle, describes the problem, attaches photos,
-/// and sends a formatted message via WhatsApp.
+/// toggles permission for the branch, and sends a formatted message via WhatsApp.
 class RequestDiagnosticPage extends StatelessWidget {
+  final String branchId;
   final String branchName;
   final String branchPhone;
 
   const RequestDiagnosticPage({
     super.key,
+    required this.branchId,
     required this.branchName,
     required this.branchPhone,
   });
@@ -30,7 +31,11 @@ class RequestDiagnosticPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => InjectorApp.resolve<RequestDiagnosticBloc>()
         ..add(
-          InitializeRequest(branchName: branchName, branchPhone: branchPhone),
+          InitializeRequest(
+            branchId: branchId,
+            branchName: branchName,
+            branchPhone: branchPhone,
+          ),
         ),
       child: const _RequestDiagnosticView(),
     );
@@ -62,6 +67,20 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+        }
+        // Handle permission toggle feedback
+        if (state is RequestDiagnosticLoaded &&
+            state.permissionMessage != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.permissionMessage!),
+              backgroundColor: Colors.green[600],
+            ),
+          );
+        }
+        // Handle success: open WhatsApp
+        if (state is RequestDiagnosticLoaded && state.successMessage != null) {
+          _openWhatsApp(context, state);
         }
         // Load evidence when motorcycle is selected and not yet loaded
         if (state is RequestDiagnosticLoaded &&
@@ -123,7 +142,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
           const SizedBox(height: 16),
           _buildPhotosSection(context, state),
           const SizedBox(height: 16),
-          _buildServiceTypeSection(context, state),
+          _buildPermissionSection(context, state),
           const SizedBox(height: 16),
           _buildPreviewSection(state),
           const SizedBox(height: 24),
@@ -527,26 +546,25 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     }
   }
 
-  Widget _buildServiceTypeSection(
+  Widget _buildPermissionSection(
     BuildContext context,
     RequestDiagnosticLoaded state,
   ) {
     return _buildSectionCard(
-      title: RequestDiagnosticConstants.sectionServiceType,
-      child: Wrap(
-        spacing: 8,
-        children: ServiceType.values.map((type) {
-          final isSelected = state.selectedServiceTypes.contains(type);
-          return FilterChip(
-            label: Text(type.label),
-            selected: isSelected,
-            onSelected: (_) => context.read<RequestDiagnosticBloc>().add(
-              ToggleServiceType(type),
-            ),
-            selectedColor: Colors.blue[100],
-            checkmarkColor: Colors.blue[600],
-          );
-        }).toList(),
+      title: RequestDiagnosticConstants.sectionPermission,
+      child: SwitchListTile(
+        title: Text(
+          '${RequestDiagnosticConstants.permissionLabel} a ${state.branchName}',
+        ),
+        subtitle: const Text(
+          RequestDiagnosticConstants.permissionSubtitle,
+          style: TextStyle(fontSize: 12),
+        ),
+        value: state.isPermissionGranted,
+        onChanged: (_) =>
+            context.read<RequestDiagnosticBloc>().add(const TogglePermission()),
+        activeColor: Colors.blue[600],
+        contentPadding: EdgeInsets.zero,
       ),
     );
   }
@@ -581,7 +599,9 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: state.isValid && !state.isSubmitting
-            ? () => _submitRequest(context, state)
+            ? () => context.read<RequestDiagnosticBloc>().add(
+                const SubmitRequest(),
+              )
             : null,
         icon: state.isSubmitting
             ? const SizedBox(
@@ -604,20 +624,27 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     );
   }
 
-  Future<void> _submitRequest(
+  Future<void> _openWhatsApp(
     BuildContext context,
     RequestDiagnosticLoaded state,
   ) async {
-    // TODO: Upload photos to Evidence API first
-
-    // Open WhatsApp with the message
     final phone = state.branchPhone.replaceAll(RegExp(r'[^0-9]'), '');
     final message = Uri.encodeComponent(state.messagePreview);
     final url = Uri.parse('https://wa.me/$phone?text=$message');
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
+    try {
+      final launched = await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(RequestDiagnosticConstants.whatsappError),
+          ),
+        );
+      }
+    } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

@@ -23,7 +23,7 @@ void main() {
 
     const testDepartmentId = 'dept-01';
 
-    final testBranch = BranchModel(
+    const testBranch = BranchModel(
       name: 'MotoGo Centro',
       establishmentType: 'WORKSHOP',
       address: 'Calle 123',

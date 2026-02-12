@@ -36,12 +36,6 @@ class _$InjectorApp extends InjectorApp {
       )
       ..registerFactory((c) => LoginUseCase(c.resolve<LoginRepository>()))
       ..registerFactory(
-        (c) => LoginDataSource(
-          c.resolve<UserSessionDataSource>(),
-          dio: c.resolve<Dio>(),
-        ),
-      )
-      ..registerFactory(
         (c) => GetPersonUsecase(c.resolve<UserSessionRepository>()),
       )
       ..registerFactory(

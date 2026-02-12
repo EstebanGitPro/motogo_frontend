@@ -222,6 +222,11 @@ abstract class InjectorApp {
       (c) => UserSessionDataSourceImpl(),
     );
 
+    // Login - has its own Dio (public endpoint, no auth)
+    container.registerFactory<LoginDataSource>(
+      (c) => LoginDataSource(c.resolve<UserSessionDataSource>()),
+    );
+
     // FirebaseToken - uses DioClient
     container.registerFactory<FirebaseTokenDataSource>(
       (c) => FirebaseTokenDataSourceImpl(c.resolve<DioClient>()),
@@ -651,7 +656,6 @@ abstract class InjectorApp {
   @Register.factory(RegisterPersonDataSource)
   @Register.factory(LoginRepository, from: LoginRepositoryImpl)
   @Register.factory(LoginUseCase)
-  @Register.factory(LoginDataSource)
   @Register.factory(GetPersonUsecase)
   @Register.factory(UpdatePersonUsecase)
   @Register.factory(

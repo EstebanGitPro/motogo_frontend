@@ -1,6 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/day_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
@@ -21,9 +19,8 @@ class BranchScheduleBloc
     extends Bloc<BranchScheduleEvent, BranchScheduleState> {
   final BranchScheduleRepository _repository;
 
-  BranchScheduleBloc({BranchScheduleRepository? repository})
-    : _repository =
-          repository ?? InjectorApp.resolve<BranchScheduleRepository>(),
+  BranchScheduleBloc({required BranchScheduleRepository repository})
+    : _repository = repository,
       super(BranchScheduleInitial()) {
     on<LoadSchedule>(_onLoadSchedule);
     on<CreateSchedule>(_onCreateSchedule);
@@ -158,14 +155,15 @@ class BranchScheduleBloc
           add(LoadSchedule(event.branchId));
         }
       },
-      (schedule) {
+      (record) {
+        final (schedule, message) = record;
         emit(
           BranchScheduleLoaded(
             schedule: schedule,
             daysCatalog: _daysCatalog,
             details: _scheduleDetails,
             exceptions: _scheduleExceptions,
-            message: ScheduleConstants.scheduleUpdated,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );
@@ -292,12 +290,13 @@ class BranchScheduleBloc
       (error) {
         emit(currentState.copyWith(message: error.message, isSuccess: false));
       },
-      (detail) {
+      (record) {
+        final (detail, message) = record;
         _scheduleDetails = [..._scheduleDetails, detail];
         emit(
           currentState.copyWith(
             details: _scheduleDetails,
-            message: ScheduleConstants.timeSlotCreated,
+            message: message, // Use backend message
             isSuccess: true,
           ),
         );

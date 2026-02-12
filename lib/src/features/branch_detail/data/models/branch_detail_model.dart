@@ -62,6 +62,8 @@ class BranchDetailModel extends BranchDetailEntity {
         return 'taller';
       case 'STORE':
         return 'tienda';
+      case 'WORKSHOP_STORE':
+        return 'taller_tienda';
       default:
         return type?.toLowerCase() ?? 'taller';
     }

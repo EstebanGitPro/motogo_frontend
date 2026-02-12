@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/entities/motorcycle_evidence_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
 
 /// Page for searching motorcycles by license plate (HU47).
 ///
 /// Allows workshop representatives to lookup motorcycle
-/// information using the plate number.
+/// information using the plate number. Displays diagnostics
+/// history with evidence photos for workshop evaluation.
 class SearchMotorcyclePage extends StatelessWidget {
   const SearchMotorcyclePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SearchMotorcycleBloc(),
+      create: (context) => InjectorApp.resolve<SearchMotorcycleBloc>(),
       child: const _SearchMotorcycleView(),
     );
   }
@@ -63,6 +67,26 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
               ),
             );
           }
+          if (state is SearchMotorcycleLoaded) {
+            if (state.solutionMessage != null &&
+                state.solutionMessage!.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.solutionMessage!),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+            if (state.solutionError != null &&
+                state.solutionError!.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.solutionError!),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
         },
         builder: (context, state) {
           return SingleChildScrollView(
@@ -72,8 +96,13 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
               children: [
                 _buildSearchCard(state),
                 const SizedBox(height: 24),
-                if (state is SearchMotorcycleLoaded)
+                if (state is SearchMotorcycleLoaded) ...[
                   _buildResultCard(state.motorcycle),
+                  const SizedBox(height: 24),
+                  _buildEvidenceGallery(state.motorcycle.evidence),
+                  const SizedBox(height: 24),
+                  _buildDiagnosticsSection(state.motorcycle.diagnostics),
+                ],
                 if (state is SearchMotorcycleLoading)
                   const Center(
                     child: Padding(
@@ -209,23 +238,27 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
             ),
             const Divider(height: 32),
             // Technical specs
-            _buildSpecRow(Icons.calendar_today, 'Año', '${motorcycle.year}'),
+            _buildSpecRow(
+              Icons.calendar_today,
+              MotorcycleConstants.yearDetailLabel,
+              '${motorcycle.year}',
+            ),
             const SizedBox(height: 12),
             _buildSpecRow(
               Icons.speed,
-              'Kilometraje',
+              MotorcycleConstants.mileageDetailLabel,
               '${motorcycle.currentMileage} km',
             ),
             const SizedBox(height: 12),
             _buildSpecRow(
               Icons.category,
-              'Categoría',
+              MotorcycleConstants.categoryDetailLabel,
               motorcycle.reference.category,
             ),
             const SizedBox(height: 12),
             _buildSpecRow(
               Icons.settings,
-              'Cilindraje',
+              MotorcycleConstants.engineDisplacementLabel,
               '${motorcycle.reference.engineDisplacementCc} cc',
             ),
           ],
@@ -249,6 +282,440 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
             value,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
             textAlign: TextAlign.right,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // === Motorcycle Evidence Gallery ===
+
+  Widget _buildEvidenceGallery(List<MotorcycleEvidenceEntity> evidence) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.photo_library, color: Colors.teal[700], size: 24),
+            const SizedBox(width: 8),
+            Text(
+              MotorcycleConstants.motorcycleEvidenceTitle,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.teal[800],
+              ),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.teal[50],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${evidence.length}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.teal[700],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (evidence.isEmpty)
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.photo_camera_outlined,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      MotorcycleConstants.motorcycleNoEvidence,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: evidence.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final item = evidence[index];
+                return GestureDetector(
+                  onTap: () => _showFullScreenImage(context, item.imageUrl),
+                  child: Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.network(
+                          item.imageUrl,
+                          width: 120,
+                          height: 110,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            width: 120,
+                            height: 110,
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.broken_image,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (item.angle != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          item.angle!,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black87,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.broken_image,
+                    color: Colors.white,
+                    size: 64,
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // === Diagnostics Section ===
+
+  Widget _buildDiagnosticsSection(List<DiagnosticEntity> diagnostics) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.assignment, color: Colors.blue[700], size: 24),
+            const SizedBox(width: 8),
+            Text(
+              MotorcycleConstants.diagnosticsSectionTitle,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue[800],
+              ),
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${diagnostics.length}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[700],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (diagnostics.isEmpty)
+          Card(
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      MotorcycleConstants.diagnosticNoDiagnostics,
+                      style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          ...diagnostics.map(_buildDiagnosticCard),
+      ],
+    );
+  }
+
+  Widget _buildDiagnosticCard(DiagnosticEntity diagnostic) {
+    final hasSolution =
+        diagnostic.possibleSolution != null &&
+        diagnostic.possibleSolution!.isNotEmpty;
+    final dateFormatted =
+        '${diagnostic.date.day.toString().padLeft(2, '0')}/${diagnostic.date.month.toString().padLeft(2, '0')}/${diagnostic.date.year}';
+
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 16,
+          ),
+          leading: Icon(
+            hasSolution ? Icons.check_circle : Icons.pending,
+            color: hasSolution ? Colors.green : Colors.orange,
+            size: 28,
+          ),
+          title: Text(
+            dateFormatted,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
+          subtitle: diagnostic.sentViaWhatsapp
+              ? Row(
+                  children: [
+                    Icon(Icons.chat, size: 14, color: Colors.green[600]),
+                    const SizedBox(width: 4),
+                    Text(
+                      MotorcycleConstants.diagnosticSentViaWhatsapp,
+                      style: TextStyle(fontSize: 12, color: Colors.green[600]),
+                    ),
+                  ],
+                )
+              : null,
+          children: [
+            // Problem description (full)
+            _buildDetailRow(
+              Icons.report_problem,
+              MotorcycleConstants.diagnosticProblemLabel,
+              diagnostic.problemDescription,
+              Colors.orange,
+            ),
+            const SizedBox(height: 12),
+
+            // Editable solution field
+            _buildEditableSolutionField(diagnostic),
+
+            // Evidence photos
+            if (diagnostic.evidence.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Icon(Icons.photo_library, size: 18, color: Colors.blue[700]),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${MotorcycleConstants.diagnosticEvidenceLabel} (${diagnostic.evidence.length})',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue[700],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 100,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: diagnostic.evidence.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final evidence = diagnostic.evidence[index];
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        evidence.imageUrl,
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          width: 100,
+                          height: 100,
+                          color: Colors.grey[200],
+                          child: Icon(
+                            Icons.broken_image,
+                            color: Colors.grey[400],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditableSolutionField(DiagnosticEntity diagnostic) {
+    final solutionController = TextEditingController(
+      text: diagnostic.possibleSolution ?? '',
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.lightbulb,
+              size: 18,
+              color: (diagnostic.possibleSolution?.isNotEmpty ?? false)
+                  ? Colors.green
+                  : Colors.grey,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              MotorcycleConstants.diagnosticSolutionLabel,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: solutionController,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  hintText: MotorcycleConstants.solutionHint,
+                  contentPadding: const EdgeInsets.all(12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                style: const TextStyle(fontSize: 14),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                final solution = solutionController.text.trim();
+                if (solution.isNotEmpty) {
+                  context.read<SearchMotorcycleBloc>().add(
+                    SetDiagnosticSolution(
+                      diagnosticId: diagnostic.id,
+                      solution: solution,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(MotorcycleConstants.solutionSaveButton),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(
+    IconData icon,
+    String label,
+    String value,
+    Color iconColor,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: iconColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(value, style: const TextStyle(fontSize: 14)),
+            ],
           ),
         ),
       ],

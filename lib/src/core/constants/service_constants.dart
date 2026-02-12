@@ -54,6 +54,11 @@ class ServiceConstants {
   static const String featurePending =
       'Esta funcionalidad estará disponible próximamente';
 
+  // Datasource fallback messages
+  static const String parseError = 'Error al procesar respuesta del servidor';
+  static const String serviceActivated = 'Servicio activado';
+  static const String serviceDeactivated = 'Servicio desactivado';
+
   /// Returns all service types as a list for filter chips
   static List<String> get allServiceTypes => [
     filterAll,

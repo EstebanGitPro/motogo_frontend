@@ -125,8 +125,8 @@ class ScheduleStatusCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     isActive
-                        ? 'El horario está visible para los clientes'
-                        : 'El horario no es visible para los clientes',
+                        ? ScheduleConstants.scheduleVisibleMessage
+                        : ScheduleConstants.scheduleNotVisibleMessage,
                     style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   ),
                 ),

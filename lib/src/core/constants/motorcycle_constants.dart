@@ -104,6 +104,37 @@ class MotorcycleConstants {
       'No se encontró ninguna moto con esa placa';
   static const String searchByPlateLoading = 'Buscando...';
 
+  // Diagnostics section in plate lookup (workshop view)
+  static const String diagnosticsSectionTitle = 'Diagnósticos';
+  static const String diagnosticProblemLabel = 'Problema reportado';
+  static const String diagnosticSolutionLabel = 'Solución propuesta';
+  static const String diagnosticDateLabel = 'Fecha';
+  static const String diagnosticNoDiagnostics =
+      'No hay diagnósticos registrados';
+  static const String diagnosticPendingSolution = 'Pendiente de solución';
+  static const String diagnosticEvidenceLabel = 'Evidencia fotográfica';
+  static const String diagnosticSentViaWhatsapp = 'Enviado por WhatsApp';
+
+  // Motorcycle Evidence Gallery (workshop view)
+  static const String motorcycleEvidenceTitle = 'Galería de evidencias';
+  static const String motorcycleNoEvidence =
+      'No hay evidencias fotográficas registradas';
+
+  // Editable solution field (workshop view)
+  static const String solutionHint = 'Escriba la solución propuesta';
+  static const String solutionSaveButton = 'Guardar';
+
+  // Datasource fallback errors
+  static const String parseError =
+      'No se encontró información de la motocicleta';
+  static const String invalidServerResponse = 'Respuesta inválida del servidor';
+
+  // Motorcycle detail spec labels
+  static const String yearDetailLabel = 'Año';
+  static const String mileageDetailLabel = 'Kilometraje';
+  static const String categoryDetailLabel = 'Categoría';
+  static const String engineDisplacementLabel = 'Cilindraje';
+
   // Profile image (HU36)
   static const String profileImageLabel = 'Imagen de tu Moto';
   static const String profileImageHint = 'Toca para cambiar la imagen';
@@ -126,4 +157,17 @@ class MotorcycleConstants {
 
   // Menu items (User Home)
   static const String menuMyMotorcycle = 'Mi Moto';
+
+  // Motorcycle History (Service History)
+  static const String motorcycleHistoryTitle = 'Historial de Servicios';
+  static const String noServiceHistory = 'Aún no hay servicios registrados';
+  static const String noServiceHistorySubtitle =
+      'Cuando el taller registre servicios para esta moto, aparecerán aquí.';
+  static const String quotedPriceLabel = 'Cotización';
+  static const String finalPriceLabel = 'Precio Final';
+  static const String representativeNotesLabel = 'Notas del Representante';
+  static const String diagnosticRefLabel = 'Diagnóstico';
+  static const String statusRequested = 'Solicitado';
+  static const String statusInProgress = 'En Proceso';
+  static const String statusCompleted = 'Finalizado';
 }

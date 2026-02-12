@@ -38,6 +38,9 @@ class BranchMarkerEntity extends Equatable {
   /// Returns true if this is a store.
   bool get isStore => type == 'tienda';
 
+  /// Returns true if this is a workshop and store.
+  bool get isWorkshopStore => type == 'taller_tienda';
+
   /// Returns formatted distance string.
   String get formattedDistance {
     if (distanceKm == null) return '';
@@ -48,8 +51,12 @@ class BranchMarkerEntity extends Equatable {
   }
 
   /// Returns the display type label.
-  String get displayTypeLabel =>
-      typeLabel ?? (isWorkshop ? 'Taller' : 'Tienda');
+  String get displayTypeLabel {
+    if (typeLabel != null) return typeLabel!;
+    if (isWorkshop) return 'Taller';
+    if (isWorkshopStore) return 'Taller y Tienda';
+    return 'Tienda';
+  }
 
   @override
   List<Object?> get props => [

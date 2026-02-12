@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_event.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_state.dart';
@@ -8,9 +7,8 @@ import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_
 class EditBranchBloc extends Bloc<EditBranchEvent, EditBranchState> {
   final UpdateBranchUseCase _updateBranchUseCase;
 
-  EditBranchBloc({UpdateBranchUseCase? updateBranchUseCase})
-    : _updateBranchUseCase =
-          updateBranchUseCase ?? InjectorApp.resolve<UpdateBranchUseCase>(),
+  EditBranchBloc({required UpdateBranchUseCase updateBranchUseCase})
+    : _updateBranchUseCase = updateBranchUseCase,
       super(EditBranchInitial()) {
     on<EditBranchSubmitted>(_onSubmitted);
     on<EditBranchReset>(_onReset);

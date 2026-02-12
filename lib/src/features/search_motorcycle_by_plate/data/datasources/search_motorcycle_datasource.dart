@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -13,6 +14,14 @@ abstract class SearchMotorcycleDataSource {
   ///
   /// Returns motorcycle details including reference info.
   Future<Either<ErrorModel, MotorcycleDetailModel>> searchByPlate(String plate);
+
+  /// Sets the diagnostic solution (workshop representative).
+  ///
+  /// Calls PATCH /diagnostics/:id/solution.
+  Future<Either<ErrorModel, String>> setSolution({
+    required String diagnosticId,
+    required String solution,
+  });
 }
 
 class SearchMotorcycleDataSourceImpl implements SearchMotorcycleDataSource {
@@ -46,7 +55,7 @@ class SearchMotorcycleDataSourceImpl implements SearchMotorcycleDataSource {
 
         return Left(
           ErrorModel(
-            message: 'No se encontró información de la motocicleta',
+            message: MotorcycleConstants.parseError,
             errorCode: 'PARSE_ERROR',
           ),
         );
@@ -54,7 +63,42 @@ class SearchMotorcycleDataSourceImpl implements SearchMotorcycleDataSource {
 
       return Left(
         ErrorModel(
-          message: 'Respuesta inválida del servidor',
+          message: MotorcycleConstants.invalidServerResponse,
+          errorCode: 'INVALID_RESPONSE',
+        ),
+      );
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> setSolution({
+    required String diagnosticId,
+    required String solution,
+  }) async {
+    try {
+      final response = await _dioClient.patch(
+        '/diagnostics/$diagnosticId/solution',
+        data: {'possible_solution': solution},
+      );
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final message = responseData['message'] as String? ?? '';
+        return Right(message);
+      }
+
+      return Left(
+        ErrorModel(
+          message: MotorcycleConstants.invalidServerResponse,
           errorCode: 'INVALID_RESPONSE',
         ),
       );

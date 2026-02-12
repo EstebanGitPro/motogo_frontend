@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 
 /// Entity representing the complete detail of a branch/store.
 ///
@@ -58,9 +59,16 @@ class BranchDetailEntity extends Equatable {
   /// Returns true if this is a store.
   bool get isStore => type == 'tienda';
 
+  /// Returns true if this is a workshop and store.
+  bool get isWorkshopStore => type == 'taller_tienda';
+
   /// Returns the display type label.
-  String get displayTypeLabel =>
-      typeLabel ?? (isWorkshop ? 'Taller' : 'Tienda');
+  String get displayTypeLabel {
+    if (typeLabel != null) return typeLabel!;
+    if (isWorkshop) return 'Taller';
+    if (isWorkshopStore) return 'Taller y Tienda';
+    return 'Tienda';
+  }
 
   /// Returns the full address with city.
   String get fullAddress {
@@ -72,10 +80,72 @@ class BranchDetailEntity extends Equatable {
 
   /// Checks if the branch is currently open based on the schedule.
   ///
-  /// [schedules] - List of schedule details for each day.
+  /// First checks if there is an active exception for today that overrides
+  /// the regular schedule. If an active closed exception covers today,
+  /// returns false immediately.
+  ///
+  /// [schedules] - List of regular schedule details for each day.
+  /// [exceptions] - List of schedule exceptions (holidays, special days).
   /// Returns true if currently within opening hours.
-  bool isOpenNow(List<ScheduleDetailEntity> schedules) {
+  bool isOpenNow(
+    List<ScheduleDetailEntity> schedules, [
+    List<ScheduleExceptionEntity> exceptions = const [],
+  ]) {
     final now = DateTime.now();
+    final todayOnly = DateTime(now.year, now.month, now.day);
+
+    // Check exceptions first — they override the regular schedule
+    for (final exception in exceptions) {
+      if (!exception.active) continue;
+
+      final startDate = DateTime.tryParse(exception.exceptionStartDate);
+      if (startDate == null) continue;
+      // Single-day exceptions may have empty endDate — treat as same day
+      final endDate =
+          DateTime.tryParse(exception.exceptionEndDate) ?? startDate;
+
+      final startOnly = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      );
+      final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+      // Check if today falls within the exception date range
+      if (!todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly)) {
+        if (exception.isClosed) {
+          return false; // Closed due to exception
+        }
+        // Exception overrides with custom hours — check those hours
+        final openParts = exception.openingTime.split(':');
+        final closeParts = exception.closingTime.split(':');
+        if (openParts.length >= 2 && closeParts.length >= 2) {
+          final openHour = int.tryParse(openParts[0]) ?? 0;
+          final openMinute = int.tryParse(openParts[1]) ?? 0;
+          final closeHour = int.tryParse(closeParts[0]) ?? 0;
+          final closeMinute = int.tryParse(closeParts[1]) ?? 0;
+
+          final openTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            openHour,
+            openMinute,
+          );
+          final closeTime = DateTime(
+            now.year,
+            now.month,
+            now.day,
+            closeHour,
+            closeMinute,
+          );
+
+          return now.isAfter(openTime) && now.isBefore(closeTime);
+        }
+      }
+    }
+
+    // No applicable exception — check regular schedule
     // weekday: 1 = Monday, 7 = Sunday (same as backend)
     final todaySchedules = schedules
         .where((s) => s.dayOfWeek == now.weekday)

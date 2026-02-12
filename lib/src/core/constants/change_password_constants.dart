@@ -31,4 +31,7 @@ abstract class ChangePasswordConstants {
 
   // Botón
   static const String submitButton = 'Cambiar Contraseña';
+
+  // Datasource/Repository fallback messages
+  static const String noActiveSession = 'No hay sesión activa';
 }

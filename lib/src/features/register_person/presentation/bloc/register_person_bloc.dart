@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 
@@ -10,11 +9,13 @@ part 'register_person-state.dart';
 
 class RegisterPersonBloc
     extends Bloc<RegisterPersonEvent, RegisterPersonState> {
-  RegisterPersonBloc() : super(RegisterPersonInitial()) {
-    final registerUseCase = InjectorApp.resolve<RegisterPersonUseCase>();
+  final RegisterPersonUseCase _registerUseCase;
 
+  RegisterPersonBloc({required RegisterPersonUseCase registerUseCase})
+    : _registerUseCase = registerUseCase,
+      super(RegisterPersonInitial()) {
     on<RegisterPersonSubmitted>(
-      (event, emit) => _onRegisterSubmitted(event, emit, registerUseCase),
+      (event, emit) => _onRegisterSubmitted(event, emit, _registerUseCase),
     );
   }
 

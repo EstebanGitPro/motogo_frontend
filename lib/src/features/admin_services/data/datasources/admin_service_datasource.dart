@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -127,7 +128,7 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
       return Left(
         ErrorModel(
           errorCode: 'PARSE_ERROR',
-          message: 'Error al procesar respuesta del servidor',
+          message: ServiceConstants.parseError,
         ),
       );
     } on DioException catch (e) {
@@ -151,11 +152,12 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
         final message =
-            responseData['message'] as String? ?? 'Servicio activado';
+            responseData['message'] as String? ??
+            ServiceConstants.serviceActivated;
         return Right(message);
       }
 
-      return const Right('Servicio activado');
+      return const Right(ServiceConstants.serviceActivated);
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -177,11 +179,12 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
         final message =
-            responseData['message'] as String? ?? 'Servicio desactivado';
+            responseData['message'] as String? ??
+            ServiceConstants.serviceDeactivated;
         return Right(message);
       }
 
-      return const Right('Servicio desactivado');
+      return const Right(ServiceConstants.serviceDeactivated);
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {

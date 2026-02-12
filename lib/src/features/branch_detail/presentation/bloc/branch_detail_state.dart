@@ -23,17 +23,25 @@ class BranchDetailLoaded extends BranchDetailState {
   final BranchDetailEntity detail;
   final List<BranchServiceEntity> services;
   final List<ScheduleDetailEntity> schedules;
+  final List<ScheduleExceptionEntity> exceptions;
   final bool isOpenNow;
 
   const BranchDetailLoaded({
     required this.detail,
     required this.services,
     required this.schedules,
+    required this.exceptions,
     required this.isOpenNow,
   });
 
   @override
-  List<Object?> get props => [detail, services, schedules, isOpenNow];
+  List<Object?> get props => [
+    detail,
+    services,
+    schedules,
+    exceptions,
+    isOpenNow,
+  ];
 }
 
 /// Error state when loading fails.

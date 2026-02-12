@@ -65,7 +65,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
       _isDateRange = false;
       _openingTime = const TimeOfDay(hour: 9, minute: 0);
       _closingTime = const TimeOfDay(hour: 18, minute: 0);
-      _isClosed = false;
+      _isClosed = true;
     }
   }
 
@@ -201,7 +201,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
     if (!_isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('La hora de apertura debe ser anterior a la de cierre'),
+          content: Text(ScheduleConstants.validationOpeningBeforeClosing),
           backgroundColor: Colors.red,
         ),
       );
@@ -212,9 +212,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
     if (_hasDateOverlap()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Ya existe una excepción para las fechas seleccionadas',
-          ),
+          content: Text(ScheduleConstants.validationDateOverlap),
           backgroundColor: Colors.red,
         ),
       );
@@ -304,7 +302,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
                 subtitle: Text(
                   _selectedEndDate != null
                       ? _formatDisplayDate(_selectedEndDate!)
-                      : 'Seleccionar fecha',
+                      : ScheduleConstants.selectDate,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,

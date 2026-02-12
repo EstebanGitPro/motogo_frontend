@@ -2,27 +2,33 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/usecase/create_diagnostic_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/list_permissions_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/domain/usecases/get_my_motorcycles_usecase.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
-import 'package:motogo_frontend/src/features/request_diagnostic/domain/enums/service_type.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
-import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 
 part 'request_diagnostic_event.dart';
 part 'request_diagnostic_state.dart';
 
 /// BLoC for managing the diagnostic request form.
 ///
-/// Handles motorcycle selection, immediate photo upload, and WhatsApp message generation.
+/// Handles motorcycle selection, immediate photo upload, diagnostic creation,
+/// permission granting, and WhatsApp message generation.
 class RequestDiagnosticBloc
     extends Bloc<RequestDiagnosticEvent, RequestDiagnosticState> {
   final GetMyMotorcyclesUseCase _getMyMotorcyclesUseCase;
   final UploadEvidenceUseCase _uploadEvidenceUseCase;
   final DeleteEvidenceUseCase _deleteEvidenceUseCase;
   final GetEvidenceUseCase _getEvidenceUseCase;
+  final CreateDiagnosticUseCase _createDiagnosticUseCase;
+  final GrantPermissionUseCase _grantPermissionUseCase;
+  final ListPermissionsUseCase _listPermissionsUseCase;
 
   /// Maximum number of photos allowed.
   static const int maxPhotos = 4;
@@ -32,17 +38,23 @@ class RequestDiagnosticBloc
     required UploadEvidenceUseCase uploadEvidenceUseCase,
     required DeleteEvidenceUseCase deleteEvidenceUseCase,
     required GetEvidenceUseCase getEvidenceUseCase,
+    required CreateDiagnosticUseCase createDiagnosticUseCase,
+    required GrantPermissionUseCase grantPermissionUseCase,
+    required ListPermissionsUseCase listPermissionsUseCase,
   }) : _getMyMotorcyclesUseCase = getMyMotorcyclesUseCase,
        _uploadEvidenceUseCase = uploadEvidenceUseCase,
        _deleteEvidenceUseCase = deleteEvidenceUseCase,
        _getEvidenceUseCase = getEvidenceUseCase,
+       _createDiagnosticUseCase = createDiagnosticUseCase,
+       _grantPermissionUseCase = grantPermissionUseCase,
+       _listPermissionsUseCase = listPermissionsUseCase,
        super(const RequestDiagnosticInitial()) {
     on<InitializeRequest>(_onInitializeRequest);
     on<SelectMotorcycle>(_onSelectMotorcycle);
     on<UpdateProblemDescription>(_onUpdateProblemDescription);
     on<AddPhoto>(_onAddPhoto);
     on<RemovePhoto>(_onRemovePhoto);
-    on<ToggleServiceType>(_onToggleServiceType);
+    on<TogglePermission>(_onTogglePermission);
     on<SubmitRequest>(_onSubmitRequest);
     on<LoadEvidence>(_onLoadEvidence);
   }
@@ -66,6 +78,7 @@ class RequestDiagnosticBloc
     final shouldLoadEvidence = motorcycleId != null;
 
     final baseState = RequestDiagnosticLoaded(
+      branchId: event.branchId,
       branchName: event.branchName,
       branchPhone: event.branchPhone,
       motorcycles: motorcycles,
@@ -78,7 +91,7 @@ class RequestDiagnosticBloc
     if (!shouldLoadEvidence) return;
 
     final evidenceResult = await _getEvidenceUseCase(
-      motorcycleId: motorcycleId!,
+      motorcycleId: motorcycleId,
     );
 
     evidenceResult.fold(
@@ -107,6 +120,13 @@ class RequestDiagnosticBloc
           ),
         );
       },
+    );
+
+    // Hydrate permission toggle from backend
+    await _hydratePermissionState(
+      motorcycleId: motorcycleId,
+      branchId: event.branchId,
+      emit: emit,
     );
   }
 
@@ -173,6 +193,13 @@ class RequestDiagnosticBloc
           ),
         );
       },
+    );
+
+    // Hydrate permission toggle from backend
+    await _hydratePermissionState(
+      motorcycleId: motorcycleId,
+      branchId: currentState.branchId,
+      emit: emit,
     );
   }
 
@@ -260,8 +287,8 @@ class RequestDiagnosticBloc
     );
 
     try {
-      if (await photoFile.exists()) {
-        await photoFile.delete();
+      if (photoFile.existsSync()) {
+        photoFile.deleteSync();
       }
     } catch (_) {}
 
@@ -321,19 +348,83 @@ class RequestDiagnosticBloc
     );
   }
 
-  void _onToggleServiceType(
-    ToggleServiceType event,
-    Emitter<RequestDiagnosticState> emit,
-  ) {
+  /// Fetches existing permission state from the backend and updates the toggle.
+  ///
+  /// If no permission row exists for this motorcycle+branch, defaults to false.
+  Future<void> _hydratePermissionState({
+    required String motorcycleId,
+    required String branchId,
+    required Emitter<RequestDiagnosticState> emit,
+  }) async {
     final currentState = state;
-    if (currentState is RequestDiagnosticLoaded) {
-      final newTypes = Set<ServiceType>.from(currentState.selectedServiceTypes);
-      if (newTypes.contains(event.serviceType)) {
-        newTypes.remove(event.serviceType);
-      } else {
-        newTypes.add(event.serviceType);
+    if (currentState is! RequestDiagnosticLoaded) return;
+
+    final permResult = await _listPermissionsUseCase(
+      motorcycleId: motorcycleId,
+    );
+
+    if (permResult.isRight) {
+      final permissions = permResult.right;
+      // Find the permission for this specific branch
+      final matchingPerm = permissions
+          .where((p) => p.branchId == branchId)
+          .toList();
+
+      final isActive = matchingPerm.isNotEmpty
+          ? matchingPerm.first.active
+          : false;
+
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(latestState.copyWith(isPermissionGranted: isActive));
       }
-      emit(currentState.copyWith(selectedServiceTypes: newTypes));
+    }
+    // On error, keep the current default (false)
+  }
+
+  /// Toggles the permission and immediately calls the API to persist the change.
+  ///
+  /// The toggle fires independently from the form submit so the user can
+  /// grant/revoke lookup permission without re-sending the WhatsApp message.
+  Future<void> _onTogglePermission(
+    TogglePermission event,
+    Emitter<RequestDiagnosticState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! RequestDiagnosticLoaded) return;
+    if (currentState.selectedMotorcycle == null) return;
+    final motorcycleId = currentState.selectedMotorcycle!.id;
+    if (motorcycleId == null) return;
+
+    final newValue = !currentState.isPermissionGranted;
+
+    // Optimistic UI update
+    emit(currentState.copyWith(isPermissionGranted: newValue));
+
+    // Fire API call — non-blocking, but rollback on failure
+    final result = await _grantPermissionUseCase(
+      motorcycleId: motorcycleId,
+      branchId: currentState.branchId,
+      active: newValue,
+    );
+
+    if (result.isLeft) {
+      // Rollback on failure
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(
+          latestState.copyWith(
+            isPermissionGranted: !newValue,
+            errorMessage: result.left.message,
+          ),
+        );
+      }
+    } else {
+      // Show backend success message
+      final latestState = state;
+      if (latestState is RequestDiagnosticLoaded) {
+        emit(latestState.copyWith(permissionMessage: result.right.message));
+      }
     }
   }
 
@@ -345,9 +436,34 @@ class RequestDiagnosticBloc
     if (currentState is! RequestDiagnosticLoaded) return;
     if (!currentState.isValid) return;
 
-    emit(currentState.copyWith(isSubmitting: true));
+    final motorcycleId = currentState.selectedMotorcycle!.id;
+    if (motorcycleId == null) return;
 
-    // Photos are already uploaded, just open WhatsApp
-    emit(currentState.copyWith(isSubmitting: false));
+    emit(currentState.copyWith(isSubmitting: true, clearError: true));
+
+    // Step 1: Create diagnostic via API
+    final diagnosticResult = await _createDiagnosticUseCase(
+      motorcycleId: motorcycleId,
+      problemDescription: currentState.problemDescription,
+      branchId: currentState.branchId,
+    );
+
+    if (diagnosticResult.isLeft) {
+      emit(
+        currentState.copyWith(
+          isSubmitting: false,
+          errorMessage: diagnosticResult.left.message,
+        ),
+      );
+      return;
+    }
+
+    // Step 2: Ready for WhatsApp — the page will handle opening it
+    emit(
+      currentState.copyWith(
+        isSubmitting: false,
+        successMessage: RequestDiagnosticConstants.submitSuccess,
+      ),
+    );
   }
 }

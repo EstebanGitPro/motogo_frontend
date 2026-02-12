@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_event.dart';
@@ -11,10 +10,9 @@ class MyBranchesBloc extends Bloc<MyBranchesEvent, MyBranchesState> {
   final ListFranchisesUseCase? _listFranchisesUseCase;
 
   MyBranchesBloc({
-    GetBranchesUseCase? getBranchesUseCase,
+    required GetBranchesUseCase getBranchesUseCase,
     ListFranchisesUseCase? listFranchisesUseCase,
-  }) : _getBranchesUseCase =
-           getBranchesUseCase ?? InjectorApp.resolve<GetBranchesUseCase>(),
+  }) : _getBranchesUseCase = getBranchesUseCase,
        _listFranchisesUseCase = listFranchisesUseCase,
        super(MyBranchesInitial()) {
     on<LoadBranches>(_onLoadBranches);

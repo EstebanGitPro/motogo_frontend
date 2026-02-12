@@ -142,6 +142,11 @@ class ScheduleConstants {
 
   // === Schedule Exceptions (HU20-25) ===
 
+  // Exception status labels
+  static const String exceptionStatusActive = 'Activa';
+  static const String exceptionStatusInactive = 'Inactiva';
+  static const String exceptionStatusExpired = 'Vencida';
+
   // UI Labels
   static const String exceptionsTitle = 'Excepciones de Horario';
   static const String addException = 'Agregar Excepción';
@@ -197,4 +202,27 @@ class ScheduleConstants {
   /// Builds the deactivate exception endpoint.
   static String getExceptionDeactivatePath(String exceptionId) =>
       '/schedule-exceptions/$exceptionId/deactivate';
+
+  // Validation messages
+  static const String validationOpeningBeforeClosing =
+      'La hora de apertura debe ser anterior a la de cierre';
+  static const String validationDateOverlap =
+      'Ya existe una excepción para las fechas seleccionadas';
+
+  // Placeholder texts
+  static const String selectDate = 'Seleccionar fecha';
+
+  // Toggle labels
+  static const String toggleActivate = 'Activar';
+  static const String toggleDeactivate = 'Desactivar';
+  static const String exceptionRangeLabel = 'Rango';
+
+  // Schedule visibility messages
+  static const String scheduleVisibleMessage =
+      'El horario está visible para los clientes';
+  static const String scheduleNotVisibleMessage =
+      'El horario no es visible para los clientes';
+
+  // Retry
+  static const String retry = 'Reintentar';
 }

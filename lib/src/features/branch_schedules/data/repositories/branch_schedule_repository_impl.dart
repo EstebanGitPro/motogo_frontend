@@ -29,7 +29,7 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleEntity>> updateSchedule(
+  Future<Either<ErrorModel, (ScheduleEntity, String)>> updateSchedule(
     String branchId, {
     bool? active,
     DateTime? startDate,
@@ -80,7 +80,8 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
   }
 
   @override
-  Future<Either<ErrorModel, ScheduleDetailEntity>> createScheduleDetail(
+  Future<Either<ErrorModel, (ScheduleDetailEntity, String)>>
+  createScheduleDetail(
     String branchId, {
     required int dayOfWeek,
     required String openingTime,
@@ -94,7 +95,10 @@ class BranchScheduleRepositoryImpl implements BranchScheduleRepository {
       closingTime: closingTime,
       isClosed: isClosed,
     );
-    return result.map((model) => model.toEntity());
+    return result.map((record) {
+      final (model, message) = record;
+      return (model.toEntity(), message);
+    });
   }
 
   @override

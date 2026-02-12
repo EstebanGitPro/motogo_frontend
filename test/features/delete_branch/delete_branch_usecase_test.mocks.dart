@@ -37,17 +37,13 @@ class MockDeleteBranchRepository extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> deleteBranch(String? id) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteBranch,
-          [id],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #deleteBranch,
-            [id],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#deleteBranch, [id]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i6.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#deleteBranch, [id]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

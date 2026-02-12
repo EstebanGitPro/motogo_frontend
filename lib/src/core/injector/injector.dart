@@ -23,6 +23,12 @@ import 'package:motogo_frontend/src/features/admin_services/data/datasources/adm
 import 'package:motogo_frontend/src/features/admin_services/data/repositories/admin_service_repository_impl.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/repositories/admin_service_repository.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
+// Features - Branch Detail
+import 'package:motogo_frontend/src/features/branch_detail/data/datasources/branch_detail_datasource.dart';
+import 'package:motogo_frontend/src/features/branch_detail/data/repositories/branch_detail_repository_impl.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/repositories/branch_detail_repository.dart';
+import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
 // Features - Branch Schedules
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource_impl.dart';
@@ -64,6 +70,32 @@ import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase
 // Features - Manage Franchise
 import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
+// Features - Diagnostic
+import 'package:motogo_frontend/src/features/diagnostic/data/datasource/diagnostic_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic/data/repository/diagnostic_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/repository/diagnostic_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic/domain/usecase/create_diagnostic_usecase.dart';
+// Features - Diagnostic Permission
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/datasource/diagnostic_permission_datasource.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/data/repository/diagnostic_permission_repository_impl.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/repository/diagnostic_permission_repository.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/list_permissions_usecase.dart';
+import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/revoke_permission_usecase.dart';
+// Features - Motorcycle Evidence
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/repositories/motorcycle_evidence_repository.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
+// Features - Motorcycle Profile Image (HU36-39)
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/datasources/profile_image_datasource.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/repositories/profile_image_repository_impl.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/repositories/profile_image_repository.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/delete_profile_image_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/get_profile_image_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/update_profile_image_usecase.dart';
 // Features - Motorcycle References (catalog)
 import 'package:motogo_frontend/src/features/motorcycle_references/data/datasources/motorcycle_reference_datasource.dart';
 import 'package:motogo_frontend/src/features/motorcycle_references/domain/usecases/get_motorcycle_references_usecase.dart';
@@ -97,23 +129,29 @@ import 'package:motogo_frontend/src/features/register_motorcycle/data/datasource
 import 'package:motogo_frontend/src/features/register_motorcycle/data/repositories/motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
-// Features - Motorcycle Profile Image (HU36-39)
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/datasources/profile_image_datasource.dart';
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/data/repositories/profile_image_repository_impl.dart';
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/repositories/profile_image_repository.dart';
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/update_profile_image_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/get_profile_image_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_profile_image/domain/usecases/delete_profile_image_usecase.dart';
 // Features - Register
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
 import 'package:motogo_frontend/src/features/register_person/data/repositories/register_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/repositories/register_person_repository.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
-// Features - Search Motorcycle by Plate (HU47)
+import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_bloc.dart';
+import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
+import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_bloc.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
+import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
+import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
+import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
+import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/datasources/search_motorcycle_datasource.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/repositories/search_motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/repositories/search_motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/set_solution_usecase.dart';
 // Features - Technical Catalogs (HU40)
 import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/brand_lines_datasource.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
@@ -124,20 +162,7 @@ import 'package:motogo_frontend/src/features/user_home/data/datasources/nearby_b
 import 'package:motogo_frontend/src/features/user_home/data/repositories/nearby_branches_repository_impl.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/repositories/nearby_branches_repository.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/usecases/get_nearby_branches_usecase.dart';
-// Features - Branch Detail
-import 'package:motogo_frontend/src/features/branch_detail/data/datasources/branch_detail_datasource.dart';
-import 'package:motogo_frontend/src/features/branch_detail/data/repositories/branch_detail_repository_impl.dart';
-import 'package:motogo_frontend/src/features/branch_detail/domain/repositories/branch_detail_repository.dart';
-import 'package:motogo_frontend/src/features/branch_detail/domain/usecases/get_branch_detail_usecase.dart';
-// Features - Request Diagnostic
-import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
-// Features - Motorcycle Evidence
-import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/repositories/motorcycle_evidence_repository.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/upload_evidence_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/delete_evidence_usecase.dart';
-import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/usecases/get_evidence_usecase.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
 
 part 'injector.g.dart';
 
@@ -195,6 +220,11 @@ abstract class InjectorApp {
     // UserSession - has its own Dio (receives token as parameter)
     container.registerFactory<UserSessionDataSource>(
       (c) => UserSessionDataSourceImpl(),
+    );
+
+    // Login - has its own Dio (public endpoint, no auth)
+    container.registerFactory<LoginDataSource>(
+      (c) => LoginDataSource(c.resolve<UserSessionDataSource>()),
     );
 
     // FirebaseToken - uses DioClient
@@ -392,6 +422,12 @@ abstract class InjectorApp {
     container.registerSingleton<LocationService>(
       (c) => LocationService.instance,
     );
+    container.registerFactory<UserHomeBloc>(
+      (c) => UserHomeBloc(
+        getNearbyBranchesUseCase: c.resolve<GetNearbyBranchesUseCase>(),
+        locationService: c.resolve<LocationService>(),
+      ),
+    );
 
     // Branch Detail - uses multiple datasources
     container.registerFactory<BranchDetailDataSource>(
@@ -406,6 +442,11 @@ abstract class InjectorApp {
     );
     container.registerFactory<GetBranchDetailUseCase>(
       (c) => GetBranchDetailUseCase(c.resolve<BranchDetailRepository>()),
+    );
+    container.registerFactory<BranchDetailBloc>(
+      (c) => BranchDetailBloc(
+        getBranchDetailUseCase: c.resolve<GetBranchDetailUseCase>(),
+      ),
     );
 
     // Search Motorcycle by Plate (HU47)
@@ -422,6 +463,9 @@ abstract class InjectorApp {
         c.resolve<SearchMotorcycleRepository>(),
       ),
     );
+    container.registerFactory<SetSolutionUseCase>(
+      (c) => SetSolutionUseCase(c.resolve<SearchMotorcycleRepository>()),
+    );
 
     // Technical Catalogs - Brand Lines (HU40)
     container.registerFactory<BrandLinesDataSource>(
@@ -434,6 +478,39 @@ abstract class InjectorApp {
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
     );
 
+    // Diagnostic Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticDataSource>(
+      (c) => DiagnosticDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticRepository>(
+      (c) => DiagnosticRepositoryImpl(c.resolve<DiagnosticDataSource>()),
+    );
+    container.registerFactory<CreateDiagnosticUseCase>(
+      (c) => CreateDiagnosticUseCase(c.resolve<DiagnosticRepository>()),
+    );
+
+    // Diagnostic Permission Feature - DataSource, Repository, UseCase
+    container.registerFactory<DiagnosticPermissionDataSource>(
+      (c) => DiagnosticPermissionDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<DiagnosticPermissionRepository>(
+      (c) => DiagnosticPermissionRepositoryImpl(
+        c.resolve<DiagnosticPermissionDataSource>(),
+      ),
+    );
+    container.registerFactory<GrantPermissionUseCase>(
+      (c) =>
+          GrantPermissionUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+    container.registerFactory<RevokePermissionUseCase>(
+      (c) =>
+          RevokePermissionUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+    container.registerFactory<ListPermissionsUseCase>(
+      (c) =>
+          ListPermissionsUseCase(c.resolve<DiagnosticPermissionRepository>()),
+    );
+
     // Request Diagnostic - BLoC
     container.registerFactory<RequestDiagnosticBloc>(
       (c) => RequestDiagnosticBloc(
@@ -441,7 +518,93 @@ abstract class InjectorApp {
         uploadEvidenceUseCase: c.resolve<UploadEvidenceUseCase>(),
         deleteEvidenceUseCase: c.resolve<DeleteEvidenceUseCase>(),
         getEvidenceUseCase: c.resolve<GetEvidenceUseCase>(),
+        createDiagnosticUseCase: c.resolve<CreateDiagnosticUseCase>(),
+        grantPermissionUseCase: c.resolve<GrantPermissionUseCase>(),
+        listPermissionsUseCase: c.resolve<ListPermissionsUseCase>(),
       ),
+    );
+
+    // === BLoC Registrations ===
+
+    // Login BLoC
+    container.registerFactory<LoginBloc>(
+      (c) => LoginBloc(loginUseCase: c.resolve<LoginUseCase>()),
+    );
+
+    // Register Person BLoC
+    container.registerFactory<RegisterPersonBloc>(
+      (c) => RegisterPersonBloc(
+        registerUseCase: c.resolve<RegisterPersonUseCase>(),
+      ),
+    );
+
+    // Edit Profile BLoC
+    container.registerFactory<EditProfileBloc>(
+      (c) => EditProfileBloc(
+        getPersonUsecase: c.resolve<GetPersonUsecase>(),
+        updatePersonUsecase: c.resolve<UpdatePersonUsecase>(),
+      ),
+    );
+
+    // Email Recovery Verification BLoC
+    container.registerFactory<EmailRecoveryVerificationBloc>(
+      (c) => EmailRecoveryVerificationBloc(
+        verifyEmailUseCase: c.resolve<VerifyRecoveryEmailUseCase>(),
+      ),
+    );
+
+    // Change Password BLoC
+    container.registerFactory<ChangePasswordBloc>(
+      (c) => ChangePasswordBloc(
+        changePasswordUseCase: c.resolve<ChangePasswordUseCase>(),
+      ),
+    );
+
+    // Search Motorcycle BLoC (HU47)
+    container.registerFactory<SearchMotorcycleBloc>(
+      (c) => SearchMotorcycleBloc(
+        searchUseCase: c.resolve<SearchMotorcycleByPlateUseCase>(),
+        setSolutionUseCase: c.resolve<SetSolutionUseCase>(),
+      ),
+    );
+
+    // Register Motorcycle BLoC
+    container.registerFactory<RegisterMotorcycleBloc>(
+      (c) => RegisterMotorcycleBloc(
+        registerMotorcycleUseCase: c.resolve<RegisterMotorcycleUseCase>(),
+      ),
+    );
+
+    // Register Franchise BLoC
+    container.registerFactory<RegisterFranchiseBloc>(
+      (c) => RegisterFranchiseBloc(
+        registerFranchiseUseCase: c.resolve<RegisterFranchiseUseCase>(),
+      ),
+    );
+
+    // Edit Branch BLoC
+    container.registerFactory<EditBranchBloc>(
+      (c) =>
+          EditBranchBloc(updateBranchUseCase: c.resolve<UpdateBranchUseCase>()),
+    );
+
+    // Register Branch BLoC
+    container.registerFactory<RegisterBranchBloc>(
+      (c) => RegisterBranchBloc(
+        registerBranchUseCase: c.resolve<RegisterBranchUseCase>(),
+      ),
+    );
+
+    // Branch Schedule BLoC
+    container.registerFactory<BranchScheduleBloc>(
+      (c) =>
+          BranchScheduleBloc(repository: c.resolve<BranchScheduleRepository>()),
+    );
+
+    // My Branches BLoC
+    container.registerFactory<MyBranchesBloc>(
+      (c) =>
+          MyBranchesBloc(getBranchesUseCase: c.resolve<GetBranchesUseCase>()),
     );
 
     // Motorcycle Evidence
@@ -493,7 +656,6 @@ abstract class InjectorApp {
   @Register.factory(RegisterPersonDataSource)
   @Register.factory(LoginRepository, from: LoginRepositoryImpl)
   @Register.factory(LoginUseCase)
-  @Register.factory(LoginDataSource)
   @Register.factory(GetPersonUsecase)
   @Register.factory(UpdatePersonUsecase)
   @Register.factory(

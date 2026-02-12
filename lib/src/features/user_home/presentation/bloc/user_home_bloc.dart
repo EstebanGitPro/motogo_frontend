@@ -94,7 +94,6 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     final currentState = state;
     if (currentState is! UserHomeLoaded) return;
 
-    print('DEBUG LoadNearbyBranches - radius: ${event.radiusKm}km');
     emit(currentState.copyWith(isLoadingBranches: true));
 
     final result = await _getNearbyBranchesUseCase(
@@ -104,10 +103,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
       type: event.type,
     );
 
-    print('DEBUG LoadNearbyBranches - Result isRight: ${result.isRight}');
     result.fold(
       (error) {
-        print('DEBUG LoadNearbyBranches - ERROR: ${error.message}');
         emit(
           currentState.copyWith(
             isLoadingBranches: false,
@@ -117,13 +114,11 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
         );
       },
       (branches) {
-        print(
-          'DEBUG LoadNearbyBranches - SUCCESS: ${branches.length} branches, radius=${event.radiusKm}',
-        );
         emit(
           currentState.copyWith(
             branches: branches,
             activeTypeFilter: event.type,
+            clearActiveTypeFilter: event.type == null,
             currentRadiusKm: event.radiusKm,
             isLoadingBranches: false,
             clearError: true,
@@ -169,14 +164,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
 
   void _onChangeRadius(ChangeRadius event, Emitter<UserHomeState> emit) {
     final currentState = state;
-    print('DEBUG ChangeRadius - Requested: ${event.radiusKm}km');
-    print(
-      'DEBUG ChangeRadius - hasUserLocation: ${currentState is UserHomeLoaded && currentState.hasUserLocation}',
-    );
     if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
-      print(
-        'DEBUG ChangeRadius - Dispatching LoadNearbyBranches with radius: ${event.radiusKm}',
-      );
       add(
         LoadNearbyBranches(
           latitude: currentState.userLatitude!,

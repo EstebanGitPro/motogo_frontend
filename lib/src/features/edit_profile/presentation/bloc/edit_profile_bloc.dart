@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/get_person_usecase.dart';
@@ -10,17 +9,20 @@ part 'edit_profile_event.dart';
 part 'edit_profile_state.dart';
 
 class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
-  EditProfileBloc() : super(const EditProfileState()) {
-    final GetPersonUsecase getPersonUsecase =
-        InjectorApp.resolve<GetPersonUsecase>();
-    final UpdatePersonUsecase updatePersonUsecase =
-        InjectorApp.resolve<UpdatePersonUsecase>();
+  final GetPersonUsecase _getPersonUsecase;
+  final UpdatePersonUsecase _updatePersonUsecase;
 
+  EditProfileBloc({
+    required GetPersonUsecase getPersonUsecase,
+    required UpdatePersonUsecase updatePersonUsecase,
+  }) : _getPersonUsecase = getPersonUsecase,
+       _updatePersonUsecase = updatePersonUsecase,
+       super(const EditProfileState()) {
     on<EditProfileLoaded>(
-      (event, emit) => _onLoaded(event, emit, getPersonUsecase),
+      (event, emit) => _onLoaded(event, emit, _getPersonUsecase),
     );
     on<EditProfileSaved>(
-      (event, emit) => _onSaved(event, emit, updatePersonUsecase),
+      (event, emit) => _onSaved(event, emit, _updatePersonUsecase),
     );
     on<EditProfileCacheCleared>(_onCacheCleared);
     on<EditProfileReset>(_onReset);

@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_event.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_state.dart';
@@ -9,9 +8,8 @@ class RegisterBranchBloc
     extends Bloc<RegisterBranchEvent, RegisterBranchState> {
   final RegisterBranchUseCase _registerBranchUseCase;
 
-  RegisterBranchBloc({RegisterBranchUseCase? registerBranchUseCase})
-    : _registerBranchUseCase =
-          registerBranchUseCase ?? InjectorApp.resolve<RegisterBranchUseCase>(),
+  RegisterBranchBloc({required RegisterBranchUseCase registerBranchUseCase})
+    : _registerBranchUseCase = registerBranchUseCase,
       super(RegisterBranchInitial()) {
     on<RegisterBranchSubmitted>(_onSubmitted);
     on<RegisterBranchReset>(_onReset);

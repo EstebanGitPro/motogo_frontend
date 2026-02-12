@@ -54,6 +54,7 @@ class UserHomeLoaded extends UserHomeState {
     bool? isLoadingBranches,
     String? errorMessage,
     bool clearSelectedBranch = false,
+    bool clearActiveTypeFilter = false,
     bool clearError = false,
   }) {
     return UserHomeLoaded(
@@ -63,7 +64,9 @@ class UserHomeLoaded extends UserHomeState {
       selectedBranchId: clearSelectedBranch
           ? null
           : (selectedBranchId ?? this.selectedBranchId),
-      activeTypeFilter: activeTypeFilter ?? this.activeTypeFilter,
+      activeTypeFilter: clearActiveTypeFilter
+          ? null
+          : (activeTypeFilter ?? this.activeTypeFilter),
       locationPermissionDenied:
           locationPermissionDenied ?? this.locationPermissionDenied,
       currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,

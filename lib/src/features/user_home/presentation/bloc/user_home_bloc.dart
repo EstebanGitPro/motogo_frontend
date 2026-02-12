@@ -118,6 +118,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           currentState.copyWith(
             branches: branches,
             activeTypeFilter: event.type,
+            clearActiveTypeFilter: event.type == null,
             currentRadiusKm: event.radiusKm,
             isLoadingBranches: false,
             clearError: true,

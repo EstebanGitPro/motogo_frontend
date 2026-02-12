@@ -88,6 +88,7 @@ class SearchMotorcycleBloc
           reference: currentState.motorcycle.reference,
           diagnostics: updatedDiagnostics,
           evidence: currentState.motorcycle.evidence,
+          permittedBranches: currentState.motorcycle.permittedBranches,
         );
 
         emit(

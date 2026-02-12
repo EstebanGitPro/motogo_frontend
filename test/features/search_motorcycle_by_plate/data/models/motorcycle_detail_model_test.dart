@@ -63,6 +63,7 @@ void main() {
   });
 
   group('MotorcycleDetailModel', () {
+    // Evidence is nested inside diagnostics, matching actual backend response
     final validJson = {
       'id': 'moto-123',
       'license_plate': 'ABC12D',
@@ -82,16 +83,19 @@ void main() {
           'problem_description': 'Ruido extraño',
           'date': '2024-01-15',
           'sent_via_whatsapp': true,
+          'evidence': [
+            {
+              'id': 'ev-1',
+              'image_url': 'https://example.com/img.jpg',
+              'description': 'Foto frontal',
+              'created_at': '2024-01-15',
+            },
+          ],
         },
       ],
-      'evidence': [
-        {
-          'id': 'ev-1',
-          'motorcycle_id': 'moto-123',
-          'image_url': 'https://example.com/img.jpg',
-          'angle': 'Frontal',
-          'created_at': '2024-01-15',
-        },
+      'permitted_branches': [
+        {'id': 'branch-1', 'name': 'Taller Norte'},
+        {'id': 'branch-2', 'name': 'Taller Sur'},
       ],
     };
 
@@ -107,6 +111,9 @@ void main() {
         expect(model.reference.brandName, 'Yamaha');
         expect(model.diagnostics.length, 1);
         expect(model.evidence.length, 1);
+        expect(model.permittedBranches.length, 2);
+        expect(model.permittedBranches[0].id, 'branch-1');
+        expect(model.permittedBranches[0].name, 'Taller Norte');
       });
 
       test('should use defaults for missing/null fields', () {
@@ -119,6 +126,7 @@ void main() {
         expect(model.profileImageUrl, isNull);
         expect(model.diagnostics, isEmpty);
         expect(model.evidence, isEmpty);
+        expect(model.permittedBranches, isEmpty);
       });
 
       test('should handle null reference as empty map', () {
@@ -151,14 +159,21 @@ void main() {
         expect(model.diagnostics, isEmpty);
       });
 
-      test('should handle null evidence list', () {
+      test('should handle diagnostics with no evidence', () {
         final json = {
           'id': 'moto-123',
           'license_plate': 'ABC12D',
           'year': 2023,
           'current_mileage': 5000,
           'reference': <String, dynamic>{},
-          'evidence': null,
+          'diagnostics': [
+            {
+              'id': 'diag-1',
+              'motorcycle_id': 'moto-123',
+              'problem_description': 'Test',
+              'date': '2024-01-15',
+            },
+          ],
         };
 
         final model = MotorcycleDetailModel.fromJson(json);
@@ -181,19 +196,104 @@ void main() {
         expect(model.diagnostics, isEmpty);
       });
 
-      test('should handle non-list evidence value', () {
+      test('should handle non-list evidence inside diagnostic', () {
         final json = {
           'id': 'moto-123',
           'license_plate': 'ABC12D',
           'year': 2023,
           'current_mileage': 5000,
           'reference': <String, dynamic>{},
-          'evidence': 42,
+          'diagnostics': [
+            {
+              'id': 'diag-1',
+              'motorcycle_id': 'moto-123',
+              'problem_description': 'Test',
+              'date': '2024-01-15',
+              'evidence': 42,
+            },
+          ],
         };
 
         final model = MotorcycleDetailModel.fromJson(json);
 
         expect(model.evidence, isEmpty);
+      });
+
+      test('should parse top-level evidence field (HU16-19)', () {
+        final json = {
+          'id': 'moto-123',
+          'license_plate': 'ABC12D',
+          'year': 2023,
+          'current_mileage': 5000,
+          'reference': <String, dynamic>{},
+          'evidence': [
+            {
+              'id': 'ev-top-1',
+              'motorcycle_id': 'moto-123',
+              'angle': 'frontal',
+              'image_url': 'https://example.com/front.jpg',
+              'description': 'Foto frontal',
+              'created_at': '2024-01-15T10:00:00Z',
+            },
+            {
+              'id': 'ev-top-2',
+              'motorcycle_id': 'moto-123',
+              'angle': 'lateral',
+              'image_url': 'https://example.com/side.jpg',
+              'description': null,
+              'created_at': '2024-01-15T10:01:00Z',
+            },
+          ],
+        };
+
+        final model = MotorcycleDetailModel.fromJson(json);
+
+        expect(model.evidence.length, 2);
+        expect(model.evidence[0].id, 'ev-top-1');
+        expect(model.evidence[0].imageUrl, 'https://example.com/front.jpg');
+        expect(model.evidence[0].angle, 'frontal');
+        expect(model.evidence[1].id, 'ev-top-2');
+        expect(model.evidence[1].description, isNull);
+      });
+
+      test('should prioritize top-level evidence over diagnostic evidence', () {
+        final json = {
+          'id': 'moto-123',
+          'license_plate': 'ABC12D',
+          'year': 2023,
+          'current_mileage': 5000,
+          'reference': <String, dynamic>{},
+          'evidence': [
+            {
+              'id': 'ev-top-1',
+              'motorcycle_id': 'moto-123',
+              'image_url': 'https://example.com/top.jpg',
+              'created_at': '2024-01-15',
+            },
+          ],
+          'diagnostics': [
+            {
+              'id': 'diag-1',
+              'motorcycle_id': 'moto-123',
+              'problem_description': 'Test',
+              'date': '2024-01-15',
+              'evidence': [
+                {
+                  'id': 'ev-diag-1',
+                  'image_url': 'https://example.com/diag.jpg',
+                  'created_at': '2024-01-15',
+                },
+              ],
+            },
+          ],
+        };
+
+        final model = MotorcycleDetailModel.fromJson(json);
+
+        // Top-level evidence takes priority
+        expect(model.evidence.length, 1);
+        expect(model.evidence[0].id, 'ev-top-1');
+        expect(model.evidence[0].imageUrl, 'https://example.com/top.jpg');
       });
 
       test('should handle numeric values as doubles', () {
@@ -228,6 +328,10 @@ void main() {
         expect(entity.diagnostics.first.id, 'diag-1');
         expect(entity.evidence.length, 1);
         expect(entity.evidence.first.id, 'ev-1');
+        expect(entity.evidence.first.imageUrl, 'https://example.com/img.jpg');
+        expect(entity.permittedBranches.length, 2);
+        expect(entity.permittedBranches[0].id, 'branch-1');
+        expect(entity.permittedBranches[0].name, 'Taller Norte');
       });
 
       test('should handle empty diagnostics and evidence', () {
@@ -248,6 +352,41 @@ void main() {
 
         expect(entity.diagnostics, isEmpty);
         expect(entity.evidence, isEmpty);
+        expect(entity.permittedBranches, isEmpty);
+      });
+    });
+  });
+
+  group('PermittedBranchInfoModel', () {
+    group('fromJson', () {
+      test('should parse all fields from valid JSON', () {
+        final json = {'id': 'branch-1', 'name': 'Taller Norte'};
+
+        final model = PermittedBranchInfoModel.fromJson(json);
+
+        expect(model.id, 'branch-1');
+        expect(model.name, 'Taller Norte');
+      });
+
+      test('should use defaults for missing/null fields', () {
+        final model = PermittedBranchInfoModel.fromJson({});
+
+        expect(model.id, '');
+        expect(model.name, '');
+      });
+    });
+
+    group('toEntity', () {
+      test('should map all fields correctly', () {
+        const model = PermittedBranchInfoModel(
+          id: 'branch-1',
+          name: 'Taller Norte',
+        );
+
+        final entity = model.toEntity();
+
+        expect(entity.id, 'branch-1');
+        expect(entity.name, 'Taller Norte');
       });
     });
   });

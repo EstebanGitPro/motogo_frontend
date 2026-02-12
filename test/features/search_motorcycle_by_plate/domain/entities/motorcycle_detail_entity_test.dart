@@ -202,7 +202,7 @@ void main() {
           reference: testReference,
         );
 
-        expect(entity.props.length, 8);
+        expect(entity.props.length, 9);
         expect(entity.props, contains('moto-123'));
         expect(entity.props, contains('ABC12D'));
         expect(entity.props, contains(2023));
@@ -210,6 +210,55 @@ void main() {
         expect(entity.props, contains('https://example.com/profile.jpg'));
         expect(entity.props, contains(testReference));
       });
+    });
+  });
+
+  group('PermittedBranchEntity', () {
+    test('should create instance with required fields', () {
+      const entity = PermittedBranchEntity(
+        id: 'branch-1',
+        name: 'Taller Norte',
+      );
+
+      expect(entity.id, 'branch-1');
+      expect(entity.name, 'Taller Norte');
+    });
+
+    test('should be equal when all properties match', () {
+      const entity1 = PermittedBranchEntity(
+        id: 'branch-1',
+        name: 'Taller Norte',
+      );
+      const entity2 = PermittedBranchEntity(
+        id: 'branch-1',
+        name: 'Taller Norte',
+      );
+
+      expect(entity1, equals(entity2));
+    });
+
+    test('should not be equal when id differs', () {
+      const entity1 = PermittedBranchEntity(
+        id: 'branch-1',
+        name: 'Taller Norte',
+      );
+      const entity2 = PermittedBranchEntity(
+        id: 'branch-2',
+        name: 'Taller Norte',
+      );
+
+      expect(entity1, isNot(equals(entity2)));
+    });
+
+    test('props should include id and name', () {
+      const entity = PermittedBranchEntity(
+        id: 'branch-1',
+        name: 'Taller Norte',
+      );
+
+      expect(entity.props.length, 2);
+      expect(entity.props, contains('branch-1'));
+      expect(entity.props, contains('Taller Norte'));
     });
   });
 }

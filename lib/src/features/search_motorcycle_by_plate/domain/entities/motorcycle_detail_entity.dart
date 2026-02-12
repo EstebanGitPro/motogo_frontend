@@ -22,6 +22,19 @@ class MotorcycleReferenceInfoEntity extends Equatable {
   List<Object?> get props => [brandName, model, category, engineDisplacementCc];
 }
 
+/// Information about a branch that has active diagnostic permission.
+///
+/// Part of the domain layer for search motorcycle by plate feature.
+class PermittedBranchEntity extends Equatable {
+  final String id;
+  final String name;
+
+  const PermittedBranchEntity({required this.id, required this.name});
+
+  @override
+  List<Object?> get props => [id, name];
+}
+
 /// Entity representing detailed motorcycle information from plate lookup.
 ///
 /// Includes full reference information (brand, model, category, engine)
@@ -36,6 +49,7 @@ class MotorcycleDetailEntity extends Equatable {
   final MotorcycleReferenceInfoEntity reference;
   final List<DiagnosticEntity> diagnostics;
   final List<MotorcycleEvidenceEntity> evidence;
+  final List<PermittedBranchEntity> permittedBranches;
 
   const MotorcycleDetailEntity({
     required this.id,
@@ -46,6 +60,7 @@ class MotorcycleDetailEntity extends Equatable {
     required this.reference,
     this.diagnostics = const [],
     this.evidence = const [],
+    this.permittedBranches = const [],
   });
 
   @override
@@ -58,5 +73,6 @@ class MotorcycleDetailEntity extends Equatable {
     reference,
     diagnostics,
     evidence,
+    permittedBranches,
   ];
 }

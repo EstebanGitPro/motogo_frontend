@@ -65,7 +65,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
       _isDateRange = false;
       _openingTime = const TimeOfDay(hour: 9, minute: 0);
       _closingTime = const TimeOfDay(hour: 18, minute: 0);
-      _isClosed = false;
+      _isClosed = true;
     }
   }
 

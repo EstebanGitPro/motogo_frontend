@@ -103,9 +103,15 @@ class DiagnosticPermissionDataSourceImpl
         if (data is List) {
           items = data;
         } else if (data is Map<String, dynamic>) {
-          final nestedItems = data['items'];
-          if (nestedItems is List) {
-            items = nestedItems;
+          // Backend wraps list under 'permissions' key
+          final permissions = data['permissions'];
+          if (permissions is List) {
+            items = permissions;
+          } else {
+            final nestedItems = data['items'];
+            if (nestedItems is List) {
+              items = nestedItems;
+            }
           }
         }
 

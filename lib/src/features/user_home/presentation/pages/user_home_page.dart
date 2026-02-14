@@ -7,26 +7,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
-import 'package:motogo_frontend/src/core/services/mapbox_directions_service.dart';
 import 'package:motogo_frontend/src/core/config/secrets.dart';
 import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
-import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/location_service.dart';
+import 'package:motogo_frontend/src/core/services/mapbox_directions_service.dart';
+import 'package:motogo_frontend/src/core/utils/app_logger.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/widgets/user_home_drawer.dart';
 import 'package:motogo_frontend/src/features/branch_detail/presentation/pages/branch_detail_page.dart';
-import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
-import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
-import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
-import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
-import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/my_motorcycles_page.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pages/register_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/widgets/branch_card.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/widgets/filter_bottom_sheet.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/widgets/navigation_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
@@ -114,7 +109,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
         ),
         actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
       ),
-      drawer: _buildDrawer(context),
+      drawer: const UserHomeDrawer(),
       body: BlocConsumer<UserHomeBloc, UserHomeState>(
         listener: (context, state) {
           if (state is UserHomeLoaded && state.hasUserLocation) {
@@ -178,7 +173,13 @@ class _UserHomeViewState extends State<_UserHomeView> {
                   bottom: 100,
                   left: 16,
                   right: 16,
-                  child: _buildBranchCard(state.selectedBranch!),
+                  child: BranchCard(
+                    branch: state.selectedBranch!,
+                    onSeeMore: () =>
+                        _navigateToBranchDetail(context, state.selectedBranch!),
+                    onNavigate: () =>
+                        _startNavigation(context, state.selectedBranch!),
+                  ),
                 ),
               // Navigation bottom sheet
               if (_isNavigating || _isLoadingRoute)
@@ -186,7 +187,23 @@ class _UserHomeViewState extends State<_UserHomeView> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: _buildNavigationSheet(),
+                  child: NavigationBottomSheet(
+                    isLoadingRoute: _isLoadingRoute,
+                    isImmersiveMode: _isImmersiveMode,
+                    navigationTarget: _navigationTarget,
+                    activeDistanceKm: _activeRoute?.distanceKm,
+                    activeDurationMin: _activeRoute?.durationMin,
+                    liveDistanceKm: _liveDistanceKm,
+                    liveDurationMin: _liveDurationMin,
+                    onBeginImmersive: _beginImmersiveTracking,
+                    onCancelRoute: _clearRoute,
+                    onOpenGoogleMaps: _navigationTarget != null
+                        ? () => _openGoogleMaps(
+                            _navigationTarget!.latitude,
+                            _navigationTarget!.longitude,
+                          )
+                        : null,
+                  ),
                 ),
               // FABs column: Add motorcycle + My location
               Positioned(
@@ -381,13 +398,13 @@ class _UserHomeViewState extends State<_UserHomeView> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Activa tu ubicación para ver talleres cercanos',
+                CommonConstants.locationPermissionBanner,
                 style: TextStyle(color: Colors.orange[900]),
               ),
             ),
             TextButton(
               onPressed: () => LocationService.instance.openAppSettings(),
-              child: const Text('Activar'),
+              child: const Text(CommonConstants.activate),
             ),
           ],
         ),
@@ -618,127 +635,6 @@ class _UserHomeViewState extends State<_UserHomeView> {
             ApplyAdvancedFilters(brand: brand, displacementRange: displacement),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildBranchCard(BranchMarkerEntity branch) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: branch.isWorkshop || branch.isWorkshopStore
-                        ? Colors.orange[50]
-                        : Colors.green[50],
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    branch.isWorkshop || branch.isWorkshopStore
-                        ? Icons.build
-                        : Icons.store,
-                    color: branch.isWorkshop || branch.isWorkshopStore
-                        ? Colors.orange[600]
-                        : Colors.green[600],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        branch.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (branch.address != null)
-                        Text(
-                          branch.address!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                if (branch.rating != null)
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 20),
-                      Text(branch.rating!.toStringAsFixed(1)),
-                    ],
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: branch.isWorkshop || branch.isWorkshopStore
-                        ? Colors.orange[100]
-                        : Colors.green[100],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    branch.displayTypeLabel,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: branch.isWorkshop || branch.isWorkshopStore
-                          ? Colors.orange[800]
-                          : Colors.green[800],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                if (branch.distanceKm != null)
-                  Text(
-                    '${branch.distanceKm!.toStringAsFixed(1)} km',
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => _navigateToBranchDetail(context, branch),
-                  child: const Text(CommonConstants.seeMore),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _startNavigation(context, branch),
-                    icon: const Icon(Icons.directions, size: 18),
-                    label: const Text(
-                      CommonConstants.howToGetThere,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -1016,7 +912,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
       LineLayer(
         id: 'route-layer',
         sourceId: 'route-source',
-        lineColor: Colors.blue.value,
+        lineColor: Colors.blue.toARGB32(),
         lineWidth: 5.0,
         lineCap: LineCap.ROUND,
         lineJoin: LineJoin.ROUND,
@@ -1044,7 +940,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
           symbolSpacing: 80.0,
           textField: '▶',
           textSize: 16.0,
-          textColor: Colors.white.value,
+          textColor: Colors.white.toARGB32(),
           textAllowOverlap: true,
           textIgnorePlacement: true,
           textRotationAlignment: TextRotationAlignment.MAP,
@@ -1052,7 +948,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
       );
     } catch (e) {
       // Arrow layer is optional — route still works without it
-      debugPrint('Could not add route arrows: $e');
+      AppLogger.error('Could not add route arrows: $e');
     }
   }
 
@@ -1131,493 +1027,5 @@ class _UserHomeViewState extends State<_UserHomeView> {
       _liveDistanceKm = null;
       _liveDurationMin = null;
     });
-  }
-
-  Widget _buildNavigationSheet() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 12,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: _isLoadingRoute
-          ? const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 12),
-                  Text(CommonConstants.loadingRoute),
-                ],
-              ),
-            )
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Handle
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                // Branch name + route info
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.blue[50],
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.directions, color: Colors.blue[600]),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _navigationTarget?.name ?? '',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
-                          if (_activeRoute != null)
-                            Text(
-                              '${(_liveDistanceKm ?? _activeRoute!.distanceKm).toStringAsFixed(1)} km · '
-                              '${(_liveDurationMin ?? _activeRoute!.durationMin).round()} ${CommonConstants.estimatedTime}',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Action buttons — layout depends on immersive mode
-                if (!_isImmersiveMode && _activeRoute != null) ...[
-                  // "Comenzar" full-width button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _beginImmersiveTracking,
-                      icon: const Icon(Icons.navigation_rounded, size: 20),
-                      label: const Text(
-                        CommonConstants.startNavigation,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green[600],
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Cancel + Google Maps row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _clearRoute,
-                          icon: const Icon(Icons.close, size: 18),
-                          label: const Text(CommonConstants.cancelRoute),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _navigationTarget != null
-                              ? () => _openGoogleMaps(
-                                  _navigationTarget!.latitude,
-                                  _navigationTarget!.longitude,
-                                )
-                              : null,
-                          icon: const Icon(Icons.map, size: 18),
-                          label: const Text(
-                            CommonConstants.openInGoogleMaps,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue[600],
-                            side: BorderSide(color: Colors.blue[600]!),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  // Immersive mode: Cancel + Google Maps
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: _clearRoute,
-                          icon: const Icon(Icons.close, size: 18),
-                          label: const Text(CommonConstants.cancelRoute),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: _navigationTarget != null
-                              ? () => _openGoogleMaps(
-                                  _navigationTarget!.latitude,
-                                  _navigationTarget!.longitude,
-                                )
-                              : null,
-                          icon: const Icon(Icons.map, size: 18),
-                          label: const Text(
-                            CommonConstants.openInGoogleMaps,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[600],
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-    );
-  }
-
-  void _navigateToLegal(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LegalPage()),
-    );
-  }
-
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue, Colors.blueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.account_circle, size: 60, color: Colors.white),
-                SizedBox(height: 8),
-                Text(
-                  MotorcycleConstants.drawerTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuHome,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () => Navigator.pop(context),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.edit, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuEditProfile,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditMyProfilePage(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.two_wheeler, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuMyMotorcycle,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MyMotorcyclesPage(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.lock, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuChangePassword,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                    create: (context) =>
-                        InjectorApp.resolve<ChangePasswordBloc>(),
-                    child: const ChangePasswordPage(),
-                  ),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text(
-              MotorcycleConstants.menuDeleteAccount,
-              style: TextStyle(fontSize: 16, color: Colors.red),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showDeleteAccountDialog(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuLogout,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () => _showLogoutDialog(context),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuAbout,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _navigateToLegal(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteAccountDialog(BuildContext context) {
-    final confirmController = TextEditingController();
-    bool isConfirmValid = false;
-    bool isDeleting = false;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (stateContext, setDialogState) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      PersonConstants.deleteAccountTitle,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    PersonConstants.deleteAccountWarning,
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    PersonConstants.deleteAccountConfirmPrompt,
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: confirmController,
-                    enabled: !isDeleting,
-                    decoration: InputDecoration(
-                      hintText: PersonConstants.deleteAccountConfirmWord,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setDialogState(() {
-                        isConfirmValid =
-                            value.toLowerCase().trim() ==
-                            PersonConstants.deleteAccountConfirmWord;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isDeleting
-                      ? null
-                      : () => Navigator.pop(dialogContext),
-                  child: const Text(CommonConstants.cancel),
-                ),
-                TextButton(
-                  onPressed: (!isConfirmValid || isDeleting)
-                      ? null
-                      : () async {
-                          setDialogState(() => isDeleting = true);
-                          final deleteUseCase =
-                              InjectorApp.resolve<DeletePersonUseCase>();
-                          final result = await deleteUseCase();
-                          result.fold(
-                            (error) {
-                              setDialogState(() => isDeleting = false);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(error.message),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            },
-                            (message) {
-                              Navigator.pop(dialogContext);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(message),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              context.read<EditProfileBloc>().add(
-                                const EditProfileReset(),
-                              );
-                              context.read<LoginBloc>().add(LoginLogout());
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/login',
-                                (route) => false,
-                              );
-                            },
-                          );
-                        },
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: isDeleting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(PersonConstants.deleteAccountButton),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return BlocConsumer<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginLoggedOut) {
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil('/login', (route) => false);
-            }
-          },
-          builder: (context, state) {
-            return AlertDialog(
-              title: const Text(MotorcycleConstants.confirmLogoutTitle),
-              content: const Text(MotorcycleConstants.confirmLogoutMessage),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text(CommonConstants.cancel),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    context.read<EditProfileBloc>().add(
-                      const EditProfileReset(),
-                    );
-                    context.read<LoginBloc>().add(LoginLogout());
-                  },
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text(MotorcycleConstants.menuLogout),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 }

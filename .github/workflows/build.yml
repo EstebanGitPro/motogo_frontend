@@ -39,8 +39,8 @@ jobs:
       - name: 📦 Instalar dependencias
         run: flutter pub get
 
-      - name: 🧪 Tests
-        run: flutter test
+      - name: 🧪 Tests con cobertura
+        run: flutter test --coverage
 
       - name: 🔎 SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/branch_type_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/brand_model.dart';
+import 'package:motogo_frontend/src/core/catalogs/data/models/displacement_range_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/city_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/department_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/service_model.dart';
@@ -35,6 +36,10 @@ abstract class CatalogsDataSource {
 
   /// Fetches the list of service types.
   Future<Either<ErrorModel, List<String>>> getServiceTypes();
+
+  /// Fetches the list of engine displacement ranges.
+  Future<Either<ErrorModel, List<DisplacementRangeModel>>>
+  getDisplacementRanges();
 }
 
 class CatalogsDataSourceImpl implements CatalogsDataSource {
@@ -209,6 +214,30 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
           }
         }
         return const Right([]);
+      }
+      return const Right([]);
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  @override
+  Future<Either<ErrorModel, List<DisplacementRangeModel>>>
+  getDisplacementRanges() async {
+    try {
+      final response = await _dioClient.get('/engine-displacements');
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final ranges = DisplacementRangeModel.fromJsonList(responseData);
+        return Right(ranges);
       }
       return const Right([]);
     } on DioException catch (e) {

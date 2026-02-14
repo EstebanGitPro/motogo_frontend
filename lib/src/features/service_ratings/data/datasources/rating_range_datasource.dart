@@ -30,22 +30,8 @@ class RatingRangeDataSourceImpl implements RatingRangeDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
-        final data = responseData['data'] as Map<String, dynamic>?;
-
-        if (data != null) {
-          final ratingsList = data['ratings'] as List<dynamic>?;
-
-          if (ratingsList != null) {
-            final ratings = ratingsList
-                .map(
-                  (json) =>
-                      RatingRangeModel.fromJson(json as Map<String, dynamic>),
-                )
-                .toList();
-            return Right(ratings);
-          }
-        }
-        return const Right([]);
+        final ratings = RatingRangeModel.fromJsonList(responseData);
+        return Right(ratings);
       }
       return const Right([]);
     } on DioException catch (e) {

@@ -40,6 +40,64 @@ void main() {
       });
     });
 
+    group('fromJsonList', () {
+      test('parses valid HATEOAS response', () {
+        final response = {
+          'data': {
+            'ratings': [
+              {'value': 1, 'label': 'Malo'},
+              {'value': 3, 'label': 'Regular'},
+              {'value': 5, 'label': 'Excelente'},
+            ],
+          },
+        };
+
+        final models = RatingRangeModel.fromJsonList(response);
+
+        expect(models, hasLength(3));
+        expect(models[0].value, 1);
+        expect(models[0].label, 'Malo');
+        expect(models[2].value, 5);
+        expect(models[2].label, 'Excelente');
+      });
+
+      test('returns empty list when data is null', () {
+        final response = <String, dynamic>{'data': null};
+
+        final models = RatingRangeModel.fromJsonList(response);
+
+        expect(models, isEmpty);
+      });
+
+      test('returns empty list when data key is missing', () {
+        final response = <String, dynamic>{};
+
+        final models = RatingRangeModel.fromJsonList(response);
+
+        expect(models, isEmpty);
+      });
+
+      test('returns empty list when ratings is null', () {
+        final response = {
+          'data': <String, dynamic>{'ratings': null},
+        };
+
+        final models = RatingRangeModel.fromJsonList(response);
+
+        expect(models, isEmpty);
+      });
+
+      test('returns empty list when ratings list is empty', () {
+        final response = {
+          'data': {'ratings': <dynamic>[]},
+        };
+
+        final models = RatingRangeModel.fromJsonList(response);
+
+        expect(models, isEmpty);
+      });
+    });
+
     group('toEntity', () {
       test('converts to RatingRangeEntity correctly', () {
         const model = RatingRangeModel(value: 4, label: 'Bueno');

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:motogo_frontend/src/core/user/data/models/user_model.dart';
 import 'package:motogo_frontend/src/core/user/domain/entities/user_entity.dart';
@@ -22,8 +23,22 @@ class UserSessionManager {
   static const String _userDataKey = 'user_data';
   static const String _userIdKey = 'user_id';
 
-  // Secure storage instance
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  // Secure storage instance (inyectable para tests)
+  FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+
+  /// Permite inyectar un mock de FlutterSecureStorage en tests.
+  @visibleForTesting
+  set secureStorageOverride(FlutterSecureStorage storage) =>
+      _secureStorage = storage;
+
+  /// Limpia el estado del singleton para aislar tests.
+  @visibleForTesting
+  void resetForTesting() {
+    _currentUser = null;
+    _accessToken = null;
+    _refreshToken = null;
+    _secureStorage = const FlutterSecureStorage();
+  }
 
   // In-memory cache
   UserEntity? _currentUser;

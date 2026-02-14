@@ -123,7 +123,6 @@ class MotorcycleConstants {
       'No hay diagnósticos registrados';
   static const String diagnosticPendingSolution = 'Pendiente de solución';
   static const String diagnosticEvidenceLabel = 'Evidencia fotográfica';
-  static const String diagnosticSentViaWhatsapp = 'Enviado por WhatsApp';
 
   // Motorcycle Evidence Gallery (workshop view)
   static const String motorcycleEvidenceTitle = 'Galería de evidencias';

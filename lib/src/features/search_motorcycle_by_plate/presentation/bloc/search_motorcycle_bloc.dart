@@ -72,7 +72,6 @@ class SearchMotorcycleBloc
               problemDescription: d.problemDescription,
               possibleSolution: event.solution,
               date: d.date,
-              sentViaWhatsapp: d.sentViaWhatsapp,
               evidence: d.evidence,
             );
           }

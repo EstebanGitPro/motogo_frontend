@@ -5,14 +5,14 @@ import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
+import 'package:motogo_frontend/src/core/widgets/delete_account_dialog.dart';
+import 'package:motogo_frontend/src/core/widgets/logout_dialog.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 import 'package:motogo_frontend/src/features/change_password/presentation/pages/change_password_page.dart';
-import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/edit_profile/presentation/pages/edit_profile_page.dart';
 import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
-import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_bloc.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/bloc/manage_franchise_event.dart';
 import 'package:motogo_frontend/src/features/manage_franchise/presentation/pages/manage_franchise_page.dart';
@@ -318,133 +318,105 @@ class _HomeViewState extends State<_HomeView> {
   }
 
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue, Colors.blueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.account_circle, size: 60, color: Colors.white),
-                SizedBox(height: 8),
-                Text(
-                  'Menú Principal',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuHome,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.search, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuSearchByPlate,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SearchMotorcyclePage(),
-                ),
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.edit, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuEditProfile,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const EditMyProfilePage(),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.lock, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuChangePassword,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                    create: (context) =>
-                        InjectorApp.resolve<ChangePasswordBloc>(),
-                    child: const ChangePasswordPage(),
-                  ),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text(
-              PersonConstants.deleteAccountMenuTitle,
-              style: TextStyle(fontSize: 16, color: Colors.red),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _showDeleteAccountDialog(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuLogout,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              _showLogoutDialog(context);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info, color: Colors.blue),
-            title: const Text(
-              MotorcycleConstants.menuAbout,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _navigateToLegal(context);
-            },
-          ),
-        ],
+    return AppDrawer(
+      header: const AppDrawerHeader(
+        icon: Icons.account_circle,
+        title: 'Menú Principal',
       ),
+      menuItems: [
+        ListTile(
+          leading: const Icon(Icons.home, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuHome,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () => Navigator.pop(context),
+        ),
+        ListTile(
+          leading: const Icon(Icons.search, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuSearchByPlate,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SearchMotorcyclePage(),
+              ),
+            );
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.edit, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuEditProfile,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EditMyProfilePage(),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.lock, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuChangePassword,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) =>
+                      InjectorApp.resolve<ChangePasswordBloc>(),
+                  child: const ChangePasswordPage(),
+                ),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.delete_forever, color: Colors.red),
+          title: const Text(
+            PersonConstants.deleteAccountMenuTitle,
+            style: TextStyle(fontSize: 16, color: Colors.red),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            showDeleteAccountDialog(context);
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.logout, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuLogout,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () => showLogoutConfirmDialog(context),
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.info, color: Colors.blue),
+          title: const Text(
+            MotorcycleConstants.menuAbout,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToLegal(context);
+          },
+        ),
+      ],
     );
   }
 
@@ -550,181 +522,6 @@ class _HomeViewState extends State<_HomeView> {
           ),
         ],
       ),
-    );
-  }
-
-  void _showDeleteAccountDialog(BuildContext context) {
-    final confirmController = TextEditingController();
-    bool isConfirmValid = false;
-    bool isDeleting = false;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (stateContext, setDialogState) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.red[700]),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      PersonConstants.deleteAccountTitle,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    PersonConstants.deleteAccountWarning,
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    PersonConstants.deleteAccountConfirmPrompt,
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: confirmController,
-                    enabled: !isDeleting,
-                    decoration: InputDecoration(
-                      hintText: PersonConstants.deleteAccountConfirmWord,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      setDialogState(() {
-                        isConfirmValid =
-                            value.toLowerCase().trim() ==
-                            PersonConstants.deleteAccountConfirmWord;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: isDeleting
-                      ? null
-                      : () => Navigator.pop(dialogContext),
-                  child: const Text(CommonConstants.cancel),
-                ),
-                TextButton(
-                  onPressed: (!isConfirmValid || isDeleting)
-                      ? null
-                      : () async {
-                          setDialogState(() {
-                            isDeleting = true;
-                          });
-
-                          final deleteUseCase =
-                              InjectorApp.resolve<DeletePersonUseCase>();
-                          final result = await deleteUseCase();
-
-                          result.fold(
-                            (error) {
-                              setDialogState(() {
-                                isDeleting = false;
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(error.message),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            },
-                            (message) {
-                              Navigator.pop(dialogContext);
-                              // Show success message from backend
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(message),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              // Clear session and redirect to login
-                              context.read<EditProfileBloc>().add(
-                                const EditProfileReset(),
-                              );
-                              context.read<LoginBloc>().add(LoginLogout());
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                '/login',
-                                (route) => false,
-                              );
-                            },
-                          );
-                        },
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: isDeleting
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Text(PersonConstants.deleteAccountButton),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return BlocConsumer<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginLoggedOut) {
-              Navigator.of(
-                context,
-              ).pushNamedAndRemoveUntil('/login', (route) => false);
-            }
-          },
-          builder: (context, state) {
-            return AlertDialog(
-              title: const Text(MotorcycleConstants.confirmLogoutTitle),
-              content: const Text(
-                '¿Estás seguro de que quieres cerrar sesión?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text(CommonConstants.cancel),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    context.read<EditProfileBloc>().add(
-                      const EditProfileReset(),
-                    );
-                    context.read<LoginBloc>().add(LoginLogout());
-                  },
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text(MotorcycleConstants.menuLogout),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }

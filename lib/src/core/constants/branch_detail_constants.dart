@@ -51,6 +51,17 @@ class BranchDetailConstants {
 
   // View reviews
   static const String viewReviews = 'Ver Reseñas';
+  static const String noReviewsYet = 'Aún no hay reseñas';
+  static const String sectionReviews = 'Reseñas';
+  static const String reviewsLabel = 'reseñas';
+  static const String rateService = 'Calificar';
+  static const String rateThankYou = '¡Gracias por tu calificación!';
+  static const String rateSubmit = 'Enviar';
+  static const String rateTitle = 'Califica este servicio';
+  static const String rateCommentHint = 'Escribe un comentario (opcional)';
+  static const String associatedServices = 'Servicios Asociados';
+  static const String noAssociatedServices =
+      'No hay servicios asociados a esta sede';
 
   // Type labels
   static const String typeWorkshop = 'TALLER';

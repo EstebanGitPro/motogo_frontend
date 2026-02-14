@@ -9,6 +9,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/sc
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
+import 'package:motogo_frontend/src/features/service_ratings/presentation/pages/service_reviews_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page displaying the full detail of a branch/store.
@@ -107,6 +108,8 @@ class _BranchDetailView extends StatelessWidget {
                 _buildInfoCard(state.detail, state.isOpenNow),
                 _buildContactSection(state.detail),
                 _buildScheduleSection(state.schedules, state.exceptions),
+                if (state.detail.displacementRanges.isNotEmpty)
+                  _buildDisplacementRangesSection(state.detail),
                 _buildServicesSection(state.services),
                 const SizedBox(height: 100), // Space for bottom buttons
               ],
@@ -412,7 +415,72 @@ class _BranchDetailView extends StatelessWidget {
     }).toList();
   }
 
-  Widget _buildServicesSection(List<BranchServiceEntity> services) {
+  Widget _buildDisplacementRangesSection(BranchDetailEntity detail) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            BranchDetailConstants.sectionDisplacementRanges,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: detail.displacementRanges.map((range) {
+                return Chip(
+                  label: Text(
+                    _displacementRangeLabel(range),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  backgroundColor: Colors.green[600],
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  /// Maps displacement range code to user-friendly label.
+  String _displacementRangeLabel(String range) {
+    switch (range.toUpperCase()) {
+      case 'BAJO':
+        return 'Bajo (50-200cc)';
+      case 'MEDIO':
+        return 'Medio (201-400cc)';
+      case 'ALTO':
+        return 'Alto (401cc+)';
+      default:
+        return range;
+    }
+  }
+
+  Widget _buildServicesSection(
+    BuildContext context,
+    List<BranchServiceEntity> services,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -442,13 +510,13 @@ class _BranchDetailView extends StatelessWidget {
               ),
             )
           else
-            ...services.map((service) => _buildServiceCard(service)),
+            ...services.map((service) => _buildServiceCard(context, service)),
         ],
       ),
     );
   }
 
-  Widget _buildServiceCard(BranchServiceEntity service) {
+  Widget _buildServiceCard(BuildContext context, BranchServiceEntity service) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -478,10 +546,47 @@ class _BranchDetailView extends StatelessWidget {
                     fontSize: 14,
                   ),
                 ),
+                if (service.averageRating != null) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const SizedBox(width: 2),
+                      Text(
+                        service.averageRating!.toStringAsFixed(1),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      const Icon(Icons.star, size: 14, color: Colors.amber),
+                      const SizedBox(width: 4),
+                      Text(
+                        '(${service.totalReviews})',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 4),
-                Text(
-                  BranchDetailConstants.viewReviews,
-                  style: TextStyle(color: Colors.blue[600], fontSize: 12),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ServiceReviewsPage(
+                          serviceId: service.id,
+                          serviceName: service.name,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    BranchDetailConstants.viewReviews,
+                    style: TextStyle(color: Colors.blue[600], fontSize: 12),
+                  ),
                 ),
               ],
             ),

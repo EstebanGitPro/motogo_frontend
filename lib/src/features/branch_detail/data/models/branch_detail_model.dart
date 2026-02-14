@@ -16,6 +16,7 @@ class BranchDetailModel extends BranchDetailEntity {
     super.phoneNumber,
     required super.latitude,
     required super.longitude,
+    super.displacementRanges,
   });
 
   /// Creates a model from JSON API response.
@@ -52,6 +53,7 @@ class BranchDetailModel extends BranchDetailEntity {
       phoneNumber: json['contact_phone'] as String?,
       latitude: _parseDouble(location?['latitude']),
       longitude: _parseDouble(location?['longitude']),
+      displacementRanges: _parseStringList(json['displacement_ranges']),
     );
   }
 
@@ -77,6 +79,14 @@ class BranchDetailModel extends BranchDetailEntity {
     return 0.0;
   }
 
+  /// Safely parses a list of strings from JSON.
+  static List<String> _parseStringList(dynamic value) {
+    if (value is List) {
+      return value.map((e) => e.toString()).toList();
+    }
+    return const [];
+  }
+
   /// Converts to domain entity.
   BranchDetailEntity toEntity() {
     return BranchDetailEntity(
@@ -91,6 +101,7 @@ class BranchDetailModel extends BranchDetailEntity {
       phoneNumber: phoneNumber,
       latitude: latitude,
       longitude: longitude,
+      displacementRanges: displacementRanges,
     );
   }
 }

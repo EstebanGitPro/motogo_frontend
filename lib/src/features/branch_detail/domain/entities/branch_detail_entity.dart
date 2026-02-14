@@ -39,6 +39,9 @@ class BranchDetailEntity extends Equatable {
   /// Longitude for maps.
   final double longitude;
 
+  /// Displacement ranges the branch works with.
+  final List<String> displacementRanges;
+
   const BranchDetailEntity({
     required this.id,
     required this.name,
@@ -51,6 +54,7 @@ class BranchDetailEntity extends Equatable {
     this.phoneNumber,
     required this.latitude,
     required this.longitude,
+    this.displacementRanges = const [],
   });
 
   /// Returns true if this is a workshop.
@@ -219,5 +223,6 @@ class BranchDetailEntity extends Equatable {
     phoneNumber,
     latitude,
     longitude,
+    displacementRanges,
   ];
 }

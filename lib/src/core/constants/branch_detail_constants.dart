@@ -9,6 +9,7 @@ class BranchDetailConstants {
   static const String sectionContact = 'Contacto';
   static const String sectionSchedule = 'Horario de Atención';
   static const String sectionServices = 'Servicios Disponibles';
+  static const String sectionDisplacementRanges = 'Cilindrajes';
 
   // Status labels
   static const String statusOpen = 'Abierto ahora';
@@ -40,6 +41,7 @@ class BranchDetailConstants {
   // Empty states
   static const String noServicesAvailable = 'No hay servicios disponibles';
   static const String noScheduleAvailable = 'Horario no disponible';
+  static const String noDisplacementRanges = 'No especificados';
 
   // Upcoming feature
   static const String featureComingSoon = 'Próximamente';

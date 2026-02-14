@@ -9,6 +9,8 @@ class BranchEntity {
   final String? profileImageUrl;
   final String status; // ACTIVE or INACTIVE
   final List<String> brands; // From branch_brands table
+  final List<String>
+  displacementRanges; // From branch_displacement_ranges table
 
   // Location fields (from locations table)
   final String address;
@@ -25,6 +27,7 @@ class BranchEntity {
     this.profileImageUrl,
     this.status = BranchStatus.active,
     this.brands = const [],
+    this.displacementRanges = const [],
     required this.address,
     required this.cityId,
     this.cityName,
@@ -41,6 +44,7 @@ class BranchEntity {
     String? profileImageUrl,
     String? status,
     List<String>? brands,
+    List<String>? displacementRanges,
     String? address,
     String? cityId,
     String? cityName,
@@ -55,6 +59,7 @@ class BranchEntity {
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       status: status ?? this.status,
       brands: brands ?? this.brands,
+      displacementRanges: displacementRanges ?? this.displacementRanges,
       address: address ?? this.address,
       cityId: cityId ?? this.cityId,
       cityName: cityName ?? this.cityName,

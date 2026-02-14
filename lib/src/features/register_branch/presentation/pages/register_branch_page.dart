@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/core/catalogs/domain/entities/branch_type_en
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/department_entity.dart';
+import 'package:motogo_frontend/src/core/catalogs/domain/entities/displacement_range_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
 import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
@@ -20,6 +21,7 @@ import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/r
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_state.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/branch_type_dropdown.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/brands_selector.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/displacement_range_selector.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/city_dropdown.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/department_dropdown.dart';
 import 'package:uuid/uuid.dart';
@@ -42,6 +44,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
   // Form state
   String? _selectedEstablishmentType;
   List<String> _selectedBrandIds = [];
+  List<String> _selectedDisplacementRanges = [];
 
   // Brands catalog state
   List<BrandEntity> _availableBrands = [];
@@ -65,6 +68,11 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
   bool _isLoadingBranchTypes = true;
   String? _branchTypesError;
 
+  // Displacement ranges catalog state
+  List<DisplacementRangeEntity> _availableDisplacementRanges = [];
+  bool _isLoadingDisplacementRanges = true;
+  String? _displacementRangesError;
+
   // Image state
   File? _selectedImage;
   bool _isUploadingImage = false;
@@ -76,6 +84,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
     _loadBrands();
     _loadDepartments();
     _loadBranchTypes();
+    _loadDisplacementRanges();
   }
 
   Future<void> _loadBrands() async {
@@ -139,6 +148,28 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         setState(() {
           _isLoadingBranchTypes = false;
           _availableBranchTypes = types;
+        });
+      },
+    );
+  }
+
+  Future<void> _loadDisplacementRanges() async {
+    final catalogsRepository = InjectorApp.resolve<CatalogsRepository>();
+    final result = await catalogsRepository.getDisplacementRanges();
+
+    if (!mounted) return;
+
+    result.fold(
+      (error) {
+        setState(() {
+          _isLoadingDisplacementRanges = false;
+          _displacementRangesError = error.message;
+        });
+      },
+      (ranges) {
+        setState(() {
+          _isLoadingDisplacementRanges = false;
+          _availableDisplacementRanges = ranges;
         });
       },
     );
@@ -265,6 +296,7 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
         name: _nameController.text.trim(),
         establishmentType: _selectedEstablishmentType!,
         brands: _selectedBrandIds,
+        displacementRanges: _selectedDisplacementRanges,
         address: _addressController.text.trim(),
         cityId: _selectedCityId!,
         cityName: selectedCity.name,
@@ -437,6 +469,21 @@ class _RegisterBranchPageState extends State<RegisterBranchPage> {
                       enabled: !isLoading,
                       isLoading: _isLoadingBrands,
                       errorMessage: _brandsError,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Displacement range selector
+                    DisplacementRangeSelector(
+                      availableRanges: _availableDisplacementRanges,
+                      selectedRanges: _selectedDisplacementRanges,
+                      onChanged: (ranges) {
+                        setState(() {
+                          _selectedDisplacementRanges = ranges;
+                        });
+                      },
+                      enabled: !isLoading,
+                      isLoading: _isLoadingDisplacementRanges,
+                      errorMessage: _displacementRangesError,
                     ),
                     const SizedBox(height: 32),
 

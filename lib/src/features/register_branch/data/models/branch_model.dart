@@ -12,6 +12,7 @@ class BranchModel extends BranchEntity {
     super.profileImageUrl,
     super.status = BranchStatus.active,
     super.brands = const [],
+    super.displacementRanges = const [],
     required super.address,
     required super.cityId,
     super.cityName,
@@ -29,6 +30,7 @@ class BranchModel extends BranchEntity {
       profileImageUrl: entity.profileImageUrl,
       status: entity.status,
       brands: entity.brands,
+      displacementRanges: entity.displacementRanges,
       address: entity.address,
       cityId: entity.cityId,
       cityName: entity.cityName,
@@ -49,7 +51,8 @@ class BranchModel extends BranchEntity {
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       status: json['status'] as String? ?? BranchStatus.active,
-      brands: _parseBrands(json['brands']),
+      brands: _parseStringList(json['brands']),
+      displacementRanges: _parseStringList(json['displacement_ranges']),
       address: location?['address'] as String? ?? json['address'] as String,
       cityId: location?['city_id'] as String? ?? json['city_id'] as String,
       cityName: location?['city_name'] as String?,
@@ -80,6 +83,10 @@ class BranchModel extends BranchEntity {
       map['brands'] = brands;
     }
 
+    if (displacementRanges.isNotEmpty) {
+      map['displacement_ranges'] = displacementRanges;
+    }
+
     // Location as nested object per API contract
     // Coordinates are optional - backend calculates via geocoding if not provided
     map['location'] = {
@@ -103,6 +110,7 @@ class BranchModel extends BranchEntity {
       profileImageUrl: profileImageUrl,
       status: status,
       brands: brands,
+      displacementRanges: displacementRanges,
       address: address,
       cityId: cityId,
       cityName: cityName,
@@ -111,8 +119,8 @@ class BranchModel extends BranchEntity {
     );
   }
 
-  /// Helper to parse brands from various formats.
-  static List<String> _parseBrands(dynamic value) {
+  /// Helper to parse string lists from various formats.
+  static List<String> _parseStringList(dynamic value) {
     if (value == null) return [];
     if (value is List) {
       return value.map((e) => e.toString()).toList();

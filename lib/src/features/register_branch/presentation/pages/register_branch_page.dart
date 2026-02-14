@@ -21,9 +21,9 @@ import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/r
 import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_state.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/branch_type_dropdown.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/brands_selector.dart';
-import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/displacement_range_selector.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/city_dropdown.dart';
 import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/department_dropdown.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/widgets/displacement_range_selector.dart';
 import 'package:uuid/uuid.dart';
 
 /// Page for registering a new branch (sede).

@@ -34,6 +34,7 @@ import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/b
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource_impl.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/repositories/branch_schedule_repository_impl.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/repositories/branch_schedule_repository.dart';
+import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_bloc.dart';
 // Features - Branch Services
 import 'package:motogo_frontend/src/features/branch_services/data/datasources/branch_services_datasource.dart';
 // Features - Change Password
@@ -41,6 +42,7 @@ import 'package:motogo_frontend/src/features/change_password/data/datasources/ch
 import 'package:motogo_frontend/src/features/change_password/data/repositories/change_password_repository_impl.dart';
 import 'package:motogo_frontend/src/features/change_password/domain/repositories/change_password_repository.dart';
 import 'package:motogo_frontend/src/features/change_password/domain/usecases/change_password_usecase.dart';
+import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
 // Features - Delete Branch
 import 'package:motogo_frontend/src/features/delete_branch/data/datasources/delete_branch_data_source.dart';
 import 'package:motogo_frontend/src/features/delete_branch/domain/repositories/delete_branch_repository.dart';
@@ -53,23 +55,6 @@ import 'package:motogo_frontend/src/features/delete_motorcycle/domain/usecases/d
 import 'package:motogo_frontend/src/features/delete_person/data/datasources/delete_person_data_source.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/repositories/delete_person_repository.dart';
 import 'package:motogo_frontend/src/features/delete_person/domain/usecases/delete_person_usecase.dart';
-// Features - Edit Branch
-import 'package:motogo_frontend/src/features/edit_branch/data/datasources/edit_branch_data_source.dart';
-import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
-// Features - Edit Motorcycle
-import 'package:motogo_frontend/src/features/edit_motorcycle/data/datasources/edit_motorcycle_datasource.dart';
-import 'package:motogo_frontend/src/features/edit_motorcycle/domain/usecases/update_motorcycle_usecase.dart';
-// Features - Edit Profile
-import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/get_person_usecase.dart';
-import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/update_person_usecase.dart';
-// Features - Login
-import 'package:motogo_frontend/src/features/login/data/datasources/login_data_source.dart';
-import 'package:motogo_frontend/src/features/login/data/repositories/login_repository_impl.dart';
-import 'package:motogo_frontend/src/features/login/domain/repositories/login_repository.dart';
-import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';
-// Features - Manage Franchise
-import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
-import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
 // Features - Diagnostic
 import 'package:motogo_frontend/src/features/diagnostic/data/datasource/diagnostic_datasource.dart';
 import 'package:motogo_frontend/src/features/diagnostic/data/repository/diagnostic_repository_impl.dart';
@@ -82,6 +67,26 @@ import 'package:motogo_frontend/src/features/diagnostic_permission/domain/reposi
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/grant_permission_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/list_permissions_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/domain/usecase/revoke_permission_usecase.dart';
+// Features - Edit Branch
+import 'package:motogo_frontend/src/features/edit_branch/data/datasources/edit_branch_data_source.dart';
+import 'package:motogo_frontend/src/features/edit_branch/domain/usecases/update_branch_usecase.dart';
+import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_bloc.dart';
+// Features - Edit Motorcycle
+import 'package:motogo_frontend/src/features/edit_motorcycle/data/datasources/edit_motorcycle_datasource.dart';
+import 'package:motogo_frontend/src/features/edit_motorcycle/domain/usecases/update_motorcycle_usecase.dart';
+// Features - Edit Profile
+import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/get_person_usecase.dart';
+import 'package:motogo_frontend/src/features/edit_profile/domain/usecases/update_person_usecase.dart';
+import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
+// Features - Login
+import 'package:motogo_frontend/src/features/login/data/datasources/login_data_source.dart';
+import 'package:motogo_frontend/src/features/login/data/repositories/login_repository_impl.dart';
+import 'package:motogo_frontend/src/features/login/domain/repositories/login_repository.dart';
+import 'package:motogo_frontend/src/features/login/domain/usecases/login_usecase.dart';
+import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
+// Features - Manage Franchise
+import 'package:motogo_frontend/src/features/manage_franchise/data/datasources/franchise_data_source.dart';
+import 'package:motogo_frontend/src/features/manage_franchise/domain/usecases/franchise_usecases.dart';
 // Features - Motorcycle Evidence
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/datasources/motorcycle_evidence_datasource.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/repositories/motorcycle_evidence_repository_impl.dart';
@@ -104,6 +109,7 @@ import 'package:motogo_frontend/src/features/my_branches/data/datasources/my_bra
 import 'package:motogo_frontend/src/features/my_branches/data/repositories/my_branches_repository_impl.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/repositories/my_branches_repository.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
+import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
 // Features - My Motorcycles
 import 'package:motogo_frontend/src/features/my_motorcycles/data/datasources/my_motorcycles_datasource.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/data/repositories/my_motorcycles_repository_impl.dart';
@@ -114,53 +120,51 @@ import 'package:motogo_frontend/src/features/password_recovery/data/datasources/
 import 'package:motogo_frontend/src/features/password_recovery/data/repositories/email_verification_repository_impl.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/repositories/email_verification_repository.dart';
 import 'package:motogo_frontend/src/features/password_recovery/domain/usecases/verify_email_usecase.dart';
+import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
 // Features - Register Branch
 import 'package:motogo_frontend/src/features/register_branch/data/datasources/register_branch_data_source.dart';
 import 'package:motogo_frontend/src/features/register_branch/data/repositories/branch_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/repositories/branch_repository.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/usecases/register_branch_usecase.dart';
+import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
 // Features - Register Franchise
 import 'package:motogo_frontend/src/features/register_franchise/data/datasources/register_franchise_data_source.dart';
 import 'package:motogo_frontend/src/features/register_franchise/data/repositories/franchise_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_franchise/domain/repositories/franchise_repository.dart';
 import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
+import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
 // Features - Register Motorcycle
 import 'package:motogo_frontend/src/features/register_motorcycle/data/datasources/motorcycle_datasource.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/data/repositories/motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/repositories/motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/usecases/register_motorcycle_usecase.dart';
+import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
 // Features - Register
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
 import 'package:motogo_frontend/src/features/register_person/data/repositories/register_repository_impl.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/repositories/register_person_repository.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
-import 'package:motogo_frontend/src/features/branch_schedules/presentation/bloc/branch_schedule_bloc.dart';
-import 'package:motogo_frontend/src/features/change_password/presentation/bloc/change_password_bloc.dart';
-import 'package:motogo_frontend/src/features/edit_branch/presentation/bloc/edit_branch_bloc.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
-import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
-import 'package:motogo_frontend/src/features/my_branches/presentation/bloc/my_branches_bloc.dart';
-import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
-import 'package:motogo_frontend/src/features/register_branch/presentation/bloc/register_branch_bloc.dart';
-import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_bloc.dart';
-import 'package:motogo_frontend/src/features/register_motorcycle/presentation/bloc/register_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
-import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/datasources/search_motorcycle_datasource.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/data/repositories/search_motorcycle_repository_impl.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/repositories/search_motorcycle_repository.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/set_solution_usecase.dart';
+import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
+// Features - Service Ratings
+import 'package:motogo_frontend/src/features/service_ratings/data/datasources/rating_range_datasource.dart';
+import 'package:motogo_frontend/src/features/service_ratings/data/repositories/rating_range_repository_impl.dart';
+import 'package:motogo_frontend/src/features/service_ratings/domain/repositories/rating_range_repository.dart';
 // Features - Technical Catalogs (HU40)
 import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/brand_lines_datasource.dart';
-import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
-import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/brand_lines_repository.dart';
-import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_brand_lines_usecase.dart';
 // Features - Technical Catalogs (Category Lines)
 import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/category_lines_datasource.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/category_lines_repository_impl.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/brand_lines_repository.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/category_lines_repository.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_brand_lines_usecase.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_categories_usecase.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_category_lines_usecase.dart';
 // Features - User Home
@@ -263,6 +267,14 @@ abstract class InjectorApp {
     // Branch Services - uses DioClient
     container.registerFactory<BranchServicesDataSource>(
       (c) => BranchServicesDataSourceImpl(c.resolve<DioClient>()),
+    );
+
+    // Service Ratings - Rating Ranges (uses DioClient)
+    container.registerFactory<RatingRangeDataSource>(
+      (c) => RatingRangeDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<RatingRangeRepository>(
+      (c) => RatingRangeRepositoryImpl(c.resolve<RatingRangeDataSource>()),
     );
 
     // My Branches - uses DioClient

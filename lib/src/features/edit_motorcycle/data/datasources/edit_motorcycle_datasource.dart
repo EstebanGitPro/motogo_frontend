@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
@@ -32,9 +31,6 @@ class EditMotorcycleDataSourceImpl implements EditMotorcycleDataSource {
   ) async {
     try {
       final body = motorcycle.toJson();
-
-      // TODO: Remove after debugging
-      debugPrint('🏍️ [EditMotoDS] PUT /motorcycles/$id body: $body');
 
       final response = await _dioClient.put('/motorcycles/$id', data: body);
       final responseData = response.data;

@@ -38,7 +38,7 @@ class MapboxDirectionsService {
     required double destLat,
     required double destLng,
   }) async {
-    final token = Secrets.mapboxAccessToken;
+    const token = Secrets.mapboxAccessToken;
     if (token.isEmpty) {
       AppLogger.error('Mapbox access token is not configured');
       return null;

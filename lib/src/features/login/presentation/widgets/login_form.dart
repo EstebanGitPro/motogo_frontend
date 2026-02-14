@@ -29,6 +29,29 @@ class _LoginFormState extends State<LoginForm> {
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    widget.emailController.addListener(_forceLowercase);
+  }
+
+  void _forceLowercase() {
+    final text = widget.emailController.text;
+    final lower = text.toLowerCase();
+    if (text != lower) {
+      widget.emailController.value = widget.emailController.value.copyWith(
+        text: lower,
+        selection: widget.emailController.selection,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.emailController.removeListener(_forceLowercase);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(

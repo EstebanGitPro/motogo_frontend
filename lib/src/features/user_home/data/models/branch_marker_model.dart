@@ -17,6 +17,8 @@ class BranchMarkerModel extends BranchMarkerEntity {
     super.profileImageUrl,
     super.cityName,
     super.departmentName,
+    super.brands,
+    super.displacementRanges,
   });
 
   /// Creates a model from JSON response.
@@ -53,6 +55,8 @@ class BranchMarkerModel extends BranchMarkerEntity {
           : null,
       profileImageUrl: json['profile_image_url'] as String?,
       rating: json['rating'] != null ? _parseDouble(json['rating']) : null,
+      brands: _parseStringList(json['brands']),
+      displacementRanges: _parseStringList(json['displacement_ranges']),
     );
   }
 
@@ -77,6 +81,14 @@ class BranchMarkerModel extends BranchMarkerEntity {
     return 0.0;
   }
 
+  /// Safely parses a list of strings from JSON.
+  static List<String> _parseStringList(dynamic value) {
+    if (value is List) {
+      return value.map((e) => e.toString()).toList();
+    }
+    return const [];
+  }
+
   /// Converts model to entity.
   BranchMarkerEntity toEntity() {
     return BranchMarkerEntity(
@@ -92,6 +104,8 @@ class BranchMarkerModel extends BranchMarkerEntity {
       profileImageUrl: profileImageUrl,
       cityName: cityName,
       departmentName: departmentName,
+      brands: brands,
+      displacementRanges: displacementRanges,
     );
   }
 }

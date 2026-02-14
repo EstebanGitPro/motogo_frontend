@@ -16,12 +16,16 @@ class NearbyBranchesRepositoryImpl implements NearbyBranchesRepository {
     required double longitude,
     double radiusKm = 10.0,
     String? type,
+    String? brand,
+    String? displacementRange,
   }) async {
     final result = await _dataSource.getNearbyBranches(
       latitude: latitude,
       longitude: longitude,
       radiusKm: radiusKm,
       type: type,
+      brand: brand,
+      displacementRange: displacementRange,
     );
 
     return result.fold(

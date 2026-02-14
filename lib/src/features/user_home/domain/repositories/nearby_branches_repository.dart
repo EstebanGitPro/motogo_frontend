@@ -9,10 +9,14 @@ abstract class NearbyBranchesRepository {
   /// [latitude] and [longitude] specify the center point.
   /// [radiusKm] is the search radius in kilometers.
   /// [type] is an optional filter for branch type (taller, tienda).
+  /// [brand] is an optional filter for brand ID.
+  /// [displacementRange] is an optional filter for displacement range.
   Future<Either<ErrorModel, List<BranchMarkerEntity>>> getNearbyBranches({
     required double latitude,
     required double longitude,
     double radiusKm = 10.0,
     String? type,
+    String? brand,
+    String? displacementRange,
   });
 }

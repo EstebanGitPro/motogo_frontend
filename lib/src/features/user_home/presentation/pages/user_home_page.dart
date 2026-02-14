@@ -26,6 +26,7 @@ import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/m
 import 'package:motogo_frontend/src/features/register_motorcycle/presentation/pages/register_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_home_bloc.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
@@ -516,37 +517,107 @@ class _UserHomeViewState extends State<_UserHomeView> {
     ];
 
     String? activeFilter;
+    String? activeBrand;
+    String? activeDisplacement;
     if (state is UserHomeLoaded) {
       activeFilter = state.activeTypeFilter;
+      activeBrand = state.activeBrandFilter;
+      activeDisplacement = state.activeDisplacementRangeFilter;
     }
+
+    // Count active advanced filters
+    int advancedFilterCount = 0;
+    if (activeBrand != null) advancedFilterCount++;
+    if (activeDisplacement != null) advancedFilterCount++;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: filters.map((filter) {
-          final isSelected =
-              filter.$2 == activeFilter ||
-              (filter.$2 == null && activeFilter == null);
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(filter.$1),
-              selected: isSelected,
-              onSelected: (selected) {
-                context.read<UserHomeBloc>().add(ChangeTypeFilter(filter.$2));
-              },
-              selectedColor: Colors.blue[600],
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        children: [
+          ...filters.map((filter) {
+            final isSelected =
+                filter.$2 == activeFilter ||
+                (filter.$2 == null && activeFilter == null);
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: FilterChip(
+                label: Text(filter.$1),
+                selected: isSelected,
+                onSelected: (selected) {
+                  context.read<UserHomeBloc>().add(ChangeTypeFilter(filter.$2));
+                },
+                selectedColor: Colors.blue[600],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+                backgroundColor: Colors.white,
+                checkmarkColor: Colors.white,
+                elevation: 2,
+                shadowColor: Colors.black26,
               ),
-              backgroundColor: Colors.white,
-              checkmarkColor: Colors.white,
-              elevation: 2,
-              shadowColor: Colors.black26,
+            );
+          }),
+          // Filter button with badge
+          ActionChip(
+            avatar: Badge(
+              isLabelVisible: advancedFilterCount > 0,
+              label: Text(
+                '$advancedFilterCount',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+              backgroundColor: Colors.orange,
+              child: Icon(
+                Icons.tune,
+                size: 18,
+                color: advancedFilterCount > 0
+                    ? Colors.blue[700]
+                    : Colors.grey[700],
+              ),
             ),
+            label: Text(
+              MotorcycleConstants.filterButton,
+              style: TextStyle(
+                color: advancedFilterCount > 0
+                    ? Colors.blue[700]
+                    : Colors.black87,
+                fontWeight: advancedFilterCount > 0
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+            onPressed: () => _showFilterBottomSheet(
+              context,
+              activeBrand,
+              activeDisplacement,
+            ),
+            backgroundColor: Colors.white,
+            elevation: 2,
+            shadowColor: Colors.black26,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFilterBottomSheet(
+    BuildContext context,
+    String? currentBrand,
+    String? currentDisplacement,
+  ) {
+    final bloc = context.read<UserHomeBloc>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => FilterBottomSheet(
+        currentBrand: currentBrand,
+        currentDisplacementRange: currentDisplacement,
+        onApply: (brand, displacement) {
+          bloc.add(
+            ApplyAdvancedFilters(brand: brand, displacementRange: displacement),
           );
-        }).toList(),
+        },
       ),
     );
   }

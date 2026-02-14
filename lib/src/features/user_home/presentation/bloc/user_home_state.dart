@@ -25,6 +25,8 @@ class UserHomeLoaded extends UserHomeState {
   final List<BranchMarkerEntity> branches;
   final String? selectedBranchId;
   final String? activeTypeFilter;
+  final String? activeBrandFilter;
+  final String? activeDisplacementRangeFilter;
   final bool locationPermissionDenied;
   final double currentRadiusKm;
   final bool isLoadingBranches;
@@ -36,6 +38,8 @@ class UserHomeLoaded extends UserHomeState {
     this.branches = const [],
     this.selectedBranchId,
     this.activeTypeFilter,
+    this.activeBrandFilter,
+    this.activeDisplacementRangeFilter,
     this.locationPermissionDenied = false,
     this.currentRadiusKm = 5.0,
     this.isLoadingBranches = false,
@@ -49,12 +53,16 @@ class UserHomeLoaded extends UserHomeState {
     List<BranchMarkerEntity>? branches,
     String? selectedBranchId,
     String? activeTypeFilter,
+    String? activeBrandFilter,
+    String? activeDisplacementRangeFilter,
     bool? locationPermissionDenied,
     double? currentRadiusKm,
     bool? isLoadingBranches,
     String? errorMessage,
     bool clearSelectedBranch = false,
     bool clearActiveTypeFilter = false,
+    bool clearActiveBrandFilter = false,
+    bool clearActiveDisplacementRangeFilter = false,
     bool clearError = false,
   }) {
     return UserHomeLoaded(
@@ -67,6 +75,13 @@ class UserHomeLoaded extends UserHomeState {
       activeTypeFilter: clearActiveTypeFilter
           ? null
           : (activeTypeFilter ?? this.activeTypeFilter),
+      activeBrandFilter: clearActiveBrandFilter
+          ? null
+          : (activeBrandFilter ?? this.activeBrandFilter),
+      activeDisplacementRangeFilter: clearActiveDisplacementRangeFilter
+          ? null
+          : (activeDisplacementRangeFilter ??
+                this.activeDisplacementRangeFilter),
       locationPermissionDenied:
           locationPermissionDenied ?? this.locationPermissionDenied,
       currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,
@@ -95,6 +110,8 @@ class UserHomeLoaded extends UserHomeState {
     branches,
     selectedBranchId,
     activeTypeFilter,
+    activeBrandFilter,
+    activeDisplacementRangeFilter,
     locationPermissionDenied,
     currentRadiusKm,
     isLoadingBranches,

@@ -27,6 +27,9 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     on<ClearBranchSelection>(_onClearBranchSelection);
     on<ChangeTypeFilter>(_onChangeTypeFilter);
     on<ChangeRadius>(_onChangeRadius);
+    on<ChangeBrandFilter>(_onChangeBrandFilter);
+    on<ChangeDisplacementRangeFilter>(_onChangeDisplacementRangeFilter);
+    on<ApplyAdvancedFilters>(_onApplyAdvancedFilters);
   }
 
   Future<void> _onInitializeMap(
@@ -101,6 +104,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
       longitude: event.longitude,
       radiusKm: event.radiusKm,
       type: event.type,
+      brand: event.brand,
+      displacementRange: event.displacementRange,
     );
 
     result.fold(
@@ -108,7 +113,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
         emit(
           currentState.copyWith(
             isLoadingBranches: false,
-            currentRadiusKm: event.radiusKm, // Preserve the requested radius
+            currentRadiusKm: event.radiusKm,
             errorMessage: error.message,
           ),
         );
@@ -119,6 +124,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
             branches: branches,
             activeTypeFilter: event.type,
             clearActiveTypeFilter: event.type == null,
+            activeBrandFilter: event.brand,
+            clearActiveBrandFilter: event.brand == null,
+            activeDisplacementRangeFilter: event.displacementRange,
+            clearActiveDisplacementRangeFilter: event.displacementRange == null,
             currentRadiusKm: event.radiusKm,
             isLoadingBranches: false,
             clearError: true,
@@ -157,6 +166,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
           type: event.type,
+          brand: currentState.activeBrandFilter,
+          displacementRange: currentState.activeDisplacementRangeFilter,
         ),
       );
     }
@@ -171,6 +182,65 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           longitude: currentState.userLongitude!,
           radiusKm: event.radiusKm,
           type: currentState.activeTypeFilter,
+          brand: currentState.activeBrandFilter,
+          displacementRange: currentState.activeDisplacementRangeFilter,
+        ),
+      );
+    }
+  }
+
+  void _onChangeBrandFilter(
+    ChangeBrandFilter event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.activeTypeFilter,
+          brand: event.brand,
+          displacementRange: currentState.activeDisplacementRangeFilter,
+        ),
+      );
+    }
+  }
+
+  void _onChangeDisplacementRangeFilter(
+    ChangeDisplacementRangeFilter event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.activeTypeFilter,
+          brand: currentState.activeBrandFilter,
+          displacementRange: event.displacementRange,
+        ),
+      );
+    }
+  }
+
+  void _onApplyAdvancedFilters(
+    ApplyAdvancedFilters event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.activeTypeFilter,
+          brand: event.brand,
+          displacementRange: event.displacementRange,
         ),
       );
     }

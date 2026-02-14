@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 
 /// Model for parsing branch detail JSON from the API.
@@ -51,9 +52,11 @@ class BranchDetailModel extends BranchDetailEntity {
       cityName: location?['city_name'] as String?,
       departmentName: location?['department_name'] as String?,
       phoneNumber: json['contact_phone'] as String?,
-      latitude: _parseDouble(location?['latitude']),
-      longitude: _parseDouble(location?['longitude']),
-      displacementRanges: _parseStringList(json['displacement_ranges']),
+      latitude: JsonHelpers.parseDouble(location?['latitude']),
+      longitude: JsonHelpers.parseDouble(location?['longitude']),
+      displacementRanges: JsonHelpers.parseStringList(
+        json['displacement_ranges'],
+      ),
     );
   }
 
@@ -69,22 +72,6 @@ class BranchDetailModel extends BranchDetailEntity {
       default:
         return type?.toLowerCase() ?? 'taller';
     }
-  }
-
-  /// Safely parses a double from dynamic value.
-  static double _parseDouble(dynamic value) {
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
-  /// Safely parses a list of strings from JSON.
-  static List<String> _parseStringList(dynamic value) {
-    if (value is List) {
-      return value.map((e) => e.toString()).toList();
-    }
-    return const [];
   }
 
   /// Converts to domain entity.

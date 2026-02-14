@@ -27,6 +27,7 @@ void main() {
         expect(model.departmentId, testDepartmentId);
         expect(model.status, 'ACTIVE'); // default
         expect(model.brands, isEmpty); // default
+        expect(model.displacementRanges, isEmpty); // default
       });
 
       test('should create BranchModel with all fields', () {
@@ -38,6 +39,7 @@ void main() {
           profileImageUrl: 'https://example.com/image.jpg',
           status: 'INACTIVE',
           brands: testBrandIds,
+          displacementRanges: const ['BAJO', 'MEDIO'],
           address: 'Calle 123 #45-67',
           cityId: testCityId,
           cityName: 'Bogotá',
@@ -48,6 +50,7 @@ void main() {
         expect(model.id, testBranchId);
         expect(model.profileImageUrl, 'https://example.com/image.jpg');
         expect(model.departmentName, 'Cundinamarca');
+        expect(model.displacementRanges, ['BAJO', 'MEDIO']);
       });
     });
 
@@ -60,6 +63,7 @@ void main() {
           cityId: testCityId,
           departmentId: testDepartmentId,
           brands: testBrandIds,
+          displacementRanges: const ['ALTO'],
         );
 
         final model = BranchModel.fromEntity(entity);
@@ -70,6 +74,7 @@ void main() {
         expect(model.cityId, entity.cityId);
         expect(model.departmentId, entity.departmentId);
         expect(model.brands, entity.brands);
+        expect(model.displacementRanges, ['ALTO']);
       });
     });
 
@@ -81,6 +86,7 @@ void main() {
           'establishment_type': 'WORKSHOP',
           'status': 'ACTIVE',
           'brands': testBrandIds,
+          'displacement_ranges': ['BAJO', 'MEDIO'],
           'address': 'Calle 123',
           'city_id': testCityId,
           'department_id': testDepartmentId,
@@ -93,6 +99,7 @@ void main() {
         expect(model.establishmentType, 'WORKSHOP');
         expect(model.brands, testBrandIds);
         expect(model.departmentId, testDepartmentId);
+        expect(model.displacementRanges, ['BAJO', 'MEDIO']);
       });
 
       test('should parse JSON with nested location object', () {
@@ -146,6 +153,7 @@ void main() {
             departmentId: testDepartmentId,
             departmentName: 'Cundinamarca',
             brands: testBrandIds,
+            displacementRanges: const ['BAJO', 'ALTO'],
           );
 
           final json = model.toJson();
@@ -153,6 +161,7 @@ void main() {
           expect(json['name'], 'MotoGo Centro');
           expect(json['establishment_type'], 'WORKSHOP');
           expect(json['brands'], testBrandIds);
+          expect(json['displacement_ranges'], ['BAJO', 'ALTO']);
           expect(json['location'], isA<Map>());
           expect(json['location']['department_id'], testDepartmentId);
           expect(json['location']['city_id'], testCityId);
@@ -166,7 +175,7 @@ void main() {
         },
       );
 
-      test('should omit optional fields when null', () {
+      test('should omit optional fields when null or empty', () {
         final model = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
@@ -180,6 +189,7 @@ void main() {
         expect(json.containsKey('franchise_id'), isFalse);
         expect(json.containsKey('profile_image_url'), isFalse);
         expect(json.containsKey('brands'), isFalse);
+        expect(json.containsKey('displacement_ranges'), isFalse);
       });
 
       test('should include profileImageUrl when set', () {
@@ -209,6 +219,7 @@ void main() {
           cityName: 'Bogotá',
           departmentId: testDepartmentId,
           brands: testBrandIds,
+          displacementRanges: const ['MEDIO'],
         );
 
         final entity = model.toEntity();
@@ -219,11 +230,12 @@ void main() {
         expect(entity.cityName, model.cityName);
         expect(entity.departmentId, model.departmentId);
         expect(entity.brands, model.brands);
+        expect(entity.displacementRanges, ['MEDIO']);
       });
     });
 
-    group('_parseBrands helper', () {
-      test('should handle list of strings', () {
+    group('_parseStringList helper', () {
+      test('should handle list of strings for brands', () {
         final json = {
           'name': 'Test',
           'establishment_type': 'WORKSHOP',
@@ -251,6 +263,36 @@ void main() {
         final model = BranchModel.fromJson(json);
 
         expect(model.brands, ['1', '2', '3']);
+      });
+
+      test('should parse displacement_ranges as string list', () {
+        final json = {
+          'name': 'Test',
+          'establishment_type': 'WORKSHOP',
+          'address': 'Test',
+          'city_id': testCityId,
+          'department_id': testDepartmentId,
+          'displacement_ranges': ['BAJO', 'MEDIO', 'ALTO'],
+        };
+
+        final model = BranchModel.fromJson(json);
+
+        expect(model.displacementRanges, ['BAJO', 'MEDIO', 'ALTO']);
+      });
+
+      test('should handle null displacement_ranges', () {
+        final json = {
+          'name': 'Test',
+          'establishment_type': 'WORKSHOP',
+          'address': 'Test',
+          'city_id': testCityId,
+          'department_id': testDepartmentId,
+          'displacement_ranges': null,
+        };
+
+        final model = BranchModel.fromJson(json);
+
+        expect(model.displacementRanges, isEmpty);
       });
     });
   });

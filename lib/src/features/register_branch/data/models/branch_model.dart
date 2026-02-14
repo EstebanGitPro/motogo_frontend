@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 /// Data model for branch with JSON serialization.
@@ -51,8 +52,10 @@ class BranchModel extends BranchEntity {
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       status: json['status'] as String? ?? BranchStatus.active,
-      brands: _parseStringList(json['brands']),
-      displacementRanges: _parseStringList(json['displacement_ranges']),
+      brands: JsonHelpers.parseStringList(json['brands']),
+      displacementRanges: JsonHelpers.parseStringList(
+        json['displacement_ranges'],
+      ),
       address: location?['address'] as String? ?? json['address'] as String,
       cityId: location?['city_id'] as String? ?? json['city_id'] as String,
       cityName: location?['city_name'] as String?,
@@ -117,14 +120,5 @@ class BranchModel extends BranchEntity {
       departmentId: departmentId,
       departmentName: departmentName,
     );
-  }
-
-  /// Helper to parse string lists from various formats.
-  static List<String> _parseStringList(dynamic value) {
-    if (value == null) return [];
-    if (value is List) {
-      return value.map((e) => e.toString()).toList();
-    }
-    return [];
   }
 }

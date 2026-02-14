@@ -5,11 +5,11 @@ import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart'
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branch_detail_entity.dart';
 import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
-import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_detail_entity.dart';
-import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
+import 'package:motogo_frontend/src/features/branch_services/presentation/widgets/service_card_widget.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/widgets/rating_bottom_sheet.dart';
+import 'package:motogo_frontend/src/features/branch_detail/presentation/widgets/schedule_section.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
-import 'package:motogo_frontend/src/features/service_ratings/presentation/pages/service_reviews_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Page displaying the full detail of a branch/store.
@@ -107,10 +107,13 @@ class _BranchDetailView extends StatelessWidget {
                 _buildHeader(state.detail),
                 _buildInfoCard(state.detail, state.isOpenNow),
                 _buildContactSection(state.detail),
-                _buildScheduleSection(state.schedules, state.exceptions),
+                ScheduleSection(
+                  schedules: state.schedules,
+                  exceptions: state.exceptions,
+                ),
                 if (state.detail.displacementRanges.isNotEmpty)
                   _buildDisplacementRangesSection(state.detail),
-                _buildServicesSection(state.services),
+                _buildServicesSection(context, state.services),
                 const SizedBox(height: 100), // Space for bottom buttons
               ],
             ),
@@ -304,117 +307,6 @@ class _BranchDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildScheduleSection(
-    List<ScheduleDetailEntity> schedules,
-    List<ScheduleExceptionEntity> exceptions,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            BranchDetailConstants.sectionSchedule,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: schedules.isEmpty
-                ? Text(
-                    BranchDetailConstants.noScheduleAvailable,
-                    style: TextStyle(color: Colors.grey[600]),
-                  )
-                : Column(children: _buildScheduleRows(schedules, exceptions)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  List<Widget> _buildScheduleRows(
-    List<ScheduleDetailEntity> schedules,
-    List<ScheduleExceptionEntity> exceptions,
-  ) {
-    // Group by day and sort
-    final grouped = <int, ScheduleDetailEntity>{};
-    for (final schedule in schedules) {
-      if (!grouped.containsKey(schedule.dayOfWeek)) {
-        grouped[schedule.dayOfWeek] = schedule;
-      }
-    }
-
-    final sortedDays = grouped.keys.toList()..sort();
-    final now = DateTime.now();
-    final todayOnly = DateTime(now.year, now.month, now.day);
-
-    // Check if today has an active closed exception
-    final hasTodayException = exceptions.any((e) {
-      if (!e.active || !e.isClosed) return false;
-      final startDate = DateTime.tryParse(e.exceptionStartDate);
-      final endDate = DateTime.tryParse(e.exceptionEndDate);
-      if (startDate == null || endDate == null) return false;
-      final startOnly = DateTime(
-        startDate.year,
-        startDate.month,
-        startDate.day,
-      );
-      final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
-      return !todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly);
-    });
-
-    return sortedDays.map((day) {
-      final schedule = grouped[day]!;
-      final isToday = day == now.weekday;
-      final showException = isToday && hasTodayException;
-
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 100,
-              child: Text(
-                schedule.dayName +
-                    (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),
-                style: TextStyle(
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  color: isToday ? Colors.blue[700] : Colors.black87,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                showException
-                    ? BranchDetailConstants.statusClosedException
-                    : schedule.isClosed
-                    ? BranchDetailConstants.dayClosed
-                    : '${schedule.openingTime} - ${schedule.closingTime}',
-                style: TextStyle(
-                  color: showException
-                      ? Colors.orange[700]
-                      : schedule.isClosed
-                      ? Colors.grey
-                      : Colors.black87,
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList();
-  }
-
   Widget _buildDisplacementRangesSection(BranchDetailEntity detail) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -510,91 +402,12 @@ class _BranchDetailView extends StatelessWidget {
               ),
             )
           else
-            ...services.map((service) => _buildServiceCard(context, service)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServiceCard(BuildContext context, BranchServiceEntity service) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
+            ...services.map(
+              (service) => ServiceCardWidget(
+                service: service,
+                onRate: () => RatingBottomSheet.show(context, service),
+              ),
             ),
-            child: Icon(Icons.build_circle_outlined, color: Colors.grey[700]),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  service.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
-                ),
-                if (service.averageRating != null) ...[
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                      const SizedBox(width: 2),
-                      Text(
-                        service.averageRating!.toStringAsFixed(1),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                      const SizedBox(width: 4),
-                      Text(
-                        '(${service.totalReviews})',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ],
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ServiceReviewsPage(
-                          serviceId: service.id,
-                          serviceName: service.name,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    BranchDetailConstants.viewReviews,
-                    style: TextStyle(color: Colors.blue[600], fontSize: 12),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            service.serviceType,
-            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-          ),
         ],
       ),
     );

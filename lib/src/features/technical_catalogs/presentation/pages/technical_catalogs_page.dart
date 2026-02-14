@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/brand_lines_page.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/category_lines_page.dart';
 
 /// Main page for Technical Catalogs section.
 ///
@@ -44,12 +45,20 @@ class TechnicalCatalogsPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // HU1 - Categories (Coming Soon)
-          const _CatalogCard(
+          // Categories (Enabled)
+          _CatalogCard(
             icon: Icons.category,
             title: AdminConstants.catalogCategories,
             subtitle: AdminConstants.catalogCategoriesSubtitle,
-            isEnabled: false,
+            isEnabled: true,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CategoryLinesPage(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 12),
 

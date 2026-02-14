@@ -40,41 +40,35 @@ class MockCategoryLinesRepository extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>>
-      getCategories() => (super.noSuchMethod(
-            Invocation.method(
-              #getCategories,
-              [],
-            ),
-            returnValue: _i3.Future<
-                    _i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>>.value(
-                _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>>(
-              this,
-              Invocation.method(
-                #getCategories,
-                [],
-              ),
-            )),
-          ) as _i3
-              .Future<_i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>>);
+  getCategories() =>
+      (super.noSuchMethod(
+            Invocation.method(#getCategories, []),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>
+                  >(this, Invocation.method(#getCategories, [])),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.CategoryEntity>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>>
-      getCategoryLines(String? categoryName) => (super.noSuchMethod(
-            Invocation.method(
-              #getCategoryLines,
-              [categoryName],
-            ),
-            returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel,
-                    List<_i8.CategoryLineEntity>>>.value(_i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>>(
-              this,
-              Invocation.method(
-                #getCategoryLines,
-                [categoryName],
-              ),
-            )),
-          ) as _i3.Future<
-              _i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>>);
+  getCategoryLines(String? categoryName) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCategoryLines, [categoryName]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>
+                  >(this, Invocation.method(#getCategoryLines, [categoryName])),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i8.CategoryLineEntity>>
+          >);
 }

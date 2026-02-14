@@ -1,4 +1,5 @@
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/displacement_range_entity.dart';
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 
 /// Data model for displacement range with JSON serialization.
 ///
@@ -19,18 +20,11 @@ class DisplacementRangeModel {
   static List<DisplacementRangeModel> fromJsonList(
     Map<String, dynamic> response,
   ) {
-    final data = response['data'] as Map<String, dynamic>?;
-    if (data == null) return [];
-
-    final displacements = data['displacements'] as List<dynamic>?;
-    if (displacements == null) return [];
-
-    return displacements
-        .map(
-          (json) =>
-              DisplacementRangeModel.fromJson(json as Map<String, dynamic>),
-        )
-        .toList();
+    return JsonHelpers.parseHateoasList(
+      response,
+      'displacements',
+      DisplacementRangeModel.fromJson,
+    );
   }
 
   /// Converts model to domain entity.

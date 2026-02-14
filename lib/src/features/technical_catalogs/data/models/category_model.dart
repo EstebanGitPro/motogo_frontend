@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/entities/category_entity.dart';
 
 /// Data model for motorcycle category with JSON serialization.
@@ -26,15 +27,11 @@ class CategoryModel extends CategoryEntity {
   /// }
   /// ```
   static List<CategoryModel> fromJsonList(Map<String, dynamic> response) {
-    final data = response['data'] as Map<String, dynamic>?;
-    if (data == null) return [];
-
-    final categories = data['categories'] as List<dynamic>?;
-    if (categories == null) return [];
-
-    return categories
-        .map((json) => CategoryModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return JsonHelpers.parseHateoasList(
+      response,
+      'categories',
+      CategoryModel.fromJson,
+    );
   }
 
   /// Converts model to domain entity.

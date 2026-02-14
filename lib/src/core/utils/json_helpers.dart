@@ -30,4 +30,24 @@ class JsonHelpers {
     if (value is String) return double.tryParse(value) ?? 0.0;
     return 0.0;
   }
+
+  /// Parses a list of models from a HATEOAS-formatted API response.
+  ///
+  /// Extracts `response['data'][listKey]` and maps each element using
+  /// the provided [fromJson] factory function.
+  ///
+  /// Returns an empty list if `data` or the list key is `null`.
+  static List<T> parseHateoasList<T>(
+    Map<String, dynamic> response,
+    String listKey,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final data = response['data'] as Map<String, dynamic>?;
+    if (data == null) return [];
+
+    final list = data[listKey] as List<dynamic>?;
+    if (list == null) return [];
+
+    return list.map((json) => fromJson(json as Map<String, dynamic>)).toList();
+  }
 }

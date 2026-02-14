@@ -62,5 +62,76 @@ void main() {
         expect(JsonHelpers.parseDouble('-74.0698'), -74.0698);
       });
     });
+
+    group('parseHateoasList', () {
+      test('returns parsed list from valid response', () {
+        final response = {
+          'data': {
+            'items': [
+              {'name': 'A'},
+              {'name': 'B'},
+            ],
+          },
+        };
+
+        final result = JsonHelpers.parseHateoasList<String>(
+          response,
+          'items',
+          (json) => json['name'] as String,
+        );
+
+        expect(result, ['A', 'B']);
+      });
+
+      test('returns empty list when data is null', () {
+        final response = <String, dynamic>{'data': null};
+
+        final result = JsonHelpers.parseHateoasList<String>(
+          response,
+          'items',
+          (json) => json['name'] as String,
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list when list key is missing', () {
+        final response = {'data': <String, dynamic>{}};
+
+        final result = JsonHelpers.parseHateoasList<String>(
+          response,
+          'items',
+          (json) => json['name'] as String,
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('returns empty list when data key is absent', () {
+        final response = <String, dynamic>{};
+
+        final result = JsonHelpers.parseHateoasList<String>(
+          response,
+          'items',
+          (json) => json['name'] as String,
+        );
+
+        expect(result, isEmpty);
+      });
+
+      test('handles empty list inside data', () {
+        final response = {
+          'data': {'items': <dynamic>[]},
+        };
+
+        final result = JsonHelpers.parseHateoasList<String>(
+          response,
+          'items',
+          (json) => json['name'] as String,
+        );
+
+        expect(result, isEmpty);
+      });
+    });
   });
 }

@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/entities/category_line_entity.dart';
 
 /// Data model for a motorcycle line within a category.
@@ -32,15 +33,11 @@ class CategoryLineModel extends CategoryLineEntity {
   /// }
   /// ```
   static List<CategoryLineModel> fromJsonList(Map<String, dynamic> response) {
-    final data = response['data'] as Map<String, dynamic>?;
-    if (data == null) return [];
-
-    final lines = data['lines'] as List<dynamic>?;
-    if (lines == null) return [];
-
-    return lines
-        .map((json) => CategoryLineModel.fromJson(json as Map<String, dynamic>))
-        .toList();
+    return JsonHelpers.parseHateoasList(
+      response,
+      'lines',
+      CategoryLineModel.fromJson,
+    );
   }
 
   /// Converts model to domain entity.

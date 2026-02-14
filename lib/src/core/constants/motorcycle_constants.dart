@@ -39,6 +39,16 @@ class MotorcycleConstants {
   static const String filterStore = 'Tienda';
   static const String filterBestRated = 'Mejor Calificados';
 
+  // Filter Bottom Sheet
+  static const String filterButton = 'Filtros';
+  static const String filterTitle = 'Filtros';
+  static const String filterBrandSection = 'Marca';
+  static const String filterDisplacementSection = 'Cilindraje';
+  static const String filterApply = 'Aplicar';
+  static const String filterClear = 'Limpiar';
+  static const String filterLoadingBrands = 'Cargando marcas...';
+  static const String filterLoadingDisplacements = 'Cargando cilindrajes...';
+
   // Drawer header
   static const String drawerTitle = 'Menú Principal';
 

@@ -157,6 +157,12 @@ import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources
 import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/brand_lines_repository_impl.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/brand_lines_repository.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_brand_lines_usecase.dart';
+// Features - Technical Catalogs (Category Lines)
+import 'package:motogo_frontend/src/features/technical_catalogs/data/datasources/category_lines_datasource.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/data/repositories/category_lines_repository_impl.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/repositories/category_lines_repository.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_categories_usecase.dart';
+import 'package:motogo_frontend/src/features/technical_catalogs/domain/usecases/get_category_lines_usecase.dart';
 // Features - User Home
 import 'package:motogo_frontend/src/features/user_home/data/datasources/nearby_branches_datasource.dart';
 import 'package:motogo_frontend/src/features/user_home/data/repositories/nearby_branches_repository_impl.dart';
@@ -476,6 +482,20 @@ abstract class InjectorApp {
     );
     container.registerFactory<GetBrandLinesUseCase>(
       (c) => GetBrandLinesUseCase(c.resolve<BrandLinesRepository>()),
+    );
+
+    // Technical Catalogs - Category Lines
+    container.registerFactory<CategoryLinesDataSource>(
+      (c) => CategoryLinesDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<CategoryLinesRepository>(
+      (c) => CategoryLinesRepositoryImpl(c.resolve<CategoryLinesDataSource>()),
+    );
+    container.registerFactory<GetCategoriesUseCase>(
+      (c) => GetCategoriesUseCase(c.resolve<CategoryLinesRepository>()),
+    );
+    container.registerFactory<GetCategoryLinesUseCase>(
+      (c) => GetCategoryLinesUseCase(c.resolve<CategoryLinesRepository>()),
     );
 
     // Diagnostic Feature - DataSource, Repository, UseCase

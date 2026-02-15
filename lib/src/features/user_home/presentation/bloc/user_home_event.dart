@@ -30,16 +30,27 @@ class LoadNearbyBranches extends UserHomeEvent {
   final double longitude;
   final double radiusKm;
   final String? type;
+  final String? brand;
+  final String? displacementRange;
 
   const LoadNearbyBranches({
     required this.latitude,
     required this.longitude,
     this.radiusKm = 10.0,
     this.type,
+    this.brand,
+    this.displacementRange,
   });
 
   @override
-  List<Object?> get props => [latitude, longitude, radiusKm, type];
+  List<Object?> get props => [
+    latitude,
+    longitude,
+    radiusKm,
+    type,
+    brand,
+    displacementRange,
+  ];
 }
 
 /// Event to select a branch marker.
@@ -75,4 +86,36 @@ class ChangeRadius extends UserHomeEvent {
 
   @override
   List<Object?> get props => [radiusKm];
+}
+
+/// Event to change the brand filter.
+class ChangeBrandFilter extends UserHomeEvent {
+  final String? brand;
+
+  const ChangeBrandFilter(this.brand);
+
+  @override
+  List<Object?> get props => [brand];
+}
+
+/// Event to change the displacement range filter.
+class ChangeDisplacementRangeFilter extends UserHomeEvent {
+  final String? displacementRange;
+
+  const ChangeDisplacementRangeFilter(this.displacementRange);
+
+  @override
+  List<Object?> get props => [displacementRange];
+}
+
+/// Event to apply both brand and displacement range filters at once.
+/// Avoids the race condition of dispatching two separate filter events.
+class ApplyAdvancedFilters extends UserHomeEvent {
+  final String? brand;
+  final String? displacementRange;
+
+  const ApplyAdvancedFilters({this.brand, this.displacementRange});
+
+  @override
+  List<Object?> get props => [brand, displacementRange];
 }

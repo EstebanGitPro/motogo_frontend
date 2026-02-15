@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
@@ -140,6 +141,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                 controller: _plateController,
                 enabled: !isLoading,
                 textCapitalization: TextCapitalization.characters,
+                inputFormatters: [UpperCaseTextFormatter()],
                 decoration: InputDecoration(
                   labelText: MotorcycleConstants.licensePlateLabel,
                   hintText: MotorcycleConstants.searchByPlateHint,
@@ -533,18 +535,6 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
             dateFormatted,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
-          subtitle: diagnostic.sentViaWhatsapp
-              ? Row(
-                  children: [
-                    Icon(Icons.chat, size: 14, color: Colors.green[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      MotorcycleConstants.diagnosticSentViaWhatsapp,
-                      style: TextStyle(fontSize: 12, color: Colors.green[600]),
-                    ),
-                  ],
-                )
-              : null,
           children: [
             // Problem description (full)
             _buildDetailRow(
@@ -719,6 +709,20 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Formatter that converts all input text to uppercase.
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }

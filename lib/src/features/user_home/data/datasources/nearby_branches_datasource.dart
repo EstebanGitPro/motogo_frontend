@@ -13,6 +13,8 @@ abstract class NearbyBranchesDataSource {
     required double longitude,
     double radiusKm = 10.0,
     String? type,
+    String? brand,
+    String? displacementRange,
   });
 }
 
@@ -27,6 +29,8 @@ class NearbyBranchesDataSourceImpl implements NearbyBranchesDataSource {
     required double longitude,
     double radiusKm = 10.0,
     String? type,
+    String? brand,
+    String? displacementRange,
   }) async {
     try {
       final queryParams = <String, dynamic>{
@@ -37,6 +41,14 @@ class NearbyBranchesDataSourceImpl implements NearbyBranchesDataSource {
 
       if (type != null && type.isNotEmpty) {
         queryParams['type'] = _mapTypeToBackend(type);
+      }
+
+      if (brand != null && brand.isNotEmpty) {
+        queryParams['brand'] = brand;
+      }
+
+      if (displacementRange != null && displacementRange.isNotEmpty) {
+        queryParams['displacement_range'] = displacementRange;
       }
 
       final response = await _dioClient.get(

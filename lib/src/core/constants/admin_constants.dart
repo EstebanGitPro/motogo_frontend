@@ -123,6 +123,15 @@ class AdminConstants {
   static const String loadingBrands = 'Cargando marcas...';
   static const String loadingLines = 'Cargando líneas...';
 
+  // Categories Catalog
+  static const String categoryLinesTitle = 'Categorías de Motocicletas';
+  static const String selectCategoryPrompt = 'Selecciona una categoría:';
+  static const String categoryLinesFoundCount = 'líneas';
+  static const String noCategoryLinesFound =
+      'No se encontraron líneas para esta categoría';
+  static const String noCategoriesFound = 'No se encontraron categorías';
+  static const String loadingCategories = 'Cargando categorías...';
+
   // Future catalogs (disabled for now)
   static const String catalogBrands = 'Marcas';
   static const String catalogBrandsSubtitle = 'Lista de marcas disponibles';

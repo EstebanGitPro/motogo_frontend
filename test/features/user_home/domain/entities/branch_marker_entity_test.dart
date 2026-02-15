@@ -231,7 +231,7 @@ void main() {
           rating: 4.5,
           address: 'addr',
         );
-        expect(entity.props.length, 12);
+        expect(entity.props.length, 14);
         expect(entity.props, contains('id'));
         expect(entity.props, contains('taller'));
       });

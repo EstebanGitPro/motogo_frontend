@@ -4,6 +4,7 @@ import 'package:motogo_frontend/src/core/catalogs/domain/entities/branch_type_en
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/department_entity.dart';
+import 'package:motogo_frontend/src/core/catalogs/domain/entities/displacement_range_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/service_entity.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
@@ -51,5 +52,12 @@ class CatalogsRepositoryImpl implements CatalogsRepository {
   @override
   Future<Either<ErrorModel, List<String>>> getServiceTypes() async {
     return dataSource.getServiceTypes();
+  }
+
+  @override
+  Future<Either<ErrorModel, List<DisplacementRangeEntity>>>
+  getDisplacementRanges() async {
+    final result = await dataSource.getDisplacementRanges();
+    return result.map((models) => models.map((m) => m.toEntity()).toList());
   }
 }

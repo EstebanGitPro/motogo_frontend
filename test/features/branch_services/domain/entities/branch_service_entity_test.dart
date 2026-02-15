@@ -23,7 +23,7 @@ void main() {
       expect(entity.active, true);
     });
 
-    test('should use default active = true', () {
+    test('should use default active = true and totalReviews = 0', () {
       const entity = BranchServiceEntity(
         id: 'service-1',
         name: 'Test',
@@ -32,6 +32,8 @@ void main() {
       );
 
       expect(entity.active, true);
+      expect(entity.averageRating, isNull);
+      expect(entity.totalReviews, 0);
     });
 
     test('should allow null addedAt', () {
@@ -44,6 +46,21 @@ void main() {
       );
 
       expect(entity.addedAt, isNull);
+    });
+
+    test('should create entity with rating fields', () {
+      final entity = BranchServiceEntity(
+        id: 'service-1',
+        name: 'Test',
+        description: 'Desc',
+        serviceType: 'Type',
+        addedAt: testDate,
+        averageRating: 4.8,
+        totalReviews: 120,
+      );
+
+      expect(entity.averageRating, 4.8);
+      expect(entity.totalReviews, 120);
     });
 
     group('Equatable', () {
@@ -121,7 +138,7 @@ void main() {
           active: true,
         );
 
-        expect(entity.props.length, 6);
+        expect(entity.props.length, 8);
       });
     });
   });

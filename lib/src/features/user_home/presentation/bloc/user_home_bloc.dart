@@ -27,6 +27,9 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     on<ClearBranchSelection>(_onClearBranchSelection);
     on<ChangeTypeFilter>(_onChangeTypeFilter);
     on<ChangeRadius>(_onChangeRadius);
+    on<ChangeBrandFilter>(_onChangeBrandFilter);
+    on<ChangeDisplacementRangeFilter>(_onChangeDisplacementRangeFilter);
+    on<ApplyAdvancedFilters>(_onApplyAdvancedFilters);
   }
 
   Future<void> _onInitializeMap(
@@ -40,9 +43,11 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     if (position == null) {
       emit(
         const UserHomeLoaded(
-          locationPermissionDenied: true,
-          userLatitude: 4.60971,
-          userLongitude: -74.08175,
+          mapConfig: MapConfig(
+            locationPermissionDenied: true,
+            userLatitude: 4.60971,
+            userLongitude: -74.08175,
+          ),
         ),
       );
 
@@ -58,8 +63,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
 
     emit(
       UserHomeLoaded(
-        userLatitude: position.latitude,
-        userLongitude: position.longitude,
+        mapConfig: MapConfig(
+          userLatitude: position.latitude,
+          userLongitude: position.longitude,
+        ),
       ),
     );
 
@@ -80,8 +87,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     if (currentState is UserHomeLoaded) {
       emit(
         currentState.copyWith(
-          userLatitude: event.latitude,
-          userLongitude: event.longitude,
+          mapConfig: currentState.mapConfig.copyWith(
+            userLatitude: event.latitude,
+            userLongitude: event.longitude,
+          ),
         ),
       );
     }
@@ -94,22 +103,29 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     final currentState = state;
     if (currentState is! UserHomeLoaded) return;
 
-    emit(currentState.copyWith(isLoadingBranches: true));
+    emit(
+      currentState.copyWith(
+        loadStatus: const BranchLoadStatus(isLoading: true),
+      ),
+    );
 
     final result = await _getNearbyBranchesUseCase(
       latitude: event.latitude,
       longitude: event.longitude,
       radiusKm: event.radiusKm,
       type: event.type,
+      brand: event.brand,
+      displacementRange: event.displacementRange,
     );
 
     result.fold(
       (error) {
         emit(
           currentState.copyWith(
-            isLoadingBranches: false,
-            currentRadiusKm: event.radiusKm, // Preserve the requested radius
-            errorMessage: error.message,
+            mapConfig: currentState.mapConfig.copyWith(
+              currentRadiusKm: event.radiusKm,
+            ),
+            loadStatus: BranchLoadStatus(errorMessage: error.message),
           ),
         );
       },
@@ -117,11 +133,15 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
         emit(
           currentState.copyWith(
             branches: branches,
-            activeTypeFilter: event.type,
-            clearActiveTypeFilter: event.type == null,
-            currentRadiusKm: event.radiusKm,
-            isLoadingBranches: false,
-            clearError: true,
+            filters: ActiveFilters(
+              type: event.type,
+              brand: event.brand,
+              displacementRange: event.displacementRange,
+            ),
+            mapConfig: currentState.mapConfig.copyWith(
+              currentRadiusKm: event.radiusKm,
+            ),
+            loadStatus: const BranchLoadStatus(),
           ),
         );
       },
@@ -157,6 +177,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
           type: event.type,
+          brand: currentState.filters.brand,
+          displacementRange: currentState.filters.displacementRange,
         ),
       );
     }
@@ -170,7 +192,66 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           latitude: currentState.userLatitude!,
           longitude: currentState.userLongitude!,
           radiusKm: event.radiusKm,
-          type: currentState.activeTypeFilter,
+          type: currentState.filters.type,
+          brand: currentState.filters.brand,
+          displacementRange: currentState.filters.displacementRange,
+        ),
+      );
+    }
+  }
+
+  void _onChangeBrandFilter(
+    ChangeBrandFilter event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.filters.type,
+          brand: event.brand,
+          displacementRange: currentState.filters.displacementRange,
+        ),
+      );
+    }
+  }
+
+  void _onChangeDisplacementRangeFilter(
+    ChangeDisplacementRangeFilter event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.filters.type,
+          brand: currentState.filters.brand,
+          displacementRange: event.displacementRange,
+        ),
+      );
+    }
+  }
+
+  void _onApplyAdvancedFilters(
+    ApplyAdvancedFilters event,
+    Emitter<UserHomeState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded && currentState.hasUserLocation) {
+      add(
+        LoadNearbyBranches(
+          latitude: currentState.userLatitude!,
+          longitude: currentState.userLongitude!,
+          radiusKm: currentState.currentRadiusKm,
+          type: currentState.filters.type,
+          brand: event.brand,
+          displacementRange: event.displacementRange,
         ),
       );
     }

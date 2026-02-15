@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/user_home/domain/entities/branch_marker_entity.dart';
 
 /// Model for branch marker data from API.
@@ -17,6 +18,8 @@ class BranchMarkerModel extends BranchMarkerEntity {
     super.profileImageUrl,
     super.cityName,
     super.departmentName,
+    super.brands,
+    super.displacementRanges,
   });
 
   /// Creates a model from JSON response.
@@ -43,16 +46,22 @@ class BranchMarkerModel extends BranchMarkerEntity {
       name: json['name'] as String? ?? '',
       type: _mapEstablishmentType(json['establishment_type'] as String?),
       typeLabel: json['establishment_type_label'] as String?,
-      latitude: _parseDouble(json['latitude']),
-      longitude: _parseDouble(json['longitude']),
+      latitude: JsonHelpers.parseDouble(json['latitude']),
+      longitude: JsonHelpers.parseDouble(json['longitude']),
       address: json['address'] as String?,
       cityName: json['city_name'] as String?,
       departmentName: json['department_name'] as String?,
       distanceKm: json['distance_km'] != null
-          ? _parseDouble(json['distance_km'])
+          ? JsonHelpers.parseDouble(json['distance_km'])
           : null,
       profileImageUrl: json['profile_image_url'] as String?,
-      rating: json['rating'] != null ? _parseDouble(json['rating']) : null,
+      rating: json['rating'] != null
+          ? JsonHelpers.parseDouble(json['rating'])
+          : null,
+      brands: JsonHelpers.parseStringList(json['brands']),
+      displacementRanges: JsonHelpers.parseStringList(
+        json['displacement_ranges'],
+      ),
     );
   }
 
@@ -70,13 +79,6 @@ class BranchMarkerModel extends BranchMarkerEntity {
     }
   }
 
-  static double _parseDouble(dynamic value) {
-    if (value is double) return value;
-    if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
   /// Converts model to entity.
   BranchMarkerEntity toEntity() {
     return BranchMarkerEntity(
@@ -92,6 +94,8 @@ class BranchMarkerModel extends BranchMarkerEntity {
       profileImageUrl: profileImageUrl,
       cityName: cityName,
       departmentName: departmentName,
+      brands: brands,
+      displacementRanges: displacementRanges,
     );
   }
 }

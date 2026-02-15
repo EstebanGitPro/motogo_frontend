@@ -48,7 +48,25 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _obscureConfirmPassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_forceLowercase);
+  }
+
+  void _forceLowercase() {
+    final text = _emailController.text;
+    final lower = text.toLowerCase();
+    if (text != lower) {
+      _emailController.value = _emailController.value.copyWith(
+        text: lower,
+        selection: _emailController.selection,
+      );
+    }
+  }
+
+  @override
   void dispose() {
+    _emailController.removeListener(_forceLowercase);
     _identityController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();

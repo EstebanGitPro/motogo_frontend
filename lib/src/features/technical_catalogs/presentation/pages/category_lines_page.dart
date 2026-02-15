@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
 import 'package:motogo_frontend/src/core/constants/common_constants.dart';
+import 'package:motogo_frontend/src/core/widgets/catalog_item_card.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/entities/category_entity.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/domain/entities/category_line_entity.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/bloc/category_lines_bloc.dart';
@@ -141,30 +142,19 @@ class _CategoryLinesView extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final category = categories[index];
-              return Card(
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[50],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.category, color: Colors.blue[700]),
-                  ),
-                  title: Text(
-                    category.name,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  subtitle: Text(
+              return CatalogItemCard(
+                icon: Icons.category,
+                iconBackgroundColor: Colors.blue[50],
+                iconColor: Colors.blue[700],
+                title: category.name,
+                subtitle:
                     '${category.lineCount} ${AdminConstants.categoryLinesFoundCount}',
-                  ),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {
-                    context.read<CategoryLinesBloc>().add(
-                      LoadCategoryLines(categoryName: category.name),
-                    );
-                  },
-                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  context.read<CategoryLinesBloc>().add(
+                    LoadCategoryLines(categoryName: category.name),
+                  );
+                },
               );
             },
           ),
@@ -219,24 +209,12 @@ class _CategoryLinesView extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final line = lines[index];
-              return Card(
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(Icons.two_wheeler, color: Colors.green[700]),
-                  ),
-                  title: Text(
-                    line.model,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  subtitle: Text(
-                    '${line.brand} · ${line.engineDisplacement} cc',
-                  ),
-                ),
+              return CatalogItemCard(
+                icon: Icons.two_wheeler,
+                iconBackgroundColor: Colors.green[50],
+                iconColor: Colors.green[700],
+                title: line.model,
+                subtitle: '${line.brand} · ${line.engineDisplacement} cc',
               );
             },
           ),

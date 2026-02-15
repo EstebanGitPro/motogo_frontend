@@ -10,14 +10,18 @@ void main() {
     const testDepartmentId = 'c3d4e5f6-3333-4000-8000-000000000001';
     const testBrandIds = ['f6a7b8c9-6666-4000-8000-000000000001'];
 
+    const testLocation = BranchLocation(
+      address: 'Calle 123',
+      cityId: testCityId,
+      departmentId: testDepartmentId,
+    );
+
     group('constructor', () {
       test('should create BranchModel with required fields', () {
         final model = BranchModel(
           name: 'MotoGo Centro',
           establishmentType: 'WORKSHOP',
-          address: 'Calle 123',
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         expect(model.name, 'MotoGo Centro');
@@ -40,11 +44,13 @@ void main() {
           status: 'INACTIVE',
           brands: testBrandIds,
           displacementRanges: const ['BAJO', 'MEDIO'],
-          address: 'Calle 123 #45-67',
-          cityId: testCityId,
-          cityName: 'Bogotá',
-          departmentId: testDepartmentId,
-          departmentName: 'Cundinamarca',
+          location: const BranchLocation(
+            address: 'Calle 123 #45-67',
+            cityId: testCityId,
+            cityName: 'Bogotá',
+            departmentId: testDepartmentId,
+            departmentName: 'Cundinamarca',
+          ),
         );
 
         expect(model.id, testBranchId);
@@ -59,9 +65,7 @@ void main() {
         final entity = BranchEntity(
           name: 'Test Branch',
           establishmentType: 'WORKSHOP',
-          address: 'Test Address',
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
           brands: testBrandIds,
           displacementRanges: const ['ALTO'],
         );
@@ -147,13 +151,15 @@ void main() {
           final model = BranchModel(
             name: 'MotoGo Centro',
             establishmentType: 'WORKSHOP',
-            address: 'Calle 123',
-            cityId: testCityId,
-            cityName: 'Bogotá',
-            departmentId: testDepartmentId,
-            departmentName: 'Cundinamarca',
             brands: testBrandIds,
             displacementRanges: const ['BAJO', 'ALTO'],
+            location: const BranchLocation(
+              address: 'Calle 123',
+              cityId: testCityId,
+              cityName: 'Bogotá',
+              departmentId: testDepartmentId,
+              departmentName: 'Cundinamarca',
+            ),
           );
 
           final json = model.toJson();
@@ -179,9 +185,7 @@ void main() {
         final model = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
-          address: 'Test',
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         final json = model.toJson();
@@ -196,9 +200,7 @@ void main() {
         final model = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
-          address: 'Test',
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
           profileImageUrl: 'https://example.com/image.jpg',
         );
 
@@ -214,12 +216,14 @@ void main() {
           id: testBranchId,
           name: 'Test Branch',
           establishmentType: 'WORKSHOP',
-          address: 'Test Address',
-          cityId: testCityId,
-          cityName: 'Bogotá',
-          departmentId: testDepartmentId,
           brands: testBrandIds,
           displacementRanges: const ['MEDIO'],
+          location: const BranchLocation(
+            address: 'Test Address',
+            cityId: testCityId,
+            cityName: 'Bogotá',
+            departmentId: testDepartmentId,
+          ),
         );
 
         final entity = model.toEntity();

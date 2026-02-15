@@ -111,37 +111,10 @@ class _UserHomeViewState extends State<_UserHomeView> {
       ),
       drawer: const UserHomeDrawer(),
       body: BlocConsumer<UserHomeBloc, UserHomeState>(
-        listener: (context, state) {
-          if (state is UserHomeLoaded && state.hasUserLocation) {
-            // Only auto-center on the very first load
-            if (!_hasInitiallyCentered) {
-              _hasInitiallyCentered = true;
-              _centerOnUser(state.userLatitude!, state.userLongitude!);
-            }
-          }
-          if (state is UserHomeLoaded) {
-            _updateMarkers(state.branches);
-            // Show error message if present
-            if (state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            }
-          }
-          if (state is UserHomeError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
+        listener: _handleStateChange,
         builder: (context, state) {
+          final showPermissionBanner =
+              state is UserHomeLoaded && state.locationPermissionDenied;
           return Stack(
             children: [
               _buildMap(state),
@@ -151,90 +124,136 @@ class _UserHomeViewState extends State<_UserHomeView> {
                 right: 16,
                 child: _buildFilterChips(context, state),
               ),
-              if (state is UserHomeLoaded && state.locationPermissionDenied)
+              if (showPermissionBanner)
                 Positioned(
                   top: 70,
                   left: 16,
                   right: 16,
                   child: _buildLocationPermissionBanner(),
                 ),
-              // Radio slider - compact on right side
               Positioned(
-                top: state is UserHomeLoaded && state.locationPermissionDenied
-                    ? 130
-                    : 70,
+                top: showPermissionBanner ? 130 : 70,
                 right: 16,
                 child: _buildRadiusSlider(context, state),
               ),
-              if (state is UserHomeLoaded &&
-                  state.selectedBranch != null &&
-                  !_isNavigating)
-                Positioned(
-                  bottom: 100,
-                  left: 16,
-                  right: 16,
-                  child: BranchCard(
-                    branch: state.selectedBranch!,
-                    onSeeMore: () =>
-                        _navigateToBranchDetail(context, state.selectedBranch!),
-                    onNavigate: () =>
-                        _startNavigation(context, state.selectedBranch!),
-                  ),
-                ),
-              // Navigation bottom sheet
-              if (_isNavigating || _isLoadingRoute)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: NavigationBottomSheet(
-                    isLoadingRoute: _isLoadingRoute,
-                    isImmersiveMode: _isImmersiveMode,
-                    navigationTarget: _navigationTarget,
-                    activeDistanceKm: _activeRoute?.distanceKm,
-                    activeDurationMin: _activeRoute?.durationMin,
-                    liveDistanceKm: _liveDistanceKm,
-                    liveDurationMin: _liveDurationMin,
-                    onBeginImmersive: _beginImmersiveTracking,
-                    onCancelRoute: _clearRoute,
-                    onOpenGoogleMaps: _navigationTarget != null
-                        ? () => _openGoogleMaps(
-                            _navigationTarget!.latitude,
-                            _navigationTarget!.longitude,
-                          )
-                        : null,
-                  ),
-                ),
-              // FABs column: Add motorcycle + My location
-              Positioned(
-                bottom: 24,
-                right: 16,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Add motorcycle FAB - always visible for multiple motorcycles
-                    FloatingActionButton(
-                      heroTag: 'add_motorcycle',
-                      onPressed: () => _navigateToRegisterMotorcycle(context),
-                      backgroundColor: Colors.green[600],
-                      foregroundColor: Colors.white,
-                      child: const Icon(Icons.add),
-                    ),
-                    const SizedBox(height: 12),
-                    // My location FAB
-                    FloatingActionButton(
-                      heroTag: 'my_location',
-                      onPressed: () => _onLocationFabPressed(context),
-                      backgroundColor: Colors.blue[600],
-                      foregroundColor: Colors.white,
-                      child: const Icon(Icons.my_location),
-                    ),
-                  ],
-                ),
-              ),
+              ..._buildSelectedBranchCard(context, state),
+              ..._buildNavigationSheet(),
+              _buildFabColumn(context),
             ],
           );
         },
+      ),
+    );
+  }
+
+  void _handleStateChange(BuildContext context, UserHomeState state) {
+    if (state is UserHomeLoaded &&
+        state.hasUserLocation &&
+        !_hasInitiallyCentered) {
+      _hasInitiallyCentered = true;
+      _centerOnUser(state.userLatitude!, state.userLongitude!);
+    }
+    if (state is UserHomeLoaded) {
+      _updateMarkers(state.branches);
+      _showErrorIfPresent(context, state.errorMessage);
+    }
+    if (state is UserHomeError) {
+      _showErrorSnackBar(context, state.message);
+    }
+  }
+
+  void _showErrorIfPresent(BuildContext context, String? errorMessage) {
+    if (errorMessage == null) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  List<Widget> _buildSelectedBranchCard(
+    BuildContext context,
+    UserHomeState state,
+  ) {
+    if (state is! UserHomeLoaded ||
+        state.selectedBranch == null ||
+        _isNavigating) {
+      return const [];
+    }
+    return [
+      Positioned(
+        bottom: 100,
+        left: 16,
+        right: 16,
+        child: BranchCard(
+          branch: state.selectedBranch!,
+          onSeeMore: () =>
+              _navigateToBranchDetail(context, state.selectedBranch!),
+          onNavigate: () => _startNavigation(context, state.selectedBranch!),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> _buildNavigationSheet() {
+    if (!_isNavigating && !_isLoadingRoute) return const [];
+    return [
+      Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: NavigationBottomSheet(
+          isLoadingRoute: _isLoadingRoute,
+          isImmersiveMode: _isImmersiveMode,
+          navigationTarget: _navigationTarget,
+          activeDistanceKm: _activeRoute?.distanceKm,
+          activeDurationMin: _activeRoute?.durationMin,
+          liveDistanceKm: _liveDistanceKm,
+          liveDurationMin: _liveDurationMin,
+          onBeginImmersive: _beginImmersiveTracking,
+          onCancelRoute: _clearRoute,
+          onOpenGoogleMaps: _navigationTarget != null
+              ? () => _openGoogleMaps(
+                  _navigationTarget!.latitude,
+                  _navigationTarget!.longitude,
+                )
+              : null,
+        ),
+      ),
+    ];
+  }
+
+  Widget _buildFabColumn(BuildContext context) {
+    return Positioned(
+      bottom: 24,
+      right: 16,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            heroTag: 'add_motorcycle',
+            onPressed: () => _navigateToRegisterMotorcycle(context),
+            backgroundColor: Colors.green[600],
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: 'my_location',
+            onPressed: () => _onLocationFabPressed(context),
+            backgroundColor: Colors.blue[600],
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.my_location),
+          ),
+        ],
       ),
     );
   }

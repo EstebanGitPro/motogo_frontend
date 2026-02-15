@@ -177,11 +177,13 @@ class _EditBranchPageState extends State<EditBranchPage>
         establishmentType: _selectedEstablishmentType,
         brands: _selectedBrandIds,
         displacementRanges: _selectedDisplacementRanges,
-        address: _addressController.text.trim(),
-        cityId: _selectedCityId,
-        cityName: selectedCity.name,
-        departmentId: _selectedDepartmentId,
-        departmentName: selectedDepartment.name,
+        location: BranchLocation(
+          address: _addressController.text.trim(),
+          cityId: _selectedCityId!,
+          cityName: selectedCity.name,
+          departmentId: _selectedDepartmentId!,
+          departmentName: selectedDepartment.name,
+        ),
         profileImageUrl: profileImageUrl,
       );
 

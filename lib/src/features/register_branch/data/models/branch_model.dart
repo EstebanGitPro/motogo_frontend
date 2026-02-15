@@ -14,11 +14,7 @@ class BranchModel extends BranchEntity {
     super.status = BranchStatus.active,
     super.brands = const [],
     super.displacementRanges = const [],
-    required super.address,
-    required super.cityId,
-    super.cityName,
-    required super.departmentId,
-    super.departmentName,
+    required super.location,
   });
 
   /// Creates a model from domain entity.
@@ -32,18 +28,14 @@ class BranchModel extends BranchEntity {
       status: entity.status,
       brands: entity.brands,
       displacementRanges: entity.displacementRanges,
-      address: entity.address,
-      cityId: entity.cityId,
-      cityName: entity.cityName,
-      departmentId: entity.departmentId,
-      departmentName: entity.departmentName,
+      location: entity.location,
     );
   }
 
   /// Creates a model from JSON map (API response).
   factory BranchModel.fromJson(Map<String, dynamic> json) {
     // Handle nested location data if present
-    final location = json['location'] as Map<String, dynamic>?;
+    final loc = json['location'] as Map<String, dynamic>?;
 
     return BranchModel(
       id: json['id'] as String?,
@@ -56,14 +48,16 @@ class BranchModel extends BranchEntity {
       displacementRanges: JsonHelpers.parseStringList(
         json['displacement_ranges'],
       ),
-      address: location?['address'] as String? ?? json['address'] as String,
-      cityId: location?['city_id'] as String? ?? json['city_id'] as String,
-      cityName: location?['city_name'] as String?,
-      departmentId:
-          location?['department_id'] as String? ??
-          json['department_id'] as String? ??
-          '',
-      departmentName: location?['department_name'] as String?,
+      location: BranchLocation(
+        address: loc?['address'] as String? ?? json['address'] as String,
+        cityId: loc?['city_id'] as String? ?? json['city_id'] as String,
+        cityName: loc?['city_name'] as String?,
+        departmentId:
+            loc?['department_id'] as String? ??
+            json['department_id'] as String? ??
+            '',
+        departmentName: loc?['department_name'] as String?,
+      ),
     );
   }
 
@@ -114,11 +108,7 @@ class BranchModel extends BranchEntity {
       status: status,
       brands: brands,
       displacementRanges: displacementRanges,
-      address: address,
-      cityId: cityId,
-      cityName: cityName,
-      departmentId: departmentId,
-      departmentName: departmentName,
+      location: location,
     );
   }
 }

@@ -52,20 +52,36 @@ class ScheduleSection extends StatelessWidget {
   }
 
   List<Widget> _buildScheduleRows() {
-    // Group by day and sort
+    final grouped = _groupSchedulesByDay();
+    final sortedDays = grouped.keys.toList()..sort();
+    final now = DateTime.now();
+    final hasTodayException = _hasTodayClosedException(now);
+
+    return sortedDays.map((day) {
+      final schedule = grouped[day]!;
+      final isToday = day == now.weekday;
+      final showException = isToday && hasTodayException;
+
+      return _buildScheduleRow(schedule, isToday, showException);
+    }).toList();
+  }
+
+  /// Groups schedules by day of week, keeping only the first per day.
+  Map<int, ScheduleDetailEntity> _groupSchedulesByDay() {
     final grouped = <int, ScheduleDetailEntity>{};
     for (final schedule in schedules) {
       if (!grouped.containsKey(schedule.dayOfWeek)) {
         grouped[schedule.dayOfWeek] = schedule;
       }
     }
+    return grouped;
+  }
 
-    final sortedDays = grouped.keys.toList()..sort();
-    final now = DateTime.now();
+  /// Checks whether today falls within an active closed exception.
+  bool _hasTodayClosedException(DateTime now) {
     final todayOnly = DateTime(now.year, now.month, now.day);
 
-    // Check if today has an active closed exception
-    final hasTodayException = exceptions.any((e) {
+    return exceptions.any((e) {
       if (!e.active || !e.isClosed) return false;
       final startDate = DateTime.tryParse(e.exceptionStartDate);
       final endDate = DateTime.tryParse(e.exceptionEndDate);
@@ -78,48 +94,55 @@ class ScheduleSection extends StatelessWidget {
       final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
       return !todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly);
     });
+  }
 
-    return sortedDays.map((day) {
-      final schedule = grouped[day]!;
-      final isToday = day == now.weekday;
-      final showException = isToday && hasTodayException;
+  /// Resolves the display text for a schedule row.
+  String _scheduleText(ScheduleDetailEntity schedule, bool showException) {
+    if (showException) return BranchDetailConstants.statusClosedException;
+    if (schedule.isClosed) return BranchDetailConstants.dayClosed;
+    return '${schedule.openingTime} - ${schedule.closingTime}';
+  }
 
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 100,
-              child: Text(
-                schedule.dayName +
-                    (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),
-                style: TextStyle(
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  color: isToday ? Colors.blue[700] : Colors.black87,
-                ),
+  /// Resolves the text color for a schedule row.
+  Color _scheduleColor(ScheduleDetailEntity schedule, bool showException) {
+    if (showException) return Colors.orange[700]!;
+    if (schedule.isClosed) return Colors.grey;
+    return Colors.black87;
+  }
+
+  /// Builds a single schedule row widget.
+  Widget _buildScheduleRow(
+    ScheduleDetailEntity schedule,
+    bool isToday,
+    bool showException,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              schedule.dayName +
+                  (isToday ? ' ${BranchDetailConstants.dayToday}' : ''),
+              style: TextStyle(
+                fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                color: isToday ? Colors.blue[700] : Colors.black87,
               ),
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                showException
-                    ? BranchDetailConstants.statusClosedException
-                    : schedule.isClosed
-                    ? BranchDetailConstants.dayClosed
-                    : '${schedule.openingTime} - ${schedule.closingTime}',
-                style: TextStyle(
-                  color: showException
-                      ? Colors.orange[700]
-                      : schedule.isClosed
-                      ? Colors.grey
-                      : Colors.black87,
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _scheduleText(schedule, showException),
+              style: TextStyle(
+                color: _scheduleColor(schedule, showException),
+                fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-          ],
-        ),
-      );
-    }).toList();
+          ),
+        ],
+      ),
+    );
   }
 }

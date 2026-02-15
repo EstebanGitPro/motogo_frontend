@@ -13,11 +13,7 @@ class BranchEntity {
   displacementRanges; // From branch_displacement_ranges table
 
   // Location fields (from locations table)
-  final String address;
-  final String cityId;
-  final String? cityName;
-  final String departmentId;
-  final String? departmentName;
+  final BranchLocation location;
 
   const BranchEntity({
     this.id,
@@ -28,12 +24,15 @@ class BranchEntity {
     this.status = BranchStatus.active,
     this.brands = const [],
     this.displacementRanges = const [],
-    required this.address,
-    required this.cityId,
-    this.cityName,
-    required this.departmentId,
-    this.departmentName,
+    required this.location,
   });
+
+  // Convenience accessors for location fields.
+  String get address => location.address;
+  String get cityId => location.cityId;
+  String? get cityName => location.cityName;
+  String get departmentId => location.departmentId;
+  String? get departmentName => location.departmentName;
 
   /// Creates a copy of this entity with the given fields replaced.
   BranchEntity copyWith({
@@ -45,11 +44,7 @@ class BranchEntity {
     String? status,
     List<String>? brands,
     List<String>? displacementRanges,
-    String? address,
-    String? cityId,
-    String? cityName,
-    String? departmentId,
-    String? departmentName,
+    BranchLocation? location,
   }) {
     return BranchEntity(
       id: id ?? this.id,
@@ -60,6 +55,36 @@ class BranchEntity {
       status: status ?? this.status,
       brands: brands ?? this.brands,
       displacementRanges: displacementRanges ?? this.displacementRanges,
+      location: location ?? this.location,
+    );
+  }
+}
+
+/// Value object representing the physical location of a branch.
+class BranchLocation {
+  final String address;
+  final String cityId;
+  final String? cityName;
+  final String departmentId;
+  final String? departmentName;
+
+  const BranchLocation({
+    required this.address,
+    required this.cityId,
+    this.cityName,
+    required this.departmentId,
+    this.departmentName,
+  });
+
+  /// Creates a copy with updated values.
+  BranchLocation copyWith({
+    String? address,
+    String? cityId,
+    String? cityName,
+    String? departmentId,
+    String? departmentName,
+  }) {
+    return BranchLocation(
       address: address ?? this.address,
       cityId: cityId ?? this.cityId,
       cityName: cityName ?? this.cityName,

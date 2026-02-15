@@ -123,14 +123,16 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           currentState.copyWith(
             branches: branches,
             activeTypeFilter: event.type,
-            clearActiveTypeFilter: event.type == null,
             activeBrandFilter: event.brand,
-            clearActiveBrandFilter: event.brand == null,
             activeDisplacementRangeFilter: event.displacementRange,
-            clearActiveDisplacementRangeFilter: event.displacementRange == null,
             currentRadiusKm: event.radiusKm,
             isLoadingBranches: false,
-            clearError: true,
+            clear: ClearFlags(
+              activeTypeFilter: event.type == null,
+              activeBrandFilter: event.brand == null,
+              activeDisplacementRangeFilter: event.displacementRange == null,
+              error: true,
+            ),
           ),
         );
       },
@@ -150,7 +152,9 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
   ) {
     final currentState = state;
     if (currentState is UserHomeLoaded) {
-      emit(currentState.copyWith(clearSelectedBranch: true));
+      emit(
+        currentState.copyWith(clear: const ClearFlags(selectedBranch: true)),
+      );
     }
   }
 

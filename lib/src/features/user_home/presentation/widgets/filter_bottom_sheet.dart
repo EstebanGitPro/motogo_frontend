@@ -67,9 +67,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final hasActiveFilters =
-        _selectedBrand != null || _selectedDisplacement != null;
-
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       decoration: const BoxDecoration(
@@ -109,142 +106,166 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
           ),
           const SizedBox(height: 16),
 
-          // Brand section
-          Text(
-            MotorcycleConstants.filterBrandSection,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 8),
-          _isLoadingBrands
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                )
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: _brands.map((brand) {
-                    final isSelected = _selectedBrand == brand.id;
-                    return FilterChip(
-                      label: Text(brand.name),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        setState(() {
-                          _selectedBrand = isSelected ? null : brand.id;
-                        });
-                      },
-                      selectedColor: Colors.blue[600],
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontSize: 12,
-                      ),
-                      backgroundColor: Colors.grey[100],
-                      checkmarkColor: Colors.white,
-                    );
-                  }).toList(),
-                ),
+          _buildBrandSection(),
           const SizedBox(height: 20),
 
-          // Displacement range section
-          Text(
-            MotorcycleConstants.filterDisplacementSection,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
-            ),
-          ),
-          const SizedBox(height: 8),
-          _isLoadingDisplacements
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Center(
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                )
-              : Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: _displacements.map((d) {
-                    final isSelected = _selectedDisplacement == d.range;
-                    return FilterChip(
-                      label: Text(d.displayLabel),
-                      selected: isSelected,
-                      onSelected: (_) {
-                        setState(() {
-                          _selectedDisplacement = isSelected ? null : d.range;
-                        });
-                      },
-                      selectedColor: Colors.green[600],
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black87,
-                        fontSize: 12,
-                      ),
-                      backgroundColor: Colors.grey[100],
-                      checkmarkColor: Colors.white,
-                    );
-                  }).toList(),
-                ),
+          _buildDisplacementSection(),
           const SizedBox(height: 24),
 
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: hasActiveFilters
-                      ? () {
-                          setState(() {
-                            _selectedBrand = null;
-                            _selectedDisplacement = null;
-                          });
-                        }
-                      : null,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(MotorcycleConstants.filterClear),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    widget.onApply(_selectedBrand, _selectedDisplacement);
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[600],
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(MotorcycleConstants.filterApply),
-                ),
-              ),
-            ],
-          ),
+          _buildActionButtons(),
         ],
       ),
+    );
+  }
+
+  Widget _buildBrandSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          MotorcycleConstants.filterBrandSection,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (_isLoadingBrands)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: _brands.map((brand) {
+              final isSelected = _selectedBrand == brand.id;
+              return FilterChip(
+                label: Text(brand.name),
+                selected: isSelected,
+                onSelected: (_) {
+                  setState(() {
+                    _selectedBrand = isSelected ? null : brand.id;
+                  });
+                },
+                selectedColor: Colors.blue[600],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontSize: 12,
+                ),
+                backgroundColor: Colors.grey[100],
+                checkmarkColor: Colors.white,
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDisplacementSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          MotorcycleConstants.filterDisplacementSection,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Colors.grey[700],
+          ),
+        ),
+        const SizedBox(height: 8),
+        if (_isLoadingDisplacements)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: _displacements.map((d) {
+              final isSelected = _selectedDisplacement == d.range;
+              return FilterChip(
+                label: Text(d.displayLabel),
+                selected: isSelected,
+                onSelected: (_) {
+                  setState(() {
+                    _selectedDisplacement = isSelected ? null : d.range;
+                  });
+                },
+                selectedColor: Colors.green[600],
+                labelStyle: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontSize: 12,
+                ),
+                backgroundColor: Colors.grey[100],
+                checkmarkColor: Colors.white,
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons() {
+    final hasActiveFilters =
+        _selectedBrand != null || _selectedDisplacement != null;
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: hasActiveFilters
+                ? () {
+                    setState(() {
+                      _selectedBrand = null;
+                      _selectedDisplacement = null;
+                    });
+                  }
+                : null,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(MotorcycleConstants.filterClear),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              widget.onApply(_selectedBrand, _selectedDisplacement);
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[600],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(MotorcycleConstants.filterApply),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -75,33 +75,7 @@ class DisplacementRangeSelector extends StatelessWidget {
           )
         // Normal state with ranges
         else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: availableRanges.map((rangeEntity) {
-              final isSelected = selectedRanges.contains(rangeEntity.range);
-              return FilterChip(
-                label: Text(rangeEntity.displayLabel),
-                selected: isSelected,
-                onSelected: enabled
-                    ? (_) => _toggleRange(rangeEntity.range)
-                    : null,
-                selectedColor: Colors.green[100],
-                checkmarkColor: Colors.green[700],
-                backgroundColor: Colors.grey[100],
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.green[700] : Colors.grey[700],
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: isSelected ? Colors.green[400]! : Colors.grey[300]!,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
+          _buildRangeChips(),
 
         // Hint text (optional — no validation required)
         if (selectedRanges.isEmpty && availableRanges.isNotEmpty)
@@ -117,6 +91,35 @@ class DisplacementRangeSelector extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+
+  /// Builds the chip list for available displacement ranges.
+  Widget _buildRangeChips() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: availableRanges.map((rangeEntity) {
+        final isSelected = selectedRanges.contains(rangeEntity.range);
+        return FilterChip(
+          label: Text(rangeEntity.displayLabel),
+          selected: isSelected,
+          onSelected: enabled ? (_) => _toggleRange(rangeEntity.range) : null,
+          selectedColor: Colors.green[100],
+          checkmarkColor: Colors.green[700],
+          backgroundColor: Colors.grey[100],
+          labelStyle: TextStyle(
+            color: isSelected ? Colors.green[700] : Colors.grey[700],
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+            side: BorderSide(
+              color: isSelected ? Colors.green[400]! : Colors.grey[300]!,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 }

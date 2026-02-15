@@ -47,6 +47,11 @@ class UserHomeLoaded extends UserHomeState {
   });
 
   /// Creates a copy with updated values.
+  ///
+  /// Use [clear] to reset nullable fields to `null`. Example:
+  /// ```dart
+  /// state.copyWith(clear: ClearFlags(selectedBranch: true));
+  /// ```
   UserHomeLoaded copyWith({
     double? userLatitude,
     double? userLongitude,
@@ -59,26 +64,22 @@ class UserHomeLoaded extends UserHomeState {
     double? currentRadiusKm,
     bool? isLoadingBranches,
     String? errorMessage,
-    bool clearSelectedBranch = false,
-    bool clearActiveTypeFilter = false,
-    bool clearActiveBrandFilter = false,
-    bool clearActiveDisplacementRangeFilter = false,
-    bool clearError = false,
+    ClearFlags clear = const ClearFlags(),
   }) {
     return UserHomeLoaded(
       userLatitude: userLatitude ?? this.userLatitude,
       userLongitude: userLongitude ?? this.userLongitude,
       branches: branches ?? this.branches,
-      selectedBranchId: clearSelectedBranch
+      selectedBranchId: clear.selectedBranch
           ? null
           : (selectedBranchId ?? this.selectedBranchId),
-      activeTypeFilter: clearActiveTypeFilter
+      activeTypeFilter: clear.activeTypeFilter
           ? null
           : (activeTypeFilter ?? this.activeTypeFilter),
-      activeBrandFilter: clearActiveBrandFilter
+      activeBrandFilter: clear.activeBrandFilter
           ? null
           : (activeBrandFilter ?? this.activeBrandFilter),
-      activeDisplacementRangeFilter: clearActiveDisplacementRangeFilter
+      activeDisplacementRangeFilter: clear.activeDisplacementRangeFilter
           ? null
           : (activeDisplacementRangeFilter ??
                 this.activeDisplacementRangeFilter),
@@ -86,7 +87,7 @@ class UserHomeLoaded extends UserHomeState {
           locationPermissionDenied ?? this.locationPermissionDenied,
       currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,
       isLoadingBranches: isLoadingBranches ?? this.isLoadingBranches,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      errorMessage: clear.error ? null : (errorMessage ?? this.errorMessage),
     );
   }
 
@@ -127,4 +128,22 @@ class UserHomeError extends UserHomeState {
 
   @override
   List<Object?> get props => [message];
+}
+
+/// Groups the clear-flag booleans used by [UserHomeLoaded.copyWith]
+/// to reset nullable fields to `null`.
+class ClearFlags {
+  final bool selectedBranch;
+  final bool activeTypeFilter;
+  final bool activeBrandFilter;
+  final bool activeDisplacementRangeFilter;
+  final bool error;
+
+  const ClearFlags({
+    this.selectedBranch = false,
+    this.activeTypeFilter = false,
+    this.activeBrandFilter = false,
+    this.activeDisplacementRangeFilter = false,
+    this.error = false,
+  });
 }

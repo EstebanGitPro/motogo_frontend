@@ -1,3 +1,4 @@
+import 'package:motogo_frontend/src/core/utils/json_helpers.dart';
 import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 /// Data model for branch with JSON serialization.
@@ -11,12 +12,8 @@ class BranchModel extends BranchEntity {
     super.franchiseId,
     super.profileImageUrl,
     super.status = BranchStatus.active,
-    super.brands = const [],
-    required super.address,
-    required super.cityId,
-    super.cityName,
-    required super.departmentId,
-    super.departmentName,
+    super.catalogs = const BranchCatalogs(),
+    required super.location,
   });
 
   /// Creates a model from domain entity.
@@ -28,19 +25,15 @@ class BranchModel extends BranchEntity {
       franchiseId: entity.franchiseId,
       profileImageUrl: entity.profileImageUrl,
       status: entity.status,
-      brands: entity.brands,
-      address: entity.address,
-      cityId: entity.cityId,
-      cityName: entity.cityName,
-      departmentId: entity.departmentId,
-      departmentName: entity.departmentName,
+      catalogs: entity.catalogs,
+      location: entity.location,
     );
   }
 
   /// Creates a model from JSON map (API response).
   factory BranchModel.fromJson(Map<String, dynamic> json) {
     // Handle nested location data if present
-    final location = json['location'] as Map<String, dynamic>?;
+    final loc = json['location'] as Map<String, dynamic>?;
 
     return BranchModel(
       id: json['id'] as String?,
@@ -49,15 +42,22 @@ class BranchModel extends BranchEntity {
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       status: json['status'] as String? ?? BranchStatus.active,
-      brands: _parseBrands(json['brands']),
-      address: location?['address'] as String? ?? json['address'] as String,
-      cityId: location?['city_id'] as String? ?? json['city_id'] as String,
-      cityName: location?['city_name'] as String?,
-      departmentId:
-          location?['department_id'] as String? ??
-          json['department_id'] as String? ??
-          '',
-      departmentName: location?['department_name'] as String?,
+      catalogs: BranchCatalogs(
+        brands: JsonHelpers.parseStringList(json['brands']),
+        displacementRanges: JsonHelpers.parseStringList(
+          json['displacement_ranges'],
+        ),
+      ),
+      location: BranchLocation(
+        address: loc?['address'] as String? ?? json['address'] as String,
+        cityId: loc?['city_id'] as String? ?? json['city_id'] as String,
+        cityName: loc?['city_name'] as String?,
+        departmentId:
+            loc?['department_id'] as String? ??
+            json['department_id'] as String? ??
+            '',
+        departmentName: loc?['department_name'] as String?,
+      ),
     );
   }
 
@@ -78,6 +78,10 @@ class BranchModel extends BranchEntity {
 
     if (brands.isNotEmpty) {
       map['brands'] = brands;
+    }
+
+    if (displacementRanges.isNotEmpty) {
+      map['displacement_ranges'] = displacementRanges;
     }
 
     // Location as nested object per API contract
@@ -102,21 +106,8 @@ class BranchModel extends BranchEntity {
       franchiseId: franchiseId,
       profileImageUrl: profileImageUrl,
       status: status,
-      brands: brands,
-      address: address,
-      cityId: cityId,
-      cityName: cityName,
-      departmentId: departmentId,
-      departmentName: departmentName,
+      catalogs: catalogs,
+      location: location,
     );
-  }
-
-  /// Helper to parse brands from various formats.
-  static List<String> _parseBrands(dynamic value) {
-    if (value == null) return [];
-    if (value is List) {
-      return value.map((e) => e.toString()).toList();
-    }
-    return [];
   }
 }

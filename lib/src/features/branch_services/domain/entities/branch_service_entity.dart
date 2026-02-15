@@ -11,6 +11,8 @@ class BranchServiceEntity extends Equatable {
   final String serviceType;
   final DateTime? addedAt;
   final bool active;
+  final double? averageRating;
+  final int totalReviews;
 
   const BranchServiceEntity({
     required this.id,
@@ -19,6 +21,8 @@ class BranchServiceEntity extends Equatable {
     required this.serviceType,
     this.addedAt,
     this.active = true,
+    this.averageRating,
+    this.totalReviews = 0,
   });
 
   @override
@@ -29,5 +33,7 @@ class BranchServiceEntity extends Equatable {
     serviceType,
     addedAt,
     active,
+    averageRating,
+    totalReviews,
   ];
 }

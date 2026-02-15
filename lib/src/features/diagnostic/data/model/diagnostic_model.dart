@@ -41,7 +41,6 @@ class DiagnosticModel {
   final String problemDescription;
   final String? possibleSolution;
   final String date;
-  final bool sentViaWhatsapp;
   final List<DiagnosticEvidenceModel> evidence;
 
   const DiagnosticModel({
@@ -51,7 +50,6 @@ class DiagnosticModel {
     required this.problemDescription,
     this.possibleSolution,
     required this.date,
-    this.sentViaWhatsapp = false,
     this.evidence = const [],
   });
 
@@ -66,7 +64,6 @@ class DiagnosticModel {
       problemDescription: source['problem_description'] as String? ?? '',
       possibleSolution: source['possible_solution'] as String?,
       date: source['date'] as String? ?? '',
-      sentViaWhatsapp: source['sent_via_whatsapp'] as bool? ?? false,
       evidence: _parseEvidence(source['evidence']),
     );
   }
@@ -80,7 +77,6 @@ class DiagnosticModel {
       problemDescription: json['problem_description'] as String? ?? '',
       possibleSolution: json['possible_solution'] as String?,
       date: json['date'] as String? ?? '',
-      sentViaWhatsapp: json['sent_via_whatsapp'] as bool? ?? false,
       evidence: _parseEvidence(json['evidence']),
     );
   }
@@ -101,7 +97,6 @@ class DiagnosticModel {
       problemDescription: problemDescription,
       possibleSolution: possibleSolution,
       date: DateTime.tryParse(date) ?? DateTime.now(),
-      sentViaWhatsapp: sentViaWhatsapp,
       evidence: evidence.map((e) => e.toEntity()).toList(),
     );
   }

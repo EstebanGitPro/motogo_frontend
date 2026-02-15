@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:motogo_frontend/src/features/register_branch/data/models/branch_model.dart';
+import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart';
 
 import 'register_branch_data_source_test.mocks.dart';
 
@@ -23,13 +24,15 @@ void main() {
 
     const testDepartmentId = 'dept-01';
 
-    const testBranch = BranchModel(
+    final testBranch = BranchModel(
       name: 'MotoGo Centro',
       establishmentType: 'WORKSHOP',
-      address: 'Calle 123',
-      cityId: 'city-01',
-      departmentId: testDepartmentId,
-      brands: ['brand-01'],
+      location: const BranchLocation(
+        address: 'Calle 123',
+        cityId: 'city-01',
+        departmentId: testDepartmentId,
+      ),
+      catalogs: const BranchCatalogs(brands: ['brand-01']),
     );
 
     group('HTTP Response Parsing', () {
@@ -81,9 +84,11 @@ void main() {
         final branchWithImage = BranchModel(
           name: 'Test',
           establishmentType: 'WORKSHOP',
-          address: 'Test Address',
-          cityId: 'city-01',
-          departmentId: testDepartmentId,
+          location: const BranchLocation(
+            address: 'Test Address',
+            cityId: 'city-01',
+            departmentId: testDepartmentId,
+          ),
           profileImageUrl: 'https://firebase.storage/image.jpg',
         );
 
@@ -98,9 +103,11 @@ void main() {
           final branch = BranchModel(
             name: 'Test',
             establishmentType: 'WORKSHOP',
-            address: 'Test Address',
-            cityId: 'city-01',
-            departmentId: testDepartmentId,
+            location: const BranchLocation(
+              address: 'Test Address',
+              cityId: 'city-01',
+              departmentId: testDepartmentId,
+            ),
           );
 
           final json = branch.toJson();

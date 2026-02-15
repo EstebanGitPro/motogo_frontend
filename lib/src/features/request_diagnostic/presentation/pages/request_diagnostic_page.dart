@@ -5,6 +5,7 @@ import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
+import 'package:motogo_frontend/src/core/utils/app_logger.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/enums/evidence_angle.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/bloc/request_diagnostic_bloc.dart';
@@ -536,7 +537,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
       }
     } catch (e) {
       // Handle error silently - log for debugging
-      debugPrint('Image picker error: $e');
+      AppLogger.error('Image picker error: $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -563,7 +564,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
         value: state.isPermissionGranted,
         onChanged: (_) =>
             context.read<RequestDiagnosticBloc>().add(const TogglePermission()),
-        activeColor: Colors.blue[600],
+        activeThumbColor: Colors.blue[600],
         contentPadding: EdgeInsets.zero,
       ),
     );

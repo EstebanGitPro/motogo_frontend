@@ -289,7 +289,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                         ],
                       )
                     : widget.existingImageUrl != null &&
-                      widget.existingImageUrl!.isNotEmpty
+                          widget.existingImageUrl!.isNotEmpty
                     ? Stack(
                         fit: StackFit.expand,
                         children: [

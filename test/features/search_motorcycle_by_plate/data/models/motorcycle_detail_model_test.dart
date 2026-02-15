@@ -82,7 +82,6 @@ void main() {
           'motorcycle_id': 'moto-123',
           'problem_description': 'Ruido extraño',
           'date': '2024-01-15',
-          'sent_via_whatsapp': true,
           'evidence': [
             {
               'id': 'ev-1',

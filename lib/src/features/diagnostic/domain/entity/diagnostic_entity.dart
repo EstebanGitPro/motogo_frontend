@@ -26,7 +26,6 @@ class DiagnosticEntity extends Equatable {
   final String problemDescription;
   final String? possibleSolution;
   final DateTime date;
-  final bool sentViaWhatsapp;
   final List<DiagnosticEvidenceEntity> evidence;
 
   const DiagnosticEntity({
@@ -36,7 +35,6 @@ class DiagnosticEntity extends Equatable {
     required this.problemDescription,
     this.possibleSolution,
     required this.date,
-    this.sentViaWhatsapp = false,
     this.evidence = const [],
   });
 
@@ -48,7 +46,6 @@ class DiagnosticEntity extends Equatable {
     problemDescription,
     possibleSolution,
     date,
-    sentViaWhatsapp,
     evidence,
   ];
 }

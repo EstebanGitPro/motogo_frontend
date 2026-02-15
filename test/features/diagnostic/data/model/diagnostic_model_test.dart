@@ -83,7 +83,6 @@ void main() {
             'problem_description': 'Ruido en motor',
             'possible_solution': 'Cambiar correa',
             'date': '2024-01-15',
-            'sent_via_whatsapp': true,
             'evidence': [
               <String, dynamic>{
                 'id': 'ev-1',
@@ -102,7 +101,6 @@ void main() {
         expect(model.problemDescription, 'Ruido en motor');
         expect(model.possibleSolution, 'Cambiar correa');
         expect(model.date, '2024-01-15');
-        expect(model.sentViaWhatsapp, isTrue);
         expect(model.evidence.length, 1);
       });
 
@@ -120,7 +118,6 @@ void main() {
         expect(model.problemDescription, 'Frenos desgastados');
         expect(model.branchId, isNull);
         expect(model.possibleSolution, isNull);
-        expect(model.sentViaWhatsapp, isFalse);
         expect(model.evidence, isEmpty);
       });
 
@@ -133,7 +130,6 @@ void main() {
         expect(model.problemDescription, '');
         expect(model.possibleSolution, isNull);
         expect(model.date, '');
-        expect(model.sentViaWhatsapp, isFalse);
         expect(model.evidence, isEmpty);
       });
     });
@@ -147,7 +143,6 @@ void main() {
           'problem_description': 'Aceite con fugas',
           'possible_solution': 'Cambiar empaque',
           'date': '2024-03-10',
-          'sent_via_whatsapp': false,
           'evidence': <Map<String, dynamic>>[],
         };
 
@@ -158,7 +153,6 @@ void main() {
         expect(model.branchId, 'branch-123');
         expect(model.problemDescription, 'Aceite con fugas');
         expect(model.possibleSolution, 'Cambiar empaque');
-        expect(model.sentViaWhatsapp, isFalse);
       });
 
       test('should handle null evidence in fromDataJson', () {
@@ -199,7 +193,6 @@ void main() {
           problemDescription: 'Motor ruidoso',
           possibleSolution: 'Cambiar correa',
           date: '2024-01-15',
-          sentViaWhatsapp: true,
           evidence: [
             DiagnosticEvidenceModel(
               id: 'ev-1',
@@ -217,7 +210,6 @@ void main() {
         expect(entity.problemDescription, 'Motor ruidoso');
         expect(entity.possibleSolution, 'Cambiar correa');
         expect(entity.date.year, 2024);
-        expect(entity.sentViaWhatsapp, isTrue);
         expect(entity.evidence.length, 1);
       });
 

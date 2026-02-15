@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/brand_entity.dart';
+import 'package:motogo_frontend/src/core/widgets/catalog_selector_states.dart';
 
 /// Widget for selecting multiple motorcycle brands using chips.
 ///
@@ -62,56 +63,13 @@ class BrandsSelector extends StatelessWidget {
 
         // Loading state
         if (isLoading)
-          const Center(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: CircularProgressIndicator(),
-            ),
-          )
+          const CatalogLoadingState()
         // Error state
         else if (errorMessage != null)
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.red[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.error_outline, color: Colors.red[700], size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    errorMessage!,
-                    style: TextStyle(color: Colors.red[700], fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          )
+          CatalogErrorState(message: errorMessage!)
         // Normal state with brands
         else if (availableBrands.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.orange[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.orange[200]!),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.warning_amber, color: Colors.orange[700], size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'No hay marcas disponibles',
-                    style: TextStyle(color: Colors.orange[700], fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          )
+          const CatalogEmptyState(message: 'No hay marcas disponibles')
         else
           Wrap(
             spacing: 8,

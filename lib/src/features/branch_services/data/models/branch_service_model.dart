@@ -11,6 +11,8 @@ class BranchServiceModel extends BranchServiceEntity {
     required super.serviceType,
     super.addedAt,
     super.active,
+    super.averageRating,
+    super.totalReviews,
   });
 
   /// Creates a BranchServiceModel from JSON map.
@@ -23,13 +25,21 @@ class BranchServiceModel extends BranchServiceEntity {
   ///   "description": "Cambio completo de aceite de motor",
   ///   "service_type": "Mantenimiento",
   ///   "added_at": "2026-01-15T10:30:00-05:00",
-  ///   "active": true
+  ///   "active": true,
+  ///   "average_rating": 4.8,
+  ///   "total_reviews": 120
   /// }
   /// ```
   factory BranchServiceModel.fromJson(Map<String, dynamic> json) {
     DateTime? addedAt;
     if (json['added_at'] != null) {
       addedAt = DateTime.tryParse(json['added_at'] as String);
+    }
+
+    double? averageRating;
+    final rawRating = json['average_rating'];
+    if (rawRating is num) {
+      averageRating = rawRating.toDouble();
     }
 
     return BranchServiceModel(
@@ -39,6 +49,8 @@ class BranchServiceModel extends BranchServiceEntity {
       serviceType: json['service_type'] as String? ?? '',
       addedAt: addedAt,
       active: json['active'] as bool? ?? true,
+      averageRating: averageRating,
+      totalReviews: json['total_reviews'] as int? ?? 0,
     );
   }
 
@@ -51,6 +63,8 @@ class BranchServiceModel extends BranchServiceEntity {
       serviceType: serviceType,
       addedAt: addedAt,
       active: active,
+      averageRating: averageRating,
+      totalReviews: totalReviews,
     );
   }
 }

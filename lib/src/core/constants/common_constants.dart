@@ -47,6 +47,10 @@ class CommonConstants {
   static const String continueEditing = 'Continuar editando';
   static const String exitWithoutSaving = 'Salir sin guardar';
 
+  // Location
+  static const String locationPermissionBanner =
+      'Activa tu ubicación para ver talleres cercanos';
+
   // Empty states
   static const String noBrandsAvailable = 'No hay marcas disponibles';
 }

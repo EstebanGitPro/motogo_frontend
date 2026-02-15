@@ -95,7 +95,6 @@ void main() {
         expect(entity.problemDescription, 'Ruido extraño');
         expect(entity.possibleSolution, isNull);
         expect(entity.date, testDate);
-        expect(entity.sentViaWhatsapp, isFalse);
         expect(entity.evidence, isEmpty);
       });
 
@@ -108,7 +107,6 @@ void main() {
           problemDescription: 'Ruido extraño',
           possibleSolution: 'Cambiar correa',
           date: testDate,
-          sentViaWhatsapp: true,
           evidence: [
             DiagnosticEvidenceEntity(
               id: 'ev-1',
@@ -120,7 +118,6 @@ void main() {
 
         expect(entity.branchId, 'branch-789');
         expect(entity.possibleSolution, 'Cambiar correa');
-        expect(entity.sentViaWhatsapp, isTrue);
         expect(entity.evidence.length, 1);
       });
     });
@@ -169,18 +166,16 @@ void main() {
           problemDescription: 'Issue',
           possibleSolution: 'Fix',
           date: testDate,
-          sentViaWhatsapp: true,
           evidence: const [],
         );
 
-        expect(entity.props.length, 8);
+        expect(entity.props.length, 7);
         expect(entity.props, contains('diag-123'));
         expect(entity.props, contains('moto-456'));
         expect(entity.props, contains('branch-789'));
         expect(entity.props, contains('Issue'));
         expect(entity.props, contains('Fix'));
         expect(entity.props, contains(testDate));
-        expect(entity.props, contains(true));
       });
     });
   });

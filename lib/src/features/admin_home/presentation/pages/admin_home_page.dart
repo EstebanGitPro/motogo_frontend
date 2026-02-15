@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
+import 'package:motogo_frontend/src/core/widgets/logout_dialog.dart';
 import 'package:motogo_frontend/src/features/admin_home/presentation/widgets/admin_menu_card.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_bloc.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/bloc/admin_services_event.dart';
 import 'package:motogo_frontend/src/features/admin_services/presentation/pages/admin_services_list_page.dart';
-import 'package:motogo_frontend/src/features/edit_profile/presentation/bloc/edit_profile_bloc.dart';
 import 'package:motogo_frontend/src/features/legal/presentation/pages/legal_page.dart';
-import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/technical_catalogs/presentation/pages/technical_catalogs_page.dart';
 
 /// Admin Home Page - Main dashboard for administrators.
@@ -155,82 +155,55 @@ class AdminHomePage extends StatelessWidget {
   }
 
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: <Widget>[
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue, Colors.blueAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.admin_panel_settings, size: 60, color: Colors.white),
-                SizedBox(height: 8),
-                Text(
-                  AdminConstants.drawerTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  AdminConstants.drawerSubtitle,
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.home, color: Colors.blue),
-            title: const Text(
-              AdminConstants.menuHome,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () => Navigator.pop(context),
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.build_circle, color: Colors.blue),
-            title: const Text(
-              AdminConstants.menuServiceCatalog,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _navigateToServiceCatalog(context);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info, color: Colors.blue),
-            title: const Text(
-              AdminConstants.menuAbout,
-              style: TextStyle(fontSize: 16),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              _navigateToLegal(context);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text(
-              AdminConstants.menuLogout,
-              style: TextStyle(color: Colors.red, fontSize: 16),
-            ),
-            onTap: () => _showLogoutDialog(context),
-          ),
-        ],
+    return AppDrawer(
+      header: const AppDrawerHeader(
+        icon: Icons.admin_panel_settings,
+        title: AdminConstants.drawerTitle,
+        subtitle: AdminConstants.drawerSubtitle,
       ),
+      menuItems: [
+        ListTile(
+          leading: const Icon(Icons.home, color: Colors.blue),
+          title: const Text(
+            AdminConstants.menuHome,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () => Navigator.pop(context),
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.build_circle, color: Colors.blue),
+          title: const Text(
+            AdminConstants.menuServiceCatalog,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToServiceCatalog(context);
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.info, color: Colors.blue),
+          title: const Text(
+            AdminConstants.menuAbout,
+            style: TextStyle(fontSize: 16),
+          ),
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToLegal(context);
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.logout, color: Colors.red),
+          title: const Text(
+            AdminConstants.menuLogout,
+            style: TextStyle(color: Colors.red, fontSize: 16),
+          ),
+          onTap: () => showLogoutConfirmDialog(context),
+        ),
+      ],
     );
   }
 
@@ -265,37 +238,6 @@ class AdminHomePage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LegalPage()),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text(AdminConstants.confirmLogoutTitle),
-          content: const Text(AdminConstants.confirmLogoutMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text(AdminConstants.cancelButton),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                Navigator.of(context).pop(); // Close drawer
-                context.read<EditProfileBloc>().add(const EditProfileReset());
-                context.read<LoginBloc>().add(LoginLogout());
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil('/login', (route) => false);
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text(AdminConstants.menuLogout),
-            ),
-          ],
-        );
-      },
     );
   }
 }

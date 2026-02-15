@@ -12,14 +12,18 @@ void main() {
     const testDepartmentId = 'dept-001';
     const testDepartmentName = 'Cundinamarca';
 
+    const testLocation = BranchLocation(
+      address: testAddress,
+      cityId: testCityId,
+      departmentId: testDepartmentId,
+    );
+
     group('constructor', () {
       test('should create entity with required fields', () {
         const entity = BranchEntity(
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         expect(entity.name, testName);
@@ -33,9 +37,7 @@ void main() {
         const entity = BranchEntity(
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         expect(entity.status, BranchStatus.active);
@@ -45,9 +47,7 @@ void main() {
         const entity = BranchEntity(
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         expect(entity.brands, isEmpty);
@@ -61,12 +61,14 @@ void main() {
           franchiseId: 'franchise-001',
           profileImageUrl: 'https://example.com/image.jpg',
           status: BranchStatus.inactive,
-          brands: ['brand-1', 'brand-2'],
-          address: testAddress,
-          cityId: testCityId,
-          cityName: testCityName,
-          departmentId: testDepartmentId,
-          departmentName: testDepartmentName,
+          catalogs: BranchCatalogs(brands: ['brand-1', 'brand-2']),
+          location: BranchLocation(
+            address: testAddress,
+            cityId: testCityId,
+            cityName: testCityName,
+            departmentId: testDepartmentId,
+            departmentName: testDepartmentName,
+          ),
         );
 
         expect(entity.id, testId);
@@ -85,9 +87,7 @@ void main() {
           id: testId,
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         final copied = original.copyWith(
@@ -106,9 +106,7 @@ void main() {
           id: testId,
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         final copied = original.copyWith();
@@ -120,29 +118,30 @@ void main() {
 
       test('should update all fields correctly', () {
         const original = BranchEntity(
+          id: 'original-id',
           name: testName,
           establishmentType: testEstablishmentType,
-          address: testAddress,
-          cityId: testCityId,
-          departmentId: testDepartmentId,
+          location: testLocation,
         );
 
         final copied = original.copyWith(
-          id: 'new-id',
           name: 'New Name',
           establishmentType: 'PARTS_STORE',
           franchiseId: 'new-franchise',
           profileImageUrl: 'https://new-url.com',
           status: BranchStatus.inactive,
-          brands: ['brand-new'],
-          address: 'New Address',
-          cityId: 'new-city',
-          cityName: 'New City',
-          departmentId: 'new-dept',
-          departmentName: 'New Department',
+          catalogs: const BranchCatalogs(brands: ['brand-new']),
+          location: const BranchLocation(
+            address: 'New Address',
+            cityId: 'new-city',
+            cityName: 'New City',
+            departmentId: 'new-dept',
+            departmentName: 'New Department',
+          ),
         );
 
-        expect(copied.id, 'new-id');
+        // id is preserved from original (immutable)
+        expect(copied.id, 'original-id');
         expect(copied.name, 'New Name');
         expect(copied.establishmentType, 'PARTS_STORE');
         expect(copied.franchiseId, 'new-franchise');
@@ -154,6 +153,40 @@ void main() {
         expect(copied.cityName, 'New City');
         expect(copied.departmentId, 'new-dept');
         expect(copied.departmentName, 'New Department');
+      });
+    });
+
+    group('BranchLocation', () {
+      test('should create location with required fields', () {
+        const location = BranchLocation(
+          address: testAddress,
+          cityId: testCityId,
+          departmentId: testDepartmentId,
+        );
+
+        expect(location.address, testAddress);
+        expect(location.cityId, testCityId);
+        expect(location.departmentId, testDepartmentId);
+        expect(location.cityName, isNull);
+        expect(location.departmentName, isNull);
+      });
+
+      test('should copy with updated fields', () {
+        const original = BranchLocation(
+          address: testAddress,
+          cityId: testCityId,
+          departmentId: testDepartmentId,
+        );
+
+        final copied = original.copyWith(
+          address: 'New Address',
+          cityName: 'Medellín',
+        );
+
+        expect(copied.address, 'New Address');
+        expect(copied.cityName, 'Medellín');
+        expect(copied.cityId, testCityId);
+        expect(copied.departmentId, testDepartmentId);
       });
     });
   });

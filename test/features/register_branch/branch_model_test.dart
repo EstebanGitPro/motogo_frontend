@@ -42,8 +42,10 @@ void main() {
           franchiseId: 'franchise-123',
           profileImageUrl: 'https://example.com/image.jpg',
           status: 'INACTIVE',
-          brands: testBrandIds,
-          displacementRanges: const ['BAJO', 'MEDIO'],
+          catalogs: const BranchCatalogs(
+            brands: testBrandIds,
+            displacementRanges: ['BAJO', 'MEDIO'],
+          ),
           location: const BranchLocation(
             address: 'Calle 123 #45-67',
             cityId: testCityId,
@@ -66,8 +68,10 @@ void main() {
           name: 'Test Branch',
           establishmentType: 'WORKSHOP',
           location: testLocation,
-          brands: testBrandIds,
-          displacementRanges: const ['ALTO'],
+          catalogs: const BranchCatalogs(
+            brands: testBrandIds,
+            displacementRanges: ['ALTO'],
+          ),
         );
 
         final model = BranchModel.fromEntity(entity);
@@ -151,8 +155,10 @@ void main() {
           final model = BranchModel(
             name: 'MotoGo Centro',
             establishmentType: 'WORKSHOP',
-            brands: testBrandIds,
-            displacementRanges: const ['BAJO', 'ALTO'],
+            catalogs: const BranchCatalogs(
+              brands: testBrandIds,
+              displacementRanges: ['BAJO', 'ALTO'],
+            ),
             location: const BranchLocation(
               address: 'Calle 123',
               cityId: testCityId,
@@ -216,8 +222,10 @@ void main() {
           id: testBranchId,
           name: 'Test Branch',
           establishmentType: 'WORKSHOP',
-          brands: testBrandIds,
-          displacementRanges: const ['MEDIO'],
+          catalogs: const BranchCatalogs(
+            brands: testBrandIds,
+            displacementRanges: ['MEDIO'],
+          ),
           location: const BranchLocation(
             address: 'Test Address',
             cityId: testCityId,

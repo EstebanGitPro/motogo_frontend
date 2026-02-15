@@ -175,8 +175,10 @@ class _EditBranchPageState extends State<EditBranchPage>
       final updatedBranch = widget.branch.copyWith(
         name: _nameController.text.trim(),
         establishmentType: _selectedEstablishmentType,
-        brands: _selectedBrandIds,
-        displacementRanges: _selectedDisplacementRanges,
+        catalogs: BranchCatalogs(
+          brands: _selectedBrandIds,
+          displacementRanges: _selectedDisplacementRanges,
+        ),
         location: BranchLocation(
           address: _addressController.text.trim(),
           cityId: _selectedCityId!,

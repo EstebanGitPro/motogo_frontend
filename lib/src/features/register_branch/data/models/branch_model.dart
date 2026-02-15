@@ -12,8 +12,7 @@ class BranchModel extends BranchEntity {
     super.franchiseId,
     super.profileImageUrl,
     super.status = BranchStatus.active,
-    super.brands = const [],
-    super.displacementRanges = const [],
+    super.catalogs = const BranchCatalogs(),
     required super.location,
   });
 
@@ -26,8 +25,7 @@ class BranchModel extends BranchEntity {
       franchiseId: entity.franchiseId,
       profileImageUrl: entity.profileImageUrl,
       status: entity.status,
-      brands: entity.brands,
-      displacementRanges: entity.displacementRanges,
+      catalogs: entity.catalogs,
       location: entity.location,
     );
   }
@@ -44,9 +42,11 @@ class BranchModel extends BranchEntity {
       franchiseId: json['franchise_id'] as String?,
       profileImageUrl: json['profile_image_url'] as String?,
       status: json['status'] as String? ?? BranchStatus.active,
-      brands: JsonHelpers.parseStringList(json['brands']),
-      displacementRanges: JsonHelpers.parseStringList(
-        json['displacement_ranges'],
+      catalogs: BranchCatalogs(
+        brands: JsonHelpers.parseStringList(json['brands']),
+        displacementRanges: JsonHelpers.parseStringList(
+          json['displacement_ranges'],
+        ),
       ),
       location: BranchLocation(
         address: loc?['address'] as String? ?? json['address'] as String,
@@ -106,8 +106,7 @@ class BranchModel extends BranchEntity {
       franchiseId: franchiseId,
       profileImageUrl: profileImageUrl,
       status: status,
-      brands: brands,
-      displacementRanges: displacementRanges,
+      catalogs: catalogs,
       location: location,
     );
   }

@@ -20,74 +20,52 @@ class UserHomeLoading extends UserHomeState {
 
 /// State when map is ready with all data.
 class UserHomeLoaded extends UserHomeState {
-  final double? userLatitude;
-  final double? userLongitude;
+  final MapConfig mapConfig;
   final List<BranchMarkerEntity> branches;
   final String? selectedBranchId;
-  final String? activeTypeFilter;
-  final String? activeBrandFilter;
-  final String? activeDisplacementRangeFilter;
-  final bool locationPermissionDenied;
-  final double currentRadiusKm;
-  final bool isLoadingBranches;
-  final String? errorMessage; // Error message to show in snackbar
+  final ActiveFilters filters;
+  final BranchLoadStatus loadStatus;
 
   const UserHomeLoaded({
-    this.userLatitude,
-    this.userLongitude,
+    this.mapConfig = const MapConfig(),
     this.branches = const [],
     this.selectedBranchId,
-    this.activeTypeFilter,
-    this.activeBrandFilter,
-    this.activeDisplacementRangeFilter,
-    this.locationPermissionDenied = false,
-    this.currentRadiusKm = 5.0,
-    this.isLoadingBranches = false,
-    this.errorMessage,
+    this.filters = const ActiveFilters(),
+    this.loadStatus = const BranchLoadStatus(),
   });
 
+  // Convenience accessors for map config.
+  double? get userLatitude => mapConfig.userLatitude;
+  double? get userLongitude => mapConfig.userLongitude;
+  bool get locationPermissionDenied => mapConfig.locationPermissionDenied;
+  double get currentRadiusKm => mapConfig.currentRadiusKm;
+
+  // Convenience accessors for filter fields.
+  String? get activeTypeFilter => filters.type;
+  String? get activeBrandFilter => filters.brand;
+  String? get activeDisplacementRangeFilter => filters.displacementRange;
+
+  // Convenience accessors for load status.
+  bool get isLoadingBranches => loadStatus.isLoading;
+  String? get errorMessage => loadStatus.errorMessage;
+
   /// Creates a copy with updated values.
-  ///
-  /// Use [clear] to reset nullable fields to `null`. Example:
-  /// ```dart
-  /// state.copyWith(clear: ClearFlags(selectedBranch: true));
-  /// ```
   UserHomeLoaded copyWith({
-    double? userLatitude,
-    double? userLongitude,
+    MapConfig? mapConfig,
     List<BranchMarkerEntity>? branches,
     String? selectedBranchId,
-    String? activeTypeFilter,
-    String? activeBrandFilter,
-    String? activeDisplacementRangeFilter,
-    bool? locationPermissionDenied,
-    double? currentRadiusKm,
-    bool? isLoadingBranches,
-    String? errorMessage,
-    ClearFlags clear = const ClearFlags(),
+    bool clearSelectedBranch = false,
+    ActiveFilters? filters,
+    BranchLoadStatus? loadStatus,
   }) {
     return UserHomeLoaded(
-      userLatitude: userLatitude ?? this.userLatitude,
-      userLongitude: userLongitude ?? this.userLongitude,
+      mapConfig: mapConfig ?? this.mapConfig,
       branches: branches ?? this.branches,
-      selectedBranchId: clear.selectedBranch
+      selectedBranchId: clearSelectedBranch
           ? null
           : (selectedBranchId ?? this.selectedBranchId),
-      activeTypeFilter: clear.activeTypeFilter
-          ? null
-          : (activeTypeFilter ?? this.activeTypeFilter),
-      activeBrandFilter: clear.activeBrandFilter
-          ? null
-          : (activeBrandFilter ?? this.activeBrandFilter),
-      activeDisplacementRangeFilter: clear.activeDisplacementRangeFilter
-          ? null
-          : (activeDisplacementRangeFilter ??
-                this.activeDisplacementRangeFilter),
-      locationPermissionDenied:
-          locationPermissionDenied ?? this.locationPermissionDenied,
-      currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,
-      isLoadingBranches: isLoadingBranches ?? this.isLoadingBranches,
-      errorMessage: clear.error ? null : (errorMessage ?? this.errorMessage),
+      filters: filters ?? this.filters,
+      loadStatus: loadStatus ?? this.loadStatus,
     );
   }
 
@@ -106,17 +84,11 @@ class UserHomeLoaded extends UserHomeState {
 
   @override
   List<Object?> get props => [
-    userLatitude,
-    userLongitude,
+    mapConfig,
     branches,
     selectedBranchId,
-    activeTypeFilter,
-    activeBrandFilter,
-    activeDisplacementRangeFilter,
-    locationPermissionDenied,
-    currentRadiusKm,
-    isLoadingBranches,
-    errorMessage,
+    filters,
+    loadStatus,
   ];
 }
 
@@ -130,20 +102,64 @@ class UserHomeError extends UserHomeState {
   List<Object?> get props => [message];
 }
 
-/// Groups the clear-flag booleans used by [UserHomeLoaded.copyWith]
-/// to reset nullable fields to `null`.
-class ClearFlags {
-  final bool selectedBranch;
-  final bool activeTypeFilter;
-  final bool activeBrandFilter;
-  final bool activeDisplacementRangeFilter;
-  final bool error;
+/// Groups the active filter values applied to nearby branch queries.
+class ActiveFilters extends Equatable {
+  final String? type;
+  final String? brand;
+  final String? displacementRange;
 
-  const ClearFlags({
-    this.selectedBranch = false,
-    this.activeTypeFilter = false,
-    this.activeBrandFilter = false,
-    this.activeDisplacementRangeFilter = false,
-    this.error = false,
+  const ActiveFilters({this.type, this.brand, this.displacementRange});
+
+  @override
+  List<Object?> get props => [type, brand, displacementRange];
+}
+
+/// Groups map-related configuration: user location, radius, and permissions.
+class MapConfig extends Equatable {
+  final double? userLatitude;
+  final double? userLongitude;
+  final bool locationPermissionDenied;
+  final double currentRadiusKm;
+
+  const MapConfig({
+    this.userLatitude,
+    this.userLongitude,
+    this.locationPermissionDenied = false,
+    this.currentRadiusKm = 5.0,
   });
+
+  /// Creates a copy with updated values.
+  MapConfig copyWith({
+    double? userLatitude,
+    double? userLongitude,
+    bool? locationPermissionDenied,
+    double? currentRadiusKm,
+  }) {
+    return MapConfig(
+      userLatitude: userLatitude ?? this.userLatitude,
+      userLongitude: userLongitude ?? this.userLongitude,
+      locationPermissionDenied:
+          locationPermissionDenied ?? this.locationPermissionDenied,
+      currentRadiusKm: currentRadiusKm ?? this.currentRadiusKm,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    userLatitude,
+    userLongitude,
+    locationPermissionDenied,
+    currentRadiusKm,
+  ];
+}
+
+/// Groups loading state and error info for branch queries.
+class BranchLoadStatus extends Equatable {
+  final bool isLoading;
+  final String? errorMessage;
+
+  const BranchLoadStatus({this.isLoading = false, this.errorMessage});
+
+  @override
+  List<Object?> get props => [isLoading, errorMessage];
 }

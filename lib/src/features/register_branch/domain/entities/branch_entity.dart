@@ -8,9 +8,7 @@ class BranchEntity {
   final String? franchiseId;
   final String? profileImageUrl;
   final String status; // ACTIVE or INACTIVE
-  final List<String> brands; // From branch_brands table
-  final List<String>
-  displacementRanges; // From branch_displacement_ranges table
+  final BranchCatalogs catalogs;
 
   // Location fields (from locations table)
   final BranchLocation location;
@@ -22,10 +20,13 @@ class BranchEntity {
     this.franchiseId,
     this.profileImageUrl,
     this.status = BranchStatus.active,
-    this.brands = const [],
-    this.displacementRanges = const [],
+    this.catalogs = const BranchCatalogs(),
     required this.location,
   });
+
+  // Convenience accessors for catalog fields.
+  List<String> get brands => catalogs.brands;
+  List<String> get displacementRanges => catalogs.displacementRanges;
 
   // Convenience accessors for location fields.
   String get address => location.address;
@@ -36,28 +37,36 @@ class BranchEntity {
 
   /// Creates a copy of this entity with the given fields replaced.
   BranchEntity copyWith({
-    String? id,
     String? name,
     String? establishmentType,
     String? franchiseId,
     String? profileImageUrl,
     String? status,
-    List<String>? brands,
-    List<String>? displacementRanges,
+    BranchCatalogs? catalogs,
     BranchLocation? location,
   }) {
     return BranchEntity(
-      id: id ?? this.id,
+      id: id,
       name: name ?? this.name,
       establishmentType: establishmentType ?? this.establishmentType,
       franchiseId: franchiseId ?? this.franchiseId,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       status: status ?? this.status,
-      brands: brands ?? this.brands,
-      displacementRanges: displacementRanges ?? this.displacementRanges,
+      catalogs: catalogs ?? this.catalogs,
       location: location ?? this.location,
     );
   }
+}
+
+/// Value object grouping the catalog selections for a branch.
+class BranchCatalogs {
+  final List<String> brands;
+  final List<String> displacementRanges;
+
+  const BranchCatalogs({
+    this.brands = const [],
+    this.displacementRanges = const [],
+  });
 }
 
 /// Value object representing the physical location of a branch.

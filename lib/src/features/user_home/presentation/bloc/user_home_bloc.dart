@@ -43,9 +43,11 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     if (position == null) {
       emit(
         const UserHomeLoaded(
-          locationPermissionDenied: true,
-          userLatitude: 4.60971,
-          userLongitude: -74.08175,
+          mapConfig: MapConfig(
+            locationPermissionDenied: true,
+            userLatitude: 4.60971,
+            userLongitude: -74.08175,
+          ),
         ),
       );
 
@@ -61,8 +63,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
 
     emit(
       UserHomeLoaded(
-        userLatitude: position.latitude,
-        userLongitude: position.longitude,
+        mapConfig: MapConfig(
+          userLatitude: position.latitude,
+          userLongitude: position.longitude,
+        ),
       ),
     );
 
@@ -83,8 +87,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     if (currentState is UserHomeLoaded) {
       emit(
         currentState.copyWith(
-          userLatitude: event.latitude,
-          userLongitude: event.longitude,
+          mapConfig: currentState.mapConfig.copyWith(
+            userLatitude: event.latitude,
+            userLongitude: event.longitude,
+          ),
         ),
       );
     }
@@ -97,7 +103,11 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     final currentState = state;
     if (currentState is! UserHomeLoaded) return;
 
-    emit(currentState.copyWith(isLoadingBranches: true));
+    emit(
+      currentState.copyWith(
+        loadStatus: const BranchLoadStatus(isLoading: true),
+      ),
+    );
 
     final result = await _getNearbyBranchesUseCase(
       latitude: event.latitude,
@@ -112,9 +122,10 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
       (error) {
         emit(
           currentState.copyWith(
-            isLoadingBranches: false,
-            currentRadiusKm: event.radiusKm,
-            errorMessage: error.message,
+            mapConfig: currentState.mapConfig.copyWith(
+              currentRadiusKm: event.radiusKm,
+            ),
+            loadStatus: BranchLoadStatus(errorMessage: error.message),
           ),
         );
       },
@@ -122,17 +133,15 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
         emit(
           currentState.copyWith(
             branches: branches,
-            activeTypeFilter: event.type,
-            activeBrandFilter: event.brand,
-            activeDisplacementRangeFilter: event.displacementRange,
-            currentRadiusKm: event.radiusKm,
-            isLoadingBranches: false,
-            clear: ClearFlags(
-              activeTypeFilter: event.type == null,
-              activeBrandFilter: event.brand == null,
-              activeDisplacementRangeFilter: event.displacementRange == null,
-              error: true,
+            filters: ActiveFilters(
+              type: event.type,
+              brand: event.brand,
+              displacementRange: event.displacementRange,
             ),
+            mapConfig: currentState.mapConfig.copyWith(
+              currentRadiusKm: event.radiusKm,
+            ),
+            loadStatus: const BranchLoadStatus(),
           ),
         );
       },
@@ -152,9 +161,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
   ) {
     final currentState = state;
     if (currentState is UserHomeLoaded) {
-      emit(
-        currentState.copyWith(clear: const ClearFlags(selectedBranch: true)),
-      );
+      emit(currentState.copyWith(clearSelectedBranch: true));
     }
   }
 
@@ -170,8 +177,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
           type: event.type,
-          brand: currentState.activeBrandFilter,
-          displacementRange: currentState.activeDisplacementRangeFilter,
+          brand: currentState.filters.brand,
+          displacementRange: currentState.filters.displacementRange,
         ),
       );
     }
@@ -185,9 +192,9 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           latitude: currentState.userLatitude!,
           longitude: currentState.userLongitude!,
           radiusKm: event.radiusKm,
-          type: currentState.activeTypeFilter,
-          brand: currentState.activeBrandFilter,
-          displacementRange: currentState.activeDisplacementRangeFilter,
+          type: currentState.filters.type,
+          brand: currentState.filters.brand,
+          displacementRange: currentState.filters.displacementRange,
         ),
       );
     }
@@ -204,9 +211,9 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           latitude: currentState.userLatitude!,
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
-          type: currentState.activeTypeFilter,
+          type: currentState.filters.type,
           brand: event.brand,
-          displacementRange: currentState.activeDisplacementRangeFilter,
+          displacementRange: currentState.filters.displacementRange,
         ),
       );
     }
@@ -223,8 +230,8 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           latitude: currentState.userLatitude!,
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
-          type: currentState.activeTypeFilter,
-          brand: currentState.activeBrandFilter,
+          type: currentState.filters.type,
+          brand: currentState.filters.brand,
           displacementRange: event.displacementRange,
         ),
       );
@@ -242,7 +249,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           latitude: currentState.userLatitude!,
           longitude: currentState.userLongitude!,
           radiusKm: currentState.currentRadiusKm,
-          type: currentState.activeTypeFilter,
+          type: currentState.filters.type,
           brand: event.brand,
           displacementRange: event.displacementRange,
         ),

@@ -32,7 +32,7 @@ void main() {
         cityId: 'city-01',
         departmentId: testDepartmentId,
       ),
-      brands: const ['brand-01'],
+      catalogs: const BranchCatalogs(brands: ['brand-01']),
     );
 
     group('HTTP Response Parsing', () {

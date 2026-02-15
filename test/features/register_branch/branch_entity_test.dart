@@ -61,7 +61,7 @@ void main() {
           franchiseId: 'franchise-001',
           profileImageUrl: 'https://example.com/image.jpg',
           status: BranchStatus.inactive,
-          brands: ['brand-1', 'brand-2'],
+          catalogs: BranchCatalogs(brands: ['brand-1', 'brand-2']),
           location: BranchLocation(
             address: testAddress,
             cityId: testCityId,
@@ -118,19 +118,19 @@ void main() {
 
       test('should update all fields correctly', () {
         const original = BranchEntity(
+          id: 'original-id',
           name: testName,
           establishmentType: testEstablishmentType,
           location: testLocation,
         );
 
         final copied = original.copyWith(
-          id: 'new-id',
           name: 'New Name',
           establishmentType: 'PARTS_STORE',
           franchiseId: 'new-franchise',
           profileImageUrl: 'https://new-url.com',
           status: BranchStatus.inactive,
-          brands: ['brand-new'],
+          catalogs: const BranchCatalogs(brands: ['brand-new']),
           location: const BranchLocation(
             address: 'New Address',
             cityId: 'new-city',
@@ -140,7 +140,8 @@ void main() {
           ),
         );
 
-        expect(copied.id, 'new-id');
+        // id is preserved from original (immutable)
+        expect(copied.id, 'original-id');
         expect(copied.name, 'New Name');
         expect(copied.establishmentType, 'PARTS_STORE');
         expect(copied.franchiseId, 'new-franchise');

@@ -138,8 +138,10 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
       final branch = BranchEntity(
         name: _nameController.text.trim(),
         establishmentType: _selectedEstablishmentType!,
-        brands: _selectedBrandIds,
-        displacementRanges: _selectedDisplacementRanges,
+        catalogs: BranchCatalogs(
+          brands: _selectedBrandIds,
+          displacementRanges: _selectedDisplacementRanges,
+        ),
         location: BranchLocation(
           address: _addressController.text.trim(),
           cityId: _selectedCityId!,

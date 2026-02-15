@@ -15,9 +15,24 @@ echo "🔍 Ejecutando Flutter Coverage..."
 # Ejecutar las pruebas y generar la cobertura
 if output=$(flutter test --coverage); then
    echo "$output"
-   
-   # Generar el informe HTML y extraer porcentaje total
-   genhtml_output=$(genhtml coverage/lcov.info -o coverage/html 2>&1)
+
+   # Filtrar archivos excluidos de cobertura (alineado con sonar.coverage.exclusions)
+   echo "🔧 Filtrando archivos excluidos de cobertura..."
+   lcov --remove coverage/lcov.info \
+     '*.g.dart' \
+     '*.freezed.dart' \
+     '*/generated/*' \
+     '*.mocks.dart' \
+     '*/presentation/*' \
+     '*/core/widgets/*' \
+     '*/core/injector/*' \
+     '*/core/services/*' \
+     -o coverage/lcov_filtered.info \
+     --ignore-errors unused \
+     2>&1
+
+   # Generar el informe HTML con los datos filtrados
+   genhtml_output=$(genhtml coverage/lcov_filtered.info -o coverage/html 2>&1)
    
    # Extraer solo la línea del resumen total (última línea con "lines")
    # Formato esperado: "  lines......: 81.7% (1234 of 1510 lines)"

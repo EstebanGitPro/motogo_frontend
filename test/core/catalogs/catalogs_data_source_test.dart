@@ -439,5 +439,109 @@ void main() {
         expect(result.isLeft, isTrue);
       });
     });
+
+    // ========== getDisplacementRanges Tests ==========
+    group('getDisplacementRanges', () {
+      test('should return list of DisplacementRangeModel on success', () async {
+        final responseData = {
+          'success': true,
+          'data': {
+            'displacements': [
+              {'range': 'BAJO'},
+              {'range': 'MEDIO'},
+              {'range': 'ALTO'},
+            ],
+          },
+        };
+
+        when(
+          mockDioClient.get('/engine-displacements'),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isRight, isTrue);
+        final ranges = result.right;
+        expect(ranges.length, 3);
+        expect(ranges[0].range, 'BAJO');
+        expect(ranges[1].range, 'MEDIO');
+        expect(ranges[2].range, 'ALTO');
+      });
+
+      test('should return empty list when no displacements', () async {
+        final responseData = {
+          'success': true,
+          'data': {'displacements': []},
+        };
+
+        when(
+          mockDioClient.get('/engine-displacements'),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isRight, isTrue);
+        expect(result.right, isEmpty);
+      });
+
+      test('should return ErrorModel when success is false', () async {
+        final responseData = {
+          'success': false,
+          'code': 'ERR_DISP_001',
+          'message': 'Error al obtener rangos de cilindrada',
+        };
+
+        when(
+          mockDioClient.get('/engine-displacements'),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return empty list when response is not a Map', () async {
+        final response = Response(
+          requestOptions: RequestOptions(path: ''),
+          data: 'not a map',
+          statusCode: 200,
+        );
+
+        when(
+          mockDioClient.get('/engine-displacements'),
+        ).thenAnswer((_) async => response);
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isRight, isTrue);
+        expect(result.right, isEmpty);
+      });
+
+      test('should return ErrorModel on DioException', () async {
+        when(mockDioClient.get('/engine-displacements')).thenThrow(
+          DioException(
+            type: DioExceptionType.connectionTimeout,
+            requestOptions: RequestOptions(path: '/engine-displacements'),
+          ),
+        );
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return ErrorModel on generic exception', () async {
+        when(
+          mockDioClient.get('/engine-displacements'),
+        ).thenThrow(Exception('Network error'));
+
+        final result = await dataSource.getDisplacementRanges();
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+    });
   });
 }

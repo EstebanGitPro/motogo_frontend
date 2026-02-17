@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
-import 'package:motogo_frontend/src/features/motorcycle_history/domain/entity/completed_service_entity.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
+import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
 
 /// Page displaying the service history for a motorcycle.
 ///
-/// Shows completed services with quoted/final prices, representative notes,
-/// and diagnostic references. Currently uses mock data until the backend
-/// endpoint is implemented.
+/// Shows completed services fetched from the backend via
+/// GET /motorcycles/:id/completed-services.
 class MotorcycleHistoryPage extends StatelessWidget {
   final MotorcycleEntity motorcycle;
 
@@ -26,7 +28,7 @@ class MotorcycleHistoryPage extends StatelessWidget {
         children: [
           _buildMotorcycleHeader(),
           const Divider(height: 1),
-          Expanded(child: _buildServiceList()),
+          Expanded(child: _buildBody()),
         ],
       ),
     );
@@ -91,84 +93,99 @@ class MotorcycleHistoryPage extends StatelessWidget {
     return parts.isEmpty ? '' : parts.join(' | ');
   }
 
-  Widget _buildServiceList() {
-    final mockServices = _getMockServices();
+  Widget _buildBody() {
+    return BlocBuilder<MotorcycleHistoryBloc, MotorcycleHistoryState>(
+      builder: (context, state) {
+        if (state is MotorcycleHistoryLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    if (mockServices.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.history, size: 72, color: Colors.grey[400]),
-              const SizedBox(height: 16),
-              Text(
-                MotorcycleConstants.noServiceHistory,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                MotorcycleConstants.noServiceHistorySubtitle,
-                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+        if (state is MotorcycleHistoryError) {
+          return _buildErrorState(context, state.message);
+        }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: mockServices.length,
-      itemBuilder: (context, index) {
-        return _ServiceHistoryCard(service: mockServices[index]);
+        if (state is MotorcycleHistoryLoaded) {
+          if (state.isEmpty) {
+            return _buildEmptyState();
+          }
+          return _buildServiceList(state.services);
+        }
+
+        return const SizedBox.shrink();
       },
     );
   }
 
-  /// Mock data to visualize the UI while the backend is not ready.
-  List<CompletedServiceEntity> _getMockServices() {
-    return [
-      CompletedServiceEntity(
-        id: 'svc-001',
-        diagnosticId: 'diag-abc-123',
-        serviceName: 'Cambio de aceite y filtro',
-        status: 'FINALIZADO',
-        quotedPrice: 85000,
-        finalPrice: 82000,
-        representativeNotes:
-            'Se realizó cambio de aceite sintético 10W40 y filtro de aceite. Moto en buen estado general.',
-        date: DateTime.now().subtract(const Duration(days: 5)),
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                if (motorcycle.id != null) {
+                  context.read<MotorcycleHistoryBloc>().add(
+                    LoadMotorcycleHistory(motorcycle.id!),
+                  );
+                }
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text(CommonConstants.retry),
+            ),
+          ],
+        ),
       ),
-      CompletedServiceEntity(
-        id: 'svc-002',
-        diagnosticId: 'diag-abc-456',
-        serviceName: 'Revisión de frenos',
-        status: 'EN_PROCESO',
-        quotedPrice: 120000,
-        finalPrice: null,
-        representativeNotes:
-            'Pastillas delanteras desgastadas al 80%. Se requiere cambio urgente.',
-        date: DateTime.now().subtract(const Duration(days: 1)),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.history, size: 72, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              MotorcycleConstants.noServiceHistory,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              MotorcycleConstants.noServiceHistorySubtitle,
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
-      CompletedServiceEntity(
-        id: 'svc-003',
-        diagnosticId: null,
-        serviceName: 'Sincronización general',
-        status: 'SOLICITADO',
-        quotedPrice: 150000,
-        finalPrice: null,
-        representativeNotes: null,
-        date: DateTime.now(),
-      ),
-    ];
+    );
+  }
+
+  Widget _buildServiceList(List<CompletedServiceEntity> services) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: services.length,
+      itemBuilder: (context, index) {
+        return _ServiceHistoryCard(service: services[index]);
+      },
+    );
   }
 }
 
@@ -194,7 +211,9 @@ class _ServiceHistoryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    service.serviceName,
+                    service.serviceNames.isNotEmpty
+                        ? service.serviceNames.join(', ')
+                        : 'Servicio',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -206,6 +225,29 @@ class _ServiceHistoryCard extends StatelessWidget {
                 _buildStatusChip(),
               ],
             ),
+
+            // Branch name (sede)
+            if (service.branchName != null &&
+                service.branchName!.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(Icons.store, size: 15, color: Colors.blue[400]),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      service.branchName!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue[700],
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 12),
 
             // Date
@@ -214,7 +256,7 @@ class _ServiceHistoryCard extends StatelessWidget {
                 Icon(Icons.calendar_today, size: 15, color: Colors.grey[500]),
                 const SizedBox(width: 6),
                 Text(
-                  DateFormat('dd MMM yyyy', 'es').format(service.date),
+                  DateFormat('dd MMM yyyy', 'es').format(service.requestDate),
                   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                 ),
               ],

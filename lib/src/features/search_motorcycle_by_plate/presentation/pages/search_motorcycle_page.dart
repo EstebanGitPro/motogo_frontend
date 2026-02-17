@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_list_page.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/entities/motorcycle_evidence_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/register_service_bottom_sheet.dart';
 
 /// Page for searching motorcycles by license plate (HU47).
 ///
@@ -87,6 +89,25 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                 ),
               );
             }
+            // Service registration feedback
+            if (state.serviceRegistrationMessage != null &&
+                state.serviceRegistrationMessage!.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.serviceRegistrationMessage!),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+            if (state.serviceRegistrationError != null &&
+                state.serviceRegistrationError!.isNotEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.serviceRegistrationError!),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         },
         builder: (context, state) {
@@ -103,6 +124,10 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                   _buildEvidenceGallery(state.motorcycle.evidence),
                   const SizedBox(height: 24),
                   _buildDiagnosticsSection(state.motorcycle.diagnostics),
+                  const SizedBox(height: 24),
+                  _buildRegisterServiceButton(state),
+                  const SizedBox(height: 24),
+                  _buildServicesCard(state),
                 ],
                 if (state is SearchMotorcycleLoading)
                   const Center(
@@ -709,6 +734,197 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRegisterServiceButton(SearchMotorcycleLoaded state) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.blue[50],
+      child: InkWell(
+        onTap: state.isRegisteringService
+            ? null
+            : () => _showRegisterServiceSheet(state),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.build_circle,
+                size: 40,
+                color: state.isRegisteringService
+                    ? Colors.grey
+                    : Colors.blue[700],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MotorcycleConstants.registerServiceButton,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: state.isRegisteringService
+                            ? Colors.grey
+                            : Colors.blue[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Registrar un servicio realizado para esta motocicleta',
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              if (state.isRegisteringService)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: Colors.blue[700],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRegisterServiceSheet(SearchMotorcycleLoaded state) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return RegisterServiceBottomSheet(
+          motorcycleId: state.motorcycle.id,
+          onSubmit:
+              ({
+                required String branchId,
+                required List<String> serviceIds,
+                double? quotedPrice,
+                double? finalPrice,
+                String? representativeNotes,
+              }) {
+                context.read<SearchMotorcycleBloc>().add(
+                  RegisterCompletedService(
+                    branchId: branchId,
+                    motorcycleId: state.motorcycle.id,
+                    serviceIds: serviceIds,
+                    quotedPrice: quotedPrice,
+                    finalPrice: finalPrice,
+                    representativeNotes: representativeNotes,
+                  ),
+                );
+              },
+        );
+      },
+    );
+  }
+
+  Widget _buildServicesCard(SearchMotorcycleLoaded state) {
+    final count = state.serviceHistory.length;
+    final hasServices = count > 0;
+    final pluralSuffix = count > 1 ? 's' : '';
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: state.loadingHistory
+            ? null
+            : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<SearchMotorcycleBloc>(),
+                      child: ServiceListPage(services: state.serviceHistory),
+                    ),
+                  ),
+                );
+              },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                Icons.build_circle,
+                size: 40,
+                color: state.loadingHistory ? Colors.grey : Colors.orange[700],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MotorcycleConstants.servicesCardTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: state.loadingHistory
+                            ? Colors.grey
+                            : Colors.orange[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasServices
+                          ? '$count servicio$pluralSuffix registrado$pluralSuffix'
+                          : MotorcycleConstants.servicesCardSubtitle,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              if (state.loadingHistory)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else ...[
+                if (hasServices)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange[800],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: Colors.orange[700],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

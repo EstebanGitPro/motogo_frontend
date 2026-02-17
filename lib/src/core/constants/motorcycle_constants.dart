@@ -167,6 +167,11 @@ class MotorcycleConstants {
   // Menu items (User Home)
   static const String menuMyMotorcycle = 'Mi Moto';
 
+  // Services Navigation Card
+  static const String servicesCardTitle = 'Servicios';
+  static const String servicesCardSubtitle =
+      'Ver servicios registrados de esta motocicleta';
+
   // Motorcycle History (Service History)
   static const String motorcycleHistoryTitle = 'Historial de Servicios';
   static const String noServiceHistory = 'Aún no hay servicios registrados';
@@ -174,9 +179,49 @@ class MotorcycleConstants {
       'Cuando el taller registre servicios para esta moto, aparecerán aquí.';
   static const String quotedPriceLabel = 'Cotización';
   static const String finalPriceLabel = 'Precio Final';
-  static const String representativeNotesLabel = 'Notas del Representante';
+  static const String representativeNotesLabel = 'Nota';
   static const String diagnosticRefLabel = 'Diagnóstico';
   static const String statusRequested = 'Solicitado';
   static const String statusInProgress = 'En Proceso';
   static const String statusCompleted = 'Finalizado';
+  static const String statusCancelled = 'Cancelado';
+  static const String serviceDetailTitle = 'Detalle del Servicio';
+  static const String servicesPerformedLabel = 'Servicios Realizados';
+  static const String branchLabel = 'Sede';
+
+  // Service Status Transitions
+  static const String startServiceButton = 'Iniciar Servicio';
+  static const String finalizeServiceButton = 'Finalizar Servicio';
+  static const String cancelServiceButton = 'Cancelar Servicio';
+  static const String deleteServiceButton = 'Eliminar Servicio';
+  static const String deleteServiceConfirmation =
+      '¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.';
+  static const String transitionHistoryTitle = 'Historial de Cambios';
+  static const String statusPending = 'Pendiente';
+
+  // Completed Service Registration (Representative)
+  static const String registerServiceButton = 'Registrar Servicio';
+  static const String registerServiceTitle = 'Registrar Servicio Realizado';
+  static const String selectBranchLabel = 'Seleccionar Sede';
+  static const String selectBranchHint = 'Elige una sede';
+  static const String selectServicesLabel = 'Servicios Realizados';
+  static const String selectServicesHint = 'Selecciona los servicios';
+  static const String registerQuotedPriceLabel = 'Cotización';
+  static const String registerQuotedPriceHint = 'Ej: 185000';
+  static const String registerFinalPriceLabel = 'Precio Final';
+  static const String registerFinalPriceHint = 'Ej: 175000';
+  static const String registerNotesLabel = 'Notas del Representante';
+  static const String registerNotesHint =
+      'Ej: Se realizó cambio de aceite y revisión general...';
+  static const String serviceRegisteredSuccess =
+      'Servicio registrado exitosamente';
+  static const String serviceRegistrationError = 'Error al registrar servicio';
+  static const String loadingBranches = 'Cargando sedes...';
+  static const String loadingServices = 'Cargando servicios...';
+  static const String noBranchesAvailable = 'No tienes sedes registradas';
+  static const String noServicesAvailable =
+      'Esta sede no tiene servicios asociados';
+  static const String selectAtLeastOneService =
+      'Selecciona al menos un servicio';
+  static const String registeringService = 'Registrando servicio...';
 }

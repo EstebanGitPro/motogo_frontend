@@ -59,17 +59,6 @@ class SharedDrawerMenuItems {
         },
       ),
       ListTile(
-        leading: const Icon(Icons.delete_forever, color: Colors.red),
-        title: Text(
-          deleteAccountLabel,
-          style: const TextStyle(fontSize: 16, color: Colors.red),
-        ),
-        onTap: () {
-          Navigator.pop(context);
-          showDeleteAccountDialog(context);
-        },
-      ),
-      ListTile(
         leading: const Icon(Icons.logout, color: Colors.blue),
         title: const Text(
           MotorcycleConstants.menuLogout,
@@ -90,6 +79,17 @@ class SharedDrawerMenuItems {
             context,
             MaterialPageRoute(builder: (context) => const LegalPage()),
           );
+        },
+      ),
+      ListTile(
+        leading: const Icon(Icons.delete_forever, color: Colors.red),
+        title: Text(
+          deleteAccountLabel,
+          style: const TextStyle(fontSize: 16, color: Colors.red),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+          showDeleteAccountDialog(context);
         },
       ),
     ];

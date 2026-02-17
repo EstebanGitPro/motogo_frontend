@@ -330,22 +330,26 @@ class _EditServicePageState extends State<EditServicePage> {
       result.fold(
         (error) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(error.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(error.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
           }
         },
         (updatedService) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(AdminConstants.serviceUpdatedSuccess),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text(AdminConstants.serviceUpdatedSuccess),
+                  backgroundColor: Colors.green,
+                ),
+              );
             Navigator.pop(context, true);
           }
         },

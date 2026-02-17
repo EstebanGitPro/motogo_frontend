@@ -49,15 +49,17 @@ class BranchServicesPage extends StatelessWidget {
           },
           listener: (context, state) {
             if (state is BranchServicesLoaded && state.message != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message!),
-                  backgroundColor: state.isSuccess == true
-                      ? Colors.green[600]
-                      : Colors.red[600],
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..clearSnackBars()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.message!),
+                    backgroundColor: state.isSuccess == true
+                        ? Colors.green[600]
+                        : Colors.red[600],
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
             }
           },
           child: Column(

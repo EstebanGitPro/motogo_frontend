@@ -94,21 +94,25 @@ void showDeleteAccountDialog(BuildContext context) {
                         result.fold(
                           (error) {
                             setDialogState(() => isDeleting = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(error.message),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
+                            ScaffoldMessenger.of(context)
+                              ..clearSnackBars()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(error.message),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                           },
                           (message) {
                             Navigator.pop(dialogContext);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(message),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
+                            ScaffoldMessenger.of(context)
+                              ..clearSnackBars()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(message),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
                             context.read<EditProfileBloc>().add(
                               const EditProfileReset(),
                             );

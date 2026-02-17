@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:motogo_frontend/src/core/constants/image_picker_constants.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 /// Widget for selecting and previewing an image.
 ///
@@ -54,6 +53,18 @@ class ImagePickerWidget extends StatefulWidget {
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   bool _isPickingImage = false;
 
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    Color? backgroundColor,
+  }) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: backgroundColor),
+    );
+  }
+
   Future<void> _pickImage(BuildContext context, ImageSource source) async {
     if (_isPickingImage) return;
     if (mounted) {
@@ -79,11 +90,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
         if (permissionResult == CameraPermissionResult.denied) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(ImagePickerConstants.permissionDenied),
-                backgroundColor: Colors.orange,
-              ),
+            _showSnackBar(
+              context,
+              ImagePickerConstants.permissionDenied,
+              backgroundColor: Colors.orange,
             );
           }
           return;
@@ -107,11 +117,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${ImagePickerConstants.selectImageError}: $e'),
-            backgroundColor: Colors.red,
-          ),
+        _showSnackBar(
+          context,
+          '${ImagePickerConstants.selectImageError}: $e',
+          backgroundColor: Colors.red,
         );
       }
     } finally {
@@ -137,7 +146,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              openAppSettings();
+              CameraPermissionService.instance.openAppSettings();
             },
             child: const Text(ImagePickerConstants.goToSettings),
           ),

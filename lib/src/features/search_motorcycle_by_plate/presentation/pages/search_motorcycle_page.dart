@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
-import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_list_page.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_list_page.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/register_service_bottom_sheet.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/entities/motorcycle_evidence_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
-import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/register_service_bottom_sheet.dart';
 
 /// Page for searching motorcycles by license plate (HU47).
 ///
@@ -61,53 +61,22 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
         foregroundColor: Colors.white,
       ),
       body: BlocConsumer<SearchMotorcycleBloc, SearchMotorcycleState>(
+        listenWhen: (previous, current) {
+          final previousPayload = _resolveSnackPayload(previous);
+          final currentPayload = _resolveSnackPayload(current);
+          return previousPayload?.key != currentPayload?.key;
+        },
         listener: (context, state) {
-          if (state is SearchMotorcycleError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+          final payload = _resolveSnackPayload(state);
+          if (payload != null) {
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
+                content: Text(payload.message),
+                backgroundColor: payload.backgroundColor,
               ),
             );
-          }
-          if (state is SearchMotorcycleLoaded) {
-            if (state.solutionMessage != null &&
-                state.solutionMessage!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.solutionMessage!),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            }
-            if (state.solutionError != null &&
-                state.solutionError!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.solutionError!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-            // Service registration feedback
-            if (state.serviceRegistrationMessage != null &&
-                state.serviceRegistrationMessage!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.serviceRegistrationMessage!),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            }
-            if (state.serviceRegistrationError != null &&
-                state.serviceRegistrationError!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.serviceRegistrationError!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
           }
         },
         builder: (context, state) {
@@ -142,6 +111,58 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
         },
       ),
     );
+  }
+
+  _SnackPayload? _resolveSnackPayload(SearchMotorcycleState state) {
+    if (state is SearchMotorcycleError) {
+      final message = state.message.trim();
+      if (message.isEmpty) return null;
+      return _SnackPayload(
+        key: 'search-error:$message',
+        message: message,
+        backgroundColor: Colors.red,
+      );
+    }
+
+    if (state is SearchMotorcycleLoaded) {
+      final solutionError = state.solutionError?.trim();
+      if (solutionError != null && solutionError.isNotEmpty) {
+        return _SnackPayload(
+          key: 'solution-error:$solutionError',
+          message: solutionError,
+          backgroundColor: Colors.red,
+        );
+      }
+
+      final serviceError = state.serviceRegistrationError?.trim();
+      if (serviceError != null && serviceError.isNotEmpty) {
+        return _SnackPayload(
+          key: 'service-error:$serviceError',
+          message: serviceError,
+          backgroundColor: Colors.red,
+        );
+      }
+
+      final solutionMessage = state.solutionMessage?.trim();
+      if (solutionMessage != null && solutionMessage.isNotEmpty) {
+        return _SnackPayload(
+          key: 'solution-success:$solutionMessage',
+          message: solutionMessage,
+          backgroundColor: Colors.green,
+        );
+      }
+
+      final serviceMessage = state.serviceRegistrationMessage?.trim();
+      if (serviceMessage != null && serviceMessage.isNotEmpty) {
+        return _SnackPayload(
+          key: 'service-success:$serviceMessage',
+          message: serviceMessage,
+          backgroundColor: Colors.green,
+        );
+      }
+    }
+
+    return null;
   }
 
   Widget _buildSearchCard(SearchMotorcycleState state) {
@@ -941,4 +962,16 @@ class UpperCaseTextFormatter extends TextInputFormatter {
       selection: newValue.selection,
     );
   }
+}
+
+class _SnackPayload {
+  final String key;
+  final String message;
+  final Color backgroundColor;
+
+  const _SnackPayload({
+    required this.key,
+    required this.message,
+    required this.backgroundColor,
+  });
 }

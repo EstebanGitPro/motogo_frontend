@@ -48,20 +48,24 @@ class _MyMotorcyclesView extends StatelessWidget {
       body: BlocConsumer<MyMotorcyclesBloc, MyMotorcyclesState>(
         listener: (context, state) {
           if (state is MyMotorcycleDeleted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green[600],
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green[600],
+                ),
+              );
           }
           if (state is MyMotorcycleDeleteError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red[600],
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red[600],
+                ),
+              );
           }
         },
         builder: (context, state) {

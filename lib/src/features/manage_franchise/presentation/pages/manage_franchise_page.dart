@@ -37,25 +37,34 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
     return BlocConsumer<ManageFranchiseBloc, ManageFranchiseState>(
       listener: (context, state) {
         if (state is ManageFranchiseError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
         } else if (state is ManageFranchiseDeleted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
           Navigator.pop(context, true);
         } else if (state is ManageFranchiseUpdated) {
           _markChanged();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
         } else if (state is ManageFranchiseLoaded) {
           // After initial load, any reload means link/unlink was performed
           if (_loadCount > 0) {

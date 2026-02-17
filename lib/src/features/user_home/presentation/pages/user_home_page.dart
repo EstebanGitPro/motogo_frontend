@@ -164,19 +164,23 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
   void _showErrorIfPresent(BuildContext context, String? errorMessage) {
     if (errorMessage == null) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
   }
 
   void _showErrorSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
   }
 
   List<Widget> _buildSelectedBranchCard(
@@ -765,12 +769,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     if (state is! UserHomeLoaded || !state.hasUserLocation) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(CommonConstants.noLocationForNavigation),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(CommonConstants.noLocationForNavigation),
+              backgroundColor: Colors.orange,
+            ),
+          );
       }
       return;
     }
@@ -791,12 +797,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     if (result == null) {
       setState(() => _isLoadingRoute = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(CommonConstants.routeError),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(CommonConstants.routeError),
+            backgroundColor: Colors.red,
+          ),
+        );
       return;
     }
 

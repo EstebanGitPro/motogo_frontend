@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:motogo_frontend/src/core/constants/common_constants.dart';
+import 'package:motogo_frontend/src/core/constants/image_picker_constants.dart';
 import 'package:motogo_frontend/src/core/constants/request_diagnostic_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/camera_permission_service.dart';
@@ -53,6 +54,9 @@ class _RequestDiagnosticView extends StatefulWidget {
 class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
   final _problemController = TextEditingController();
   bool _isPickingPhoto = false;
+  String? _lastErrorMessage;
+  String? _lastPermissionMessage;
+  String? _lastSuccessMessage;
 
   @override
   void dispose() {
@@ -64,33 +68,8 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
   Widget build(BuildContext context) {
     return BlocConsumer<RequestDiagnosticBloc, RequestDiagnosticState>(
       listener: (context, state) {
-        if (state is RequestDiagnosticLoaded && state.errorMessage != null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
-        }
-        // Handle permission toggle feedback
-        if (state is RequestDiagnosticLoaded &&
-            state.permissionMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.permissionMessage!),
-              backgroundColor: Colors.green[600],
-            ),
-          );
-        }
-        // Handle success: open WhatsApp
-        if (state is RequestDiagnosticLoaded && state.successMessage != null) {
-          _openWhatsApp(context, state);
-        }
-        // Load evidence when motorcycle is selected and not yet loaded
-        if (state is RequestDiagnosticLoaded &&
-            state.selectedMotorcycle?.id != null &&
-            !state.isUploadingPhoto &&
-            !state.hasLoadedEvidence) {
-          context.read<RequestDiagnosticBloc>().add(
-            LoadEvidence(state.selectedMotorcycle!.id!),
-          );
+        if (state is RequestDiagnosticLoaded) {
+          _handleLoadedState(context, state);
         }
       },
       builder: (context, state) {
@@ -107,6 +86,63 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
           body: _buildBody(context, state),
         );
       },
+    );
+  }
+
+  void _handleLoadedState(BuildContext context, RequestDiagnosticLoaded state) {
+    final errorMessage = state.errorMessage?.trim();
+    if (errorMessage != null && errorMessage.isNotEmpty) {
+      if (_lastErrorMessage != errorMessage) {
+        _lastErrorMessage = errorMessage;
+        _showSnackBar(context, errorMessage);
+      }
+    } else {
+      _lastErrorMessage = null;
+    }
+
+    final permissionMessage = state.permissionMessage?.trim();
+    if (permissionMessage != null && permissionMessage.isNotEmpty) {
+      if (_lastPermissionMessage != permissionMessage) {
+        _lastPermissionMessage = permissionMessage;
+        _showSnackBar(
+          context,
+          permissionMessage,
+          backgroundColor: Colors.green[600],
+        );
+      }
+    } else {
+      _lastPermissionMessage = null;
+    }
+
+    final successMessage = state.successMessage?.trim();
+    if (successMessage != null && successMessage.isNotEmpty) {
+      if (_lastSuccessMessage != successMessage) {
+        _lastSuccessMessage = successMessage;
+        _openWhatsApp(context, state);
+      }
+    } else {
+      _lastSuccessMessage = null;
+    }
+
+    // Load evidence when motorcycle is selected and not yet loaded
+    if (state.selectedMotorcycle?.id != null &&
+        !state.isUploadingPhoto &&
+        !state.hasLoadedEvidence) {
+      context.read<RequestDiagnosticBloc>().add(
+        LoadEvidence(state.selectedMotorcycle!.id!),
+      );
+    }
+  }
+
+  void _showSnackBar(
+    BuildContext context,
+    String message, {
+    Color? backgroundColor,
+  }) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: backgroundColor),
     );
   }
 
@@ -509,10 +545,24 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
             .requestPermissionWithResult();
 
         if (permissionResult == CameraPermissionResult.permanentlyDenied) {
+          if (mounted) {
+            _showSnackBar(
+              context,
+              ImagePickerConstants.permissionMessage,
+              backgroundColor: Colors.orange,
+            );
+          }
           return;
         }
 
         if (permissionResult == CameraPermissionResult.denied) {
+          if (mounted) {
+            _showSnackBar(
+              context,
+              ImagePickerConstants.permissionDenied,
+              backgroundColor: Colors.orange,
+            );
+          }
           return;
         }
       }
@@ -639,19 +689,11 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
         mode: LaunchMode.externalApplication,
       );
       if (!launched && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(RequestDiagnosticConstants.whatsappError),
-          ),
-        );
+        _showSnackBar(context, RequestDiagnosticConstants.whatsappError);
       }
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(RequestDiagnosticConstants.whatsappError),
-          ),
-        );
+        _showSnackBar(context, RequestDiagnosticConstants.whatsappError);
       }
     }
   }

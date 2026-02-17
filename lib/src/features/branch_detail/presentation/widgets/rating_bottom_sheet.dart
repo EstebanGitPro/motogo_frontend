@@ -103,13 +103,15 @@ class _RatingBottomSheetState extends State<RatingBottomSheet> {
               onPressed: _selectedRating > 0
                   ? () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(BranchDetailConstants.rateThankYou),
-                          backgroundColor: Colors.green,
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      ScaffoldMessenger.of(context)
+                        ..clearSnackBars()
+                        ..showSnackBar(
+                          const SnackBar(
+                            content: Text(BranchDetailConstants.rateThankYou),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
                     }
                   : null,
               style: ElevatedButton.styleFrom(

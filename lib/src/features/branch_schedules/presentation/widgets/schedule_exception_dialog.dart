@@ -199,23 +199,27 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
 
   void _onConfirm() {
     if (!_isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(ScheduleConstants.validationOpeningBeforeClosing),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(ScheduleConstants.validationOpeningBeforeClosing),
+            backgroundColor: Colors.red,
+          ),
+        );
       return;
     }
 
     // Validate no date overlap with existing exceptions
     if (_hasDateOverlap()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(ScheduleConstants.validationDateOverlap),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(ScheduleConstants.validationDateOverlap),
+            backgroundColor: Colors.red,
+          ),
+        );
       return;
     }
 

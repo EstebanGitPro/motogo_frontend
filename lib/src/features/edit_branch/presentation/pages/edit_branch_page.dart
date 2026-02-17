@@ -86,22 +86,26 @@ class _EditBranchPageState extends State<EditBranchPage>
   Future<void> _onSubmit() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedBrandIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(BranchConstants.brandRequired),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(BranchConstants.brandRequired),
+              backgroundColor: Colors.orange,
+            ),
+          );
         return;
       }
 
       if (_selectedCityId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(BranchConstants.locationRequired),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(BranchConstants.locationRequired),
+              backgroundColor: Colors.orange,
+            ),
+          );
         return;
       }
 
@@ -125,19 +129,21 @@ class _EditBranchPageState extends State<EditBranchPage>
         uploadResult.fold(
           (error) {
             setState(() => _isUploadingImage = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${BranchConstants.errorUploadingImage}: ${error.message}',
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${BranchConstants.errorUploadingImage}: ${error.message}',
+                  ),
+                  backgroundColor: Colors.red,
+                  action: SnackBarAction(
+                    label: BranchConstants.retry,
+                    textColor: Colors.white,
+                    onPressed: _onSubmit,
+                  ),
                 ),
-                backgroundColor: Colors.red,
-                action: SnackBarAction(
-                  label: BranchConstants.retry,
-                  textColor: Colors.white,
-                  onPressed: _onSubmit,
-                ),
-              ),
-            );
+              );
             return;
           },
           (url) {
@@ -213,23 +219,27 @@ class _EditBranchPageState extends State<EditBranchPage>
             ScaffoldMessenger.of(context).clearSnackBars();
 
             if (state is EditBranchSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(BranchConstants.branchUpdatedSuccess),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..clearSnackBars()
+                ..showSnackBar(
+                  const SnackBar(
+                    content: Text(BranchConstants.branchUpdatedSuccess),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
               // Navigate back with the updated branch
               Navigator.pop(context, state.updatedBranch);
             } else if (state is EditBranchFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error.message),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..clearSnackBars()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.error.message),
+                    backgroundColor: Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
             }
           },
           builder: (context, state) {

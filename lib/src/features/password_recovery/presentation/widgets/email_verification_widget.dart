@@ -50,20 +50,24 @@ class _EmailVerificationWidgetState extends State<EmailVerificationWidget> {
                 ScaffoldMessenger.of(context).clearSnackBars();
 
                 if (state is EmailRecoveryVerificationSuccess) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Correo enviado ✉️'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(
+                      const SnackBar(
+                        content: Text('Correo enviado ✉️'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
                 } else if (state is EmailRecoveryVerificationFailure) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.error.message),
-                      duration: const Duration(seconds: 3),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(state.error.message),
+                        duration: const Duration(seconds: 3),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                 }
               },
               builder: (context, state) {

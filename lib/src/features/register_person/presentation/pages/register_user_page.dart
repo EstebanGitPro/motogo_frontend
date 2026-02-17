@@ -40,25 +40,27 @@ class RegisterUserPage extends StatelessWidget {
         listener: (context, state) {
           if (state is RegisterPersonSuccess) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  getTranslateText(
-                    context: context,
-                    key: 'verification_email_sent',
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    getTranslateText(
+                      context: context,
+                      key: 'verification_email_sent',
+                    ),
+                  ),
+                  backgroundColor: Colors.green[600],
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16 : 32,
+                    vertical: 16,
                   ),
                 ),
-                backgroundColor: Colors.green[600],
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                margin: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 16 : 32,
-                  vertical: 16,
-                ),
-              ),
-            );
+              );
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -67,20 +69,22 @@ class RegisterUserPage extends StatelessWidget {
             );
           } else if (state is RegisterPersonFailure) {
             ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorModel.message),
-                backgroundColor: Colors.red[600],
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.errorModel.message),
+                  backgroundColor: Colors.red[600],
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 16 : 32,
+                    vertical: 16,
+                  ),
                 ),
-                margin: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 16 : 32,
-                  vertical: 16,
-                ),
-              ),
-            );
+              );
           }
         },
 

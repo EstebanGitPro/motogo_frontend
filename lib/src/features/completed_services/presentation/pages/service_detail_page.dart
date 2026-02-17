@@ -53,14 +53,18 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
     bool popOnSuccess = false,
   }) {
     if (message != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.green),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.green),
+        );
       if (popOnSuccess) Navigator.of(context).pop();
     } else if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Colors.red),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: Colors.red),
+        );
     }
   }
 

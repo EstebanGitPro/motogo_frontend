@@ -57,22 +57,26 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
   Future<void> _onSubmit() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedBrandIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(BranchConstants.brandRequired),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(BranchConstants.brandRequired),
+              backgroundColor: Colors.orange,
+            ),
+          );
         return;
       }
 
       if (_selectedCityId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(BranchConstants.locationRequired),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(BranchConstants.locationRequired),
+              backgroundColor: Colors.orange,
+            ),
+          );
         return;
       }
 
@@ -97,19 +101,21 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
         uploadResult.fold(
           (error) {
             setState(() => _isUploadingImage = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${BranchConstants.errorUploadingImage}: ${error.message}',
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '${BranchConstants.errorUploadingImage}: ${error.message}',
+                  ),
+                  backgroundColor: Colors.red,
+                  action: SnackBarAction(
+                    label: BranchConstants.retry,
+                    textColor: Colors.white,
+                    onPressed: _onSubmit,
+                  ),
                 ),
-                backgroundColor: Colors.red,
-                action: SnackBarAction(
-                  label: BranchConstants.retry,
-                  textColor: Colors.white,
-                  onPressed: _onSubmit,
-                ),
-              ),
-            );
+              );
             return;
           },
           (url) {
@@ -174,23 +180,27 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
           ScaffoldMessenger.of(context).clearSnackBars();
 
           if (state is RegisterBranchSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             // Navigate back after success
             Navigator.pop(context, true);
           } else if (state is RegisterBranchFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.error.message),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
           }
         },
         builder: (context, state) {

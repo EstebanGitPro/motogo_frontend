@@ -114,38 +114,41 @@ class BackendErrorWidget extends StatelessWidget {
     ErrorModel errorModel, {
     Duration duration = const Duration(seconds: 4),
   }) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(errorModel.displayMessage),
-        backgroundColor: Colors.red.shade700,
-        duration: duration,
-        action: errorModel.description != null
-            ? SnackBarAction(
-                label: 'DETALLES',
-                textColor: Colors.white,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Detalles del Error'),
-                      content: SingleChildScrollView(
-                        child: Text(
-                          errorModel.description ?? 'Sin detalles adicionales',
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(errorModel.displayMessage),
+          backgroundColor: Colors.red.shade700,
+          duration: duration,
+          action: errorModel.description != null
+              ? SnackBarAction(
+                  label: 'DETALLES',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Detalles del Error'),
+                        content: SingleChildScrollView(
+                          child: Text(
+                            errorModel.description ??
+                                'Sin detalles adicionales',
+                          ),
                         ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cerrar'),
+                          ),
+                        ],
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cerrar'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              )
-            : null,
-      ),
-    );
+                    );
+                  },
+                )
+              : null,
+        ),
+      );
   }
 }
 

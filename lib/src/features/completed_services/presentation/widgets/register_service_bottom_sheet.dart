@@ -76,9 +76,11 @@ class _RegisterServiceBottomSheetState
         setState(() {
           _loadingBranches = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+          );
       },
       (branches) {
         setState(() {
@@ -111,9 +113,11 @@ class _RegisterServiceBottomSheetState
         setState(() {
           _loadingServices = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+          );
       },
       (services) {
         setState(() {
@@ -128,12 +132,14 @@ class _RegisterServiceBottomSheetState
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     if (_selectedServiceIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(MotorcycleConstants.selectAtLeastOneService),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(MotorcycleConstants.selectAtLeastOneService),
+            backgroundColor: Colors.orange,
+          ),
+        );
       return;
     }
 

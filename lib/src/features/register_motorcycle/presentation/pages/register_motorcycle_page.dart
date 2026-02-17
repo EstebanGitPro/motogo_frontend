@@ -58,8 +58,10 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
       create: (context) => InjectorApp.resolve<RegisterMotorcycleBloc>(),
       child: BlocConsumer<RegisterMotorcycleBloc, RegisterMotorcycleState>(
         listener: (context, state) {
+          final messenger = ScaffoldMessenger.of(context);
           if (state is RegisterMotorcycleSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: Colors.green,
@@ -68,7 +70,8 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
             );
             Navigator.pop(context, true);
           } else if (state is RegisterMotorcycleFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
@@ -391,6 +394,7 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
         setState(() => _isUploadingImage = false);
 
         if (uploadResult.isLeft) {
+          scaffoldMessenger.clearSnackBars();
           scaffoldMessenger.showSnackBar(
             SnackBar(
               content: Text(

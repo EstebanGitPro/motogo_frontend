@@ -92,7 +92,9 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
 
     result.fold(
       (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
           SnackBar(content: Text(error.message), backgroundColor: Colors.red),
         );
       },
@@ -101,7 +103,9 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
           _uploadedImageUrl = null;
           _selectedImage = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
           SnackBar(content: Text(message), backgroundColor: Colors.green),
         );
       },
@@ -114,8 +118,10 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
   Widget build(BuildContext context) {
     return BlocListener<EditMotorcycleBloc, EditMotorcycleState>(
       listener: (context, state) {
+        final messenger = ScaffoldMessenger.of(context);
         if (state is EditMotorcycleSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
             SnackBar(
               content: Text(state.message),
               backgroundColor: Colors.green,
@@ -124,7 +130,8 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
           Navigator.of(context).pop(true); // Return true to refresh list
         }
         if (state is EditMotorcycleError) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
           );
         }
@@ -311,7 +318,9 @@ class _EditMotorcycleViewState extends State<_EditMotorcycleView> {
         setState(() => _isUploadingImage = false);
 
         if (uploadResult.isLeft) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          final messenger = ScaffoldMessenger.of(context);
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
             SnackBar(
               content: Text(
                 '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',

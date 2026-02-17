@@ -60,15 +60,17 @@ class BranchScheduleTab extends StatelessWidget {
           }
 
           if (message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(message),
-                backgroundColor: isSuccess
-                    ? Colors.green[600]
-                    : Colors.red[600],
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  backgroundColor: isSuccess
+                      ? Colors.green[600]
+                      : Colors.red[600],
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
           }
         },
         child: _BranchScheduleContent(branchId: branchId),

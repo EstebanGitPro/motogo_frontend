@@ -110,12 +110,14 @@ class _TimeSlotDialogState extends State<TimeSlotDialog> {
 
   void _onConfirm() {
     if (!_isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(ScheduleConstants.validationOpeningBeforeClosing),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(ScheduleConstants.validationOpeningBeforeClosing),
+            backgroundColor: Colors.red,
+          ),
+        );
       return;
     }
 

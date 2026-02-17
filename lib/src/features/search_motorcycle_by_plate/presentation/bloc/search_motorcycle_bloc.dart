@@ -145,7 +145,11 @@ class SearchMotorcycleBloc
     final currentState = state;
     if (currentState is! SearchMotorcycleLoaded) return;
 
-    emit(currentState.copyWith(isRegisteringService: true));
+    emit(
+      currentState.copyWith(
+        registration: currentState.registration.copyWith(isRegistering: true),
+      ),
+    );
 
     final request = RegisterCompletedServiceModel(
       branchId: event.branchId,
@@ -161,15 +165,19 @@ class SearchMotorcycleBloc
     result.fold(
       (error) => emit(
         currentState.copyWith(
-          isRegisteringService: false,
-          serviceRegistrationError: error.message,
+          registration: currentState.registration.copyWith(
+            isRegistering: false,
+            error: error.message,
+          ),
         ),
       ),
       (message) {
         emit(
           currentState.copyWith(
-            isRegisteringService: false,
-            serviceRegistrationMessage: message,
+            registration: currentState.registration.copyWith(
+              isRegistering: false,
+              message: message,
+            ),
           ),
         );
         // Refresh service history with the newly registered service
@@ -185,7 +193,11 @@ class SearchMotorcycleBloc
     final currentState = state;
     if (currentState is! SearchMotorcycleLoaded) return;
 
-    emit(currentState.copyWith(loadingHistory: true));
+    emit(
+      currentState.copyWith(
+        history: currentState.history.copyWith(loading: true),
+      ),
+    );
 
     final result = await _getServiceHistoryUseCase(
       motorcycleId: event.motorcycleId,
@@ -195,13 +207,15 @@ class SearchMotorcycleBloc
     result.fold(
       (error) => emit(
         currentState.copyWith(
-          loadingHistory: false,
-          historyError: error.message,
+          history: currentState.history.copyWith(
+            loading: false,
+            error: error.message,
+          ),
         ),
       ),
-      (history) {
+      (historyList) {
         // Enrich entities with branch name
-        final enriched = history.map((e) {
+        final enriched = historyList.map((e) {
           final name = _branchNameMap[e.branchId];
           return name != null
               ? CompletedServiceEntity(
@@ -222,8 +236,10 @@ class SearchMotorcycleBloc
         }).toList();
         emit(
           currentState.copyWith(
-            loadingHistory: false,
-            serviceHistory: enriched,
+            history: currentState.history.copyWith(
+              loading: false,
+              services: enriched,
+            ),
           ),
         );
       },
@@ -266,7 +282,11 @@ class SearchMotorcycleBloc
     final currentState = state;
     if (currentState is! SearchMotorcycleLoaded) return;
 
-    emit(currentState.copyWith(isUpdatingStatus: true));
+    emit(
+      currentState.copyWith(
+        action: currentState.action.copyWith(isUpdatingStatus: true),
+      ),
+    );
 
     final result = await _updateServiceStatusUseCase(
       event.serviceId,
@@ -276,15 +296,19 @@ class SearchMotorcycleBloc
     result.fold(
       (error) => emit(
         currentState.copyWith(
-          isUpdatingStatus: false,
-          statusUpdateError: error.message,
+          action: currentState.action.copyWith(
+            isUpdatingStatus: false,
+            statusUpdateError: error.message,
+          ),
         ),
       ),
       (message) {
         emit(
           currentState.copyWith(
-            isUpdatingStatus: false,
-            statusUpdateMessage: message,
+            action: currentState.action.copyWith(
+              isUpdatingStatus: false,
+              statusUpdateMessage: message,
+            ),
           ),
         );
         // Refresh service history to reflect the status change
@@ -308,7 +332,11 @@ class SearchMotorcycleBloc
       },
       (transitions) {
         final entities = transitions.map((t) => t.toEntity()).toList();
-        emit(currentState.copyWith(serviceTransitions: entities));
+        emit(
+          currentState.copyWith(
+            history: currentState.history.copyWith(transitions: entities),
+          ),
+        );
       },
     );
   }
@@ -320,22 +348,30 @@ class SearchMotorcycleBloc
     final currentState = state;
     if (currentState is! SearchMotorcycleLoaded) return;
 
-    emit(currentState.copyWith(isDeletingService: true));
+    emit(
+      currentState.copyWith(
+        action: currentState.action.copyWith(isDeletingService: true),
+      ),
+    );
 
     final result = await _deleteCompletedServiceUseCase(event.serviceId);
 
     result.fold(
       (error) => emit(
         currentState.copyWith(
-          isDeletingService: false,
-          deleteServiceError: error.message,
+          action: currentState.action.copyWith(
+            isDeletingService: false,
+            deleteServiceError: error.message,
+          ),
         ),
       ),
       (message) {
         emit(
           currentState.copyWith(
-            isDeletingService: false,
-            deleteServiceMessage: message,
+            action: currentState.action.copyWith(
+              isDeletingService: false,
+              deleteServiceMessage: message,
+            ),
           ),
         );
         // Refresh service history to reflect the deletion

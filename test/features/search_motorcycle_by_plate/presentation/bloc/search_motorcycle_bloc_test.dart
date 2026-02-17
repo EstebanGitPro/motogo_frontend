@@ -486,11 +486,10 @@ void main() {
         solutionError: 'err',
       );
 
-      expect(loaded.props.length, 16);
+      expect(loaded.props.length, 6);
       expect(loaded.props, contains(testEntity));
       expect(loaded.props, contains('msg'));
       expect(loaded.props, contains('err'));
-      expect(loaded.props, contains(false)); // isRegisteringService
     });
 
     test('RegisterCompletedService props should contain all fields', () {
@@ -517,8 +516,10 @@ void main() {
       () {
         final loaded = SearchMotorcycleLoaded(testEntity);
         final updated = loaded.copyWith(
-          isRegisteringService: true,
-          serviceRegistrationMessage: 'OK',
+          registration: const ServiceRegistrationStatus(
+            isRegistering: true,
+            message: 'OK',
+          ),
         );
 
         expect(updated.isRegisteringService, true);
@@ -554,9 +555,11 @@ void main() {
     test('SearchMotorcycleLoaded copyWith with status update fields', () {
       final loaded = SearchMotorcycleLoaded(testEntity);
       final updated = loaded.copyWith(
-        isUpdatingStatus: true,
-        statusUpdateMessage: 'Updated',
-        statusUpdateError: 'Failed',
+        action: const ServiceActionStatus(
+          isUpdatingStatus: true,
+          statusUpdateMessage: 'Updated',
+          statusUpdateError: 'Failed',
+        ),
       );
 
       expect(updated.isUpdatingStatus, true);
@@ -566,7 +569,9 @@ void main() {
 
     test('SearchMotorcycleLoaded copyWith with serviceTransitions', () {
       final loaded = SearchMotorcycleLoaded(testEntity);
-      final updated = loaded.copyWith(serviceTransitions: []);
+      final updated = loaded.copyWith(
+        history: const ServiceHistoryStatus(transitions: []),
+      );
 
       expect(updated.serviceTransitions, isEmpty);
     });
@@ -574,9 +579,11 @@ void main() {
     test('SearchMotorcycleLoaded copyWith with delete service fields', () {
       final loaded = SearchMotorcycleLoaded(testEntity);
       final updated = loaded.copyWith(
-        isDeletingService: true,
-        deleteServiceMessage: 'Deleted',
-        deleteServiceError: 'Error deleting',
+        action: const ServiceActionStatus(
+          isDeletingService: true,
+          deleteServiceMessage: 'Deleted',
+          deleteServiceError: 'Error deleting',
+        ),
       );
 
       expect(updated.isDeletingService, true);

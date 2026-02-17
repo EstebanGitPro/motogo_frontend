@@ -18,76 +18,96 @@ class SearchMotorcycleLoading extends SearchMotorcycleState {
   const SearchMotorcycleLoading();
 }
 
-/// Success state - motorcycle found.
-class SearchMotorcycleLoaded extends SearchMotorcycleState {
-  final MotorcycleDetailEntity motorcycle;
-  final String? solutionMessage;
-  final String? solutionError;
-  final bool isRegisteringService;
-  final String? serviceRegistrationMessage;
-  final String? serviceRegistrationError;
-  final List<CompletedServiceEntity> serviceHistory;
-  final bool loadingHistory;
-  final String? historyError;
+/// Groups registration-related fields.
+class ServiceRegistrationStatus extends Equatable {
+  final bool isRegistering;
+  final String? message;
+  final String? error;
+
+  const ServiceRegistrationStatus({
+    this.isRegistering = false,
+    this.message,
+    this.error,
+  });
+
+  ServiceRegistrationStatus copyWith({
+    bool? isRegistering,
+    String? message,
+    String? error,
+  }) {
+    return ServiceRegistrationStatus(
+      isRegistering: isRegistering ?? this.isRegistering,
+      message: message,
+      error: error,
+    );
+  }
+
+  @override
+  List<Object?> get props => [isRegistering, message, error];
+}
+
+/// Groups service history fields.
+class ServiceHistoryStatus extends Equatable {
+  final List<CompletedServiceEntity> services;
+  final bool loading;
+  final String? error;
+  final List<StatusTransitionEntity> transitions;
+
+  const ServiceHistoryStatus({
+    this.services = const [],
+    this.loading = false,
+    this.error,
+    this.transitions = const [],
+  });
+
+  ServiceHistoryStatus copyWith({
+    List<CompletedServiceEntity>? services,
+    bool? loading,
+    String? error,
+    List<StatusTransitionEntity>? transitions,
+  }) {
+    return ServiceHistoryStatus(
+      services: services ?? this.services,
+      loading: loading ?? this.loading,
+      error: error,
+      transitions: transitions ?? this.transitions,
+    );
+  }
+
+  @override
+  List<Object?> get props => [services, loading, error, transitions];
+}
+
+/// Groups status-update and delete action fields.
+class ServiceActionStatus extends Equatable {
   final bool isUpdatingStatus;
   final String? statusUpdateMessage;
   final String? statusUpdateError;
-  final List<StatusTransitionEntity> serviceTransitions;
   final bool isDeletingService;
   final String? deleteServiceMessage;
   final String? deleteServiceError;
 
-  const SearchMotorcycleLoaded(
-    this.motorcycle, {
-    this.solutionMessage,
-    this.solutionError,
-    this.isRegisteringService = false,
-    this.serviceRegistrationMessage,
-    this.serviceRegistrationError,
-    this.serviceHistory = const [],
-    this.loadingHistory = false,
-    this.historyError,
+  const ServiceActionStatus({
     this.isUpdatingStatus = false,
     this.statusUpdateMessage,
     this.statusUpdateError,
-    this.serviceTransitions = const [],
     this.isDeletingService = false,
     this.deleteServiceMessage,
     this.deleteServiceError,
   });
 
-  SearchMotorcycleLoaded copyWith({
-    MotorcycleDetailEntity? motorcycle,
-    String? solutionMessage,
-    String? solutionError,
-    bool? isRegisteringService,
-    String? serviceRegistrationMessage,
-    String? serviceRegistrationError,
-    List<CompletedServiceEntity>? serviceHistory,
-    bool? loadingHistory,
-    String? historyError,
+  ServiceActionStatus copyWith({
     bool? isUpdatingStatus,
     String? statusUpdateMessage,
     String? statusUpdateError,
-    List<StatusTransitionEntity>? serviceTransitions,
     bool? isDeletingService,
     String? deleteServiceMessage,
     String? deleteServiceError,
   }) {
-    return SearchMotorcycleLoaded(
-      motorcycle ?? this.motorcycle,
-      solutionMessage: solutionMessage,
-      solutionError: solutionError,
-      isRegisteringService: isRegisteringService ?? this.isRegisteringService,
-      serviceRegistrationMessage: serviceRegistrationMessage,
-      serviceRegistrationError: serviceRegistrationError,
-      serviceHistory: serviceHistory ?? this.serviceHistory,
-      loadingHistory: loadingHistory ?? this.loadingHistory,
-      historyError: historyError,
+    return ServiceActionStatus(
       isUpdatingStatus: isUpdatingStatus ?? this.isUpdatingStatus,
       statusUpdateMessage: statusUpdateMessage,
       statusUpdateError: statusUpdateError,
-      serviceTransitions: serviceTransitions ?? this.serviceTransitions,
       isDeletingService: isDeletingService ?? this.isDeletingService,
       deleteServiceMessage: deleteServiceMessage,
       deleteServiceError: deleteServiceError,
@@ -96,22 +116,76 @@ class SearchMotorcycleLoaded extends SearchMotorcycleState {
 
   @override
   List<Object?> get props => [
-    motorcycle,
-    solutionMessage,
-    solutionError,
-    isRegisteringService,
-    serviceRegistrationMessage,
-    serviceRegistrationError,
-    serviceHistory,
-    loadingHistory,
-    historyError,
     isUpdatingStatus,
     statusUpdateMessage,
     statusUpdateError,
-    serviceTransitions,
     isDeletingService,
     deleteServiceMessage,
     deleteServiceError,
+  ];
+}
+
+/// Success state - motorcycle found.
+class SearchMotorcycleLoaded extends SearchMotorcycleState {
+  final MotorcycleDetailEntity motorcycle;
+  final String? solutionMessage;
+  final String? solutionError;
+  final ServiceRegistrationStatus registration;
+  final ServiceHistoryStatus history;
+  final ServiceActionStatus action;
+
+  const SearchMotorcycleLoaded(
+    this.motorcycle, {
+    this.solutionMessage,
+    this.solutionError,
+    this.registration = const ServiceRegistrationStatus(),
+    this.history = const ServiceHistoryStatus(),
+    this.action = const ServiceActionStatus(),
+  });
+
+  // ─── Convenience getters for backward compatibility ──────────────
+  bool get isRegisteringService => registration.isRegistering;
+  String? get serviceRegistrationMessage => registration.message;
+  String? get serviceRegistrationError => registration.error;
+
+  List<CompletedServiceEntity> get serviceHistory => history.services;
+  bool get loadingHistory => history.loading;
+  String? get historyError => history.error;
+  List<StatusTransitionEntity> get serviceTransitions => history.transitions;
+
+  bool get isUpdatingStatus => action.isUpdatingStatus;
+  String? get statusUpdateMessage => action.statusUpdateMessage;
+  String? get statusUpdateError => action.statusUpdateError;
+  bool get isDeletingService => action.isDeletingService;
+  String? get deleteServiceMessage => action.deleteServiceMessage;
+  String? get deleteServiceError => action.deleteServiceError;
+
+  SearchMotorcycleLoaded copyWith({
+    MotorcycleDetailEntity? motorcycle,
+    String? solutionMessage,
+    String? solutionError,
+    ServiceRegistrationStatus? registration,
+    ServiceHistoryStatus? history,
+    ServiceActionStatus? action,
+  }) {
+    return SearchMotorcycleLoaded(
+      motorcycle ?? this.motorcycle,
+      solutionMessage: solutionMessage,
+      solutionError: solutionError,
+      registration: registration ?? this.registration,
+      history: history ?? this.history,
+      action: action ?? this.action,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+    motorcycle,
+    solutionMessage,
+    solutionError,
+    registration,
+    history,
+    action,
   ];
 }
 

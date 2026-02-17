@@ -835,6 +835,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
   Widget _buildServicesCard(SearchMotorcycleLoaded state) {
     final count = state.serviceHistory.length;
     final hasServices = count > 0;
+    final pluralSuffix = count > 1 ? 's' : '';
 
     return Card(
       elevation: 2,
@@ -880,7 +881,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                     const SizedBox(height: 4),
                     Text(
                       hasServices
-                          ? '$count servicio${count > 1 ? 's' : ''} registrado${count > 1 ? 's' : ''}'
+                          ? '$count servicio$pluralSuffix registrado$pluralSuffix'
                           : MotorcycleConstants.servicesCardSubtitle,
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),

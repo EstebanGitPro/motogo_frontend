@@ -42,62 +42,66 @@ class MockCompletedServicesRepository extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> registerCompletedService(
-          _i6.RegisterCompletedServiceModel? request) =>
+    _i6.RegisterCompletedServiceModel? request,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #registerCompletedService,
-          [request],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #registerCompletedService,
-            [request],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#registerCompletedService, [request]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#registerCompletedService, [request]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>
-      getCompletedServicesByBranch(String? branchId) => (super.noSuchMethod(
-            Invocation.method(
-              #getCompletedServicesByBranch,
-              [branchId],
-            ),
-            returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel,
-                    List<_i8.CompletedServiceModel>>>.value(_i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>(
-              this,
-              Invocation.method(
-                #getCompletedServicesByBranch,
-                [branchId],
-              ),
-            )),
-          ) as _i3.Future<
-              _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>);
+  getCompletedServicesByBranch(String? branchId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCompletedServicesByBranch, [branchId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+                  >(
+                    this,
+                    Invocation.method(#getCompletedServicesByBranch, [
+                      branchId,
+                    ]),
+                  ),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+          >);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>
-      getCompletedServicesByMotorcycle(String? motorcycleId) =>
-          (super.noSuchMethod(
-            Invocation.method(
-              #getCompletedServicesByMotorcycle,
-              [motorcycleId],
-            ),
-            returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel,
-                    List<_i8.CompletedServiceModel>>>.value(_i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>(
-              this,
-              Invocation.method(
-                #getCompletedServicesByMotorcycle,
-                [motorcycleId],
-              ),
-            )),
-          ) as _i3.Future<
-              _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>>);
+  getCompletedServicesByMotorcycle(String? motorcycleId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getCompletedServicesByMotorcycle, [
+              motorcycleId,
+            ]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+                  >(
+                    this,
+                    Invocation.method(#getCompletedServicesByMotorcycle, [
+                      motorcycleId,
+                    ]),
+                  ),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i8.CompletedServiceModel>>
+          >);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> updateServiceStatus(
@@ -105,61 +109,49 @@ class MockCompletedServicesRepository extends _i1.Mock
     String? newStatus,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #updateServiceStatus,
-          [
-            serviceId,
-            newStatus,
-          ],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #updateServiceStatus,
-            [
-              serviceId,
-              newStatus,
-            ],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#updateServiceStatus, [serviceId, newStatus]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#updateServiceStatus, [serviceId, newStatus]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>>
-      getServiceTransitions(String? serviceId) => (super.noSuchMethod(
-            Invocation.method(
-              #getServiceTransitions,
-              [serviceId],
-            ),
-            returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel,
-                    List<_i9.StatusTransitionModel>>>.value(_i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>>(
-              this,
-              Invocation.method(
-                #getServiceTransitions,
-                [serviceId],
-              ),
-            )),
-          ) as _i3.Future<
-              _i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>>);
+  getServiceTransitions(String? serviceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getServiceTransitions, [serviceId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>
+                  >(
+                    this,
+                    Invocation.method(#getServiceTransitions, [serviceId]),
+                  ),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i9.StatusTransitionModel>>
+          >);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> deleteCompletedService(
-          String? serviceId) =>
+    String? serviceId,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #deleteCompletedService,
-          [serviceId],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #deleteCompletedService,
-            [serviceId],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#deleteCompletedService, [serviceId]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#deleteCompletedService, [serviceId]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

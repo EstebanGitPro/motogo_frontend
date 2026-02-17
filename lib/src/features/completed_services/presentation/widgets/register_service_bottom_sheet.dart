@@ -269,7 +269,7 @@ class _RegisterServiceBottomSheetState
     }
 
     return DropdownButtonFormField<String>(
-      value: _selectedBranchId,
+      initialValue: _selectedBranchId,
       decoration: InputDecoration(
         labelText: MotorcycleConstants.selectBranchLabel,
         hintText: MotorcycleConstants.selectBranchHint,

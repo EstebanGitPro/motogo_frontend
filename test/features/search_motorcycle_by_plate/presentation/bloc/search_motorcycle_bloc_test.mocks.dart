@@ -60,23 +60,22 @@ class MockSearchMotorcycleByPlateUseCase extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>> call(
-          String? plate) =>
+    String? plate,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [plate],
-        ),
-        returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>>.value(
-            _i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>>(
-          this,
-          Invocation.method(
-            #call,
-            [plate],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>>);
+            Invocation.method(#call, [plate]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>
+                  >(this, Invocation.method(#call, [plate])),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailEntity>
+          >);
 }
 
 /// A class which mocks [SetSolutionUseCase].
@@ -94,27 +93,21 @@ class MockSetSolutionUseCase extends _i1.Mock
     required String? solution,
   }) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [],
-          {
-            #diagnosticId: diagnosticId,
-            #solution: solution,
-          },
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #call,
-            [],
-            {
+            Invocation.method(#call, [], {
               #diagnosticId: diagnosticId,
               #solution: solution,
-            },
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            }),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [], {
+                  #diagnosticId: diagnosticId,
+                  #solution: solution,
+                }),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }
 
 /// A class which mocks [RegisterCompletedServiceUseCase].
@@ -128,21 +121,18 @@ class MockRegisterCompletedServiceUseCase extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(
-          _i10.RegisterCompletedServiceModel? request) =>
+    _i10.RegisterCompletedServiceModel? request,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [request],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #call,
-            [request],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#call, [request]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [request]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }
 
 /// A class which mocks [GetServiceHistoryUseCase].
@@ -156,35 +146,33 @@ class MockGetServiceHistoryUseCase extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>>
-      call({
-    required String? motorcycleId,
-    required List<String>? branchIds,
-  }) =>
-          (super.noSuchMethod(
-            Invocation.method(
-              #call,
-              [],
-              {
-                #motorcycleId: motorcycleId,
-                #branchIds: branchIds,
-              },
-            ),
-            returnValue: _i3.Future<
-                _i4.Either<_i5.ErrorModel,
-                    List<_i12.CompletedServiceEntity>>>.value(_i7.dummyValue<
-                _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>>(
-              this,
-              Invocation.method(
-                #call,
-                [],
-                {
-                  #motorcycleId: motorcycleId,
-                  #branchIds: branchIds,
-                },
-              ),
-            )),
-          ) as _i3.Future<
-              _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>>);
+  call({required String? motorcycleId, required List<String>? branchIds}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {
+              #motorcycleId: motorcycleId,
+              #branchIds: branchIds,
+            }),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<
+                      _i5.ErrorModel,
+                      List<_i12.CompletedServiceEntity>
+                    >
+                  >(
+                    this,
+                    Invocation.method(#call, [], {
+                      #motorcycleId: motorcycleId,
+                      #branchIds: branchIds,
+                    }),
+                  ),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>
+          >);
 }
 
 /// A class which mocks [GetBranchesUseCase].
@@ -199,20 +187,17 @@ class MockGetBranchesUseCase extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>> call() =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [],
-        ),
-        returnValue: _i3
-            .Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>>(
-          this,
-          Invocation.method(
-            #call,
-            [],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>>);
+            Invocation.method(#call, []),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>
+                  >(this, Invocation.method(#call, [])),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>>);
 }
 
 /// A class which mocks [UpdateServiceStatusUseCase].
@@ -230,25 +215,15 @@ class MockUpdateServiceStatusUseCase extends _i1.Mock
     String? newStatus,
   ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [
-            serviceId,
-            newStatus,
-          ],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #call,
-            [
-              serviceId,
-              newStatus,
-            ],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#call, [serviceId, newStatus]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [serviceId, newStatus]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }
 
 /// A class which mocks [GetServiceTransitionsUseCase].
@@ -262,24 +237,22 @@ class MockGetServiceTransitionsUseCase extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>> call(
-          String? serviceId) =>
+    String? serviceId,
+  ) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [serviceId],
-        ),
-        returnValue: _i3.Future<
-            _i4.Either<_i5.ErrorModel,
-                List<_i17.StatusTransitionModel>>>.value(_i7.dummyValue<
-            _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>>(
-          this,
-          Invocation.method(
-            #call,
-            [serviceId],
-          ),
-        )),
-      ) as _i3.Future<
-          _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>>);
+            Invocation.method(#call, [serviceId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+                  >(this, Invocation.method(#call, [serviceId])),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+          >);
 }
 
 /// A class which mocks [DeleteCompletedServiceUseCase].
@@ -294,17 +267,13 @@ class MockDeleteCompletedServiceUseCase extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(String? serviceId) =>
       (super.noSuchMethod(
-        Invocation.method(
-          #call,
-          [serviceId],
-        ),
-        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-          this,
-          Invocation.method(
-            #call,
-            [serviceId],
-          ),
-        )),
-      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            Invocation.method(#call, [serviceId]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [serviceId]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

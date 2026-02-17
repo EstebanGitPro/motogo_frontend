@@ -29,6 +29,41 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
     );
   }
 
+  void _handleStateChanges(BuildContext context, SearchMotorcycleState state) {
+    if (state is! SearchMotorcycleLoaded) return;
+
+    _showFeedback(
+      context,
+      message: state.statusUpdateMessage,
+      error: state.statusUpdateError,
+      popOnSuccess: true,
+    );
+    _showFeedback(
+      context,
+      message: state.deleteServiceMessage,
+      error: state.deleteServiceError,
+      popOnSuccess: true,
+    );
+  }
+
+  void _showFeedback(
+    BuildContext context, {
+    String? message,
+    String? error,
+    bool popOnSuccess = false,
+  }) {
+    if (message != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
+      );
+      if (popOnSuccess) Navigator.of(context).pop();
+    } else if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SearchMotorcycleBloc, SearchMotorcycleState>(
@@ -41,44 +76,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
         }
         return false;
       },
-      listener: (context, state) {
-        if (state is SearchMotorcycleLoaded) {
-          // Status update feedback
-          if (state.statusUpdateMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.statusUpdateMessage!),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.of(context).pop();
-          } else if (state.statusUpdateError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.statusUpdateError!),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-          // Delete service feedback
-          if (state.deleteServiceMessage != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.deleteServiceMessage!),
-                backgroundColor: Colors.green,
-              ),
-            );
-            Navigator.of(context).pop();
-          } else if (state.deleteServiceError != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.deleteServiceError!),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      },
+      listener: _handleStateChanges,
       builder: (context, state) {
         final isUpdating =
             state is SearchMotorcycleLoaded && state.isUpdatingStatus;
@@ -361,9 +359,9 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           MotorcycleConstants.transitionHistoryTitle,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 14),
         ...transitions.asMap().entries.map((entry) {

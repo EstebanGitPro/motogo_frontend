@@ -49,125 +49,136 @@ class MockCatalogsDataSource extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>> getBrands() =>
       (super.noSuchMethod(
-            Invocation.method(#getBrands, []),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>
-                  >(this, Invocation.method(#getBrands, [])),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>>);
+        Invocation.method(
+          #getBrands,
+          [],
+        ),
+        returnValue: _i3
+            .Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>>.value(
+            _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>>(
+          this,
+          Invocation.method(
+            #getBrands,
+            [],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i6.BrandModel>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>>
-  getDepartments() =>
-      (super.noSuchMethod(
-            Invocation.method(#getDepartments, []),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>
-                  >(this, Invocation.method(#getDepartments, [])),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>>);
+      getDepartments() => (super.noSuchMethod(
+            Invocation.method(
+              #getDepartments,
+              [],
+            ),
+            returnValue: _i3.Future<
+                    _i4
+                    .Either<_i5.ErrorModel, List<_i8.DepartmentModel>>>.value(
+                _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>>(
+              this,
+              Invocation.method(
+                #getDepartments,
+                [],
+              ),
+            )),
+          ) as _i3
+              .Future<_i4.Either<_i5.ErrorModel, List<_i8.DepartmentModel>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i9.CityModel>>>
-  getCitiesByDepartment(String? departmentId) =>
-      (super.noSuchMethod(
-            Invocation.method(#getCitiesByDepartment, [departmentId]),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i9.CityModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i9.CityModel>>
-                  >(
-                    this,
-                    Invocation.method(#getCitiesByDepartment, [departmentId]),
-                  ),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i9.CityModel>>>);
+      getCitiesByDepartment(String? departmentId) => (super.noSuchMethod(
+            Invocation.method(
+              #getCitiesByDepartment,
+              [departmentId],
+            ),
+            returnValue: _i3
+                .Future<_i4.Either<_i5.ErrorModel, List<_i9.CityModel>>>.value(
+                _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<_i9.CityModel>>>(
+              this,
+              Invocation.method(
+                #getCitiesByDepartment,
+                [departmentId],
+              ),
+            )),
+          ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i9.CityModel>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>>
-  getBranchTypes() =>
-      (super.noSuchMethod(
-            Invocation.method(#getBranchTypes, []),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>
-                  >(this, Invocation.method(#getBranchTypes, [])),
-                ),
-          )
-          as _i3.Future<
-            _i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>
-          >);
+      getBranchTypes() => (super.noSuchMethod(
+            Invocation.method(
+              #getBranchTypes,
+              [],
+            ),
+            returnValue: _i3.Future<
+                    _i4
+                    .Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>>.value(
+                _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>>(
+              this,
+              Invocation.method(
+                #getBranchTypes,
+                [],
+              ),
+            )),
+          ) as _i3
+              .Future<_i4.Either<_i5.ErrorModel, List<_i10.BranchTypeModel>>>);
 
   @override
-  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>> getServices({
-    String? serviceType,
-  }) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>> getServices(
+          {String? serviceType}) =>
       (super.noSuchMethod(
-            Invocation.method(#getServices, [], {#serviceType: serviceType}),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>
-                  >(
-                    this,
-                    Invocation.method(#getServices, [], {
-                      #serviceType: serviceType,
-                    }),
-                  ),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>>);
+        Invocation.method(
+          #getServices,
+          [],
+          {#serviceType: serviceType},
+        ),
+        returnValue: _i3
+            .Future<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>>.value(
+            _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>>(
+          this,
+          Invocation.method(
+            #getServices,
+            [],
+            {#serviceType: serviceType},
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i11.ServiceModel>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<String>>> getServiceTypes() =>
       (super.noSuchMethod(
-            Invocation.method(#getServiceTypes, []),
-            returnValue:
-                _i3.Future<_i4.Either<_i5.ErrorModel, List<String>>>.value(
-                  _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<String>>>(
-                    this,
-                    Invocation.method(#getServiceTypes, []),
-                  ),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, List<String>>>);
+        Invocation.method(
+          #getServiceTypes,
+          [],
+        ),
+        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, List<String>>>.value(
+            _i7.dummyValue<_i4.Either<_i5.ErrorModel, List<String>>>(
+          this,
+          Invocation.method(
+            #getServiceTypes,
+            [],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.ErrorModel, List<String>>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, List<_i12.DisplacementRangeModel>>>
-  getDisplacementRanges() =>
-      (super.noSuchMethod(
-            Invocation.method(#getDisplacementRanges, []),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, List<_i12.DisplacementRangeModel>>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<
-                      _i5.ErrorModel,
-                      List<_i12.DisplacementRangeModel>
-                    >
-                  >(this, Invocation.method(#getDisplacementRanges, [])),
-                ),
-          )
-          as _i3.Future<
-            _i4.Either<_i5.ErrorModel, List<_i12.DisplacementRangeModel>>
-          >);
+      getDisplacementRanges() => (super.noSuchMethod(
+            Invocation.method(
+              #getDisplacementRanges,
+              [],
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.ErrorModel,
+                    List<_i12.DisplacementRangeModel>>>.value(_i7.dummyValue<
+                _i4.Either<_i5.ErrorModel, List<_i12.DisplacementRangeModel>>>(
+              this,
+              Invocation.method(
+                #getDisplacementRanges,
+                [],
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.ErrorModel, List<_i12.DisplacementRangeModel>>>);
 }

@@ -37,20 +37,25 @@ class MockSearchMotorcycleDataSource extends _i1.Mock
   }
 
   @override
-  _i3.Future<_i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>>
-  searchByPlate(String? plate) =>
+  _i3.Future<
+      _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>> searchByPlate(
+          String? plate) =>
       (super.noSuchMethod(
-            Invocation.method(#searchByPlate, [plate]),
-            returnValue:
-                _i3.Future<
-                  _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>
-                >.value(
-                  _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>
-                  >(this, Invocation.method(#searchByPlate, [plate])),
-                ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>>);
+        Invocation.method(
+          #searchByPlate,
+          [plate],
+        ),
+        returnValue: _i3.Future<
+                _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>>.value(
+            _i7.dummyValue<
+                _i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>>(
+          this,
+          Invocation.method(
+            #searchByPlate,
+            [plate],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.MotorcycleDetailModel>>);
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> setSolution({
@@ -58,19 +63,25 @@ class MockSearchMotorcycleDataSource extends _i1.Mock
     required String? solution,
   }) =>
       (super.noSuchMethod(
-            Invocation.method(#setSolution, [], {
+        Invocation.method(
+          #setSolution,
+          [],
+          {
+            #diagnosticId: diagnosticId,
+            #solution: solution,
+          },
+        ),
+        returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+            _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+          this,
+          Invocation.method(
+            #setSolution,
+            [],
+            {
               #diagnosticId: diagnosticId,
               #solution: solution,
-            }),
-            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
-              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
-                this,
-                Invocation.method(#setSolution, [], {
-                  #diagnosticId: diagnosticId,
-                  #solution: solution,
-                }),
-              ),
-            ),
-          )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+            },
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 }

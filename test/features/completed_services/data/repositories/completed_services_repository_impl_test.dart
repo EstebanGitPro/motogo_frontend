@@ -4,6 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/datasources/completed_services_datasource.dart';
+import 'package:motogo_frontend/src/features/completed_services/data/model/completed_service_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/register_completed_service_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/status_transition_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/repositories/completed_services_repository_impl.dart';
@@ -18,6 +19,9 @@ void main() {
   setUpAll(() {
     provideDummy<Either<ErrorModel, String>>(const Right(''));
     provideDummy<Either<ErrorModel, List<StatusTransitionModel>>>(
+      const Right([]),
+    );
+    provideDummy<Either<ErrorModel, List<CompletedServiceModel>>>(
       const Right([]),
     );
   });
@@ -135,6 +139,107 @@ void main() {
 
       expect(result.isLeft, true);
       expect(result.left.message, 'Servicio no encontrado');
+    });
+
+    // ─── getCompletedServicesByBranch ──────────────────────────────
+
+    test(
+      'getCompletedServicesByBranch delegates to datasource on success',
+      () async {
+        when(
+          mockDataSource.getCompletedServicesByBranch(any),
+        ).thenAnswer((_) async => const Right(<CompletedServiceModel>[]));
+
+        final result = await repository.getCompletedServicesByBranch(
+          'branch-1',
+        );
+
+        expect(result.isRight, true);
+        expect(result.right, isEmpty);
+        verify(
+          mockDataSource.getCompletedServicesByBranch('branch-1'),
+        ).called(1);
+      },
+    );
+
+    test(
+      'getCompletedServicesByBranch delegates to datasource on failure',
+      () async {
+        when(mockDataSource.getCompletedServicesByBranch(any)).thenAnswer(
+          (_) async =>
+              Left(ErrorModel(errorCode: 'ERR', message: 'Branch not found')),
+        );
+
+        final result = await repository.getCompletedServicesByBranch(
+          'branch-1',
+        );
+
+        expect(result.isLeft, true);
+        expect(result.left.message, 'Branch not found');
+      },
+    );
+
+    // ─── getCompletedServicesByMotorcycle ──────────────────────────
+
+    test(
+      'getCompletedServicesByMotorcycle delegates to datasource on success',
+      () async {
+        when(
+          mockDataSource.getCompletedServicesByMotorcycle(any),
+        ).thenAnswer((_) async => const Right(<CompletedServiceModel>[]));
+
+        final result = await repository.getCompletedServicesByMotorcycle(
+          'moto-1',
+        );
+
+        expect(result.isRight, true);
+        expect(result.right, isEmpty);
+        verify(
+          mockDataSource.getCompletedServicesByMotorcycle('moto-1'),
+        ).called(1);
+      },
+    );
+
+    test(
+      'getCompletedServicesByMotorcycle delegates to datasource on failure',
+      () async {
+        when(mockDataSource.getCompletedServicesByMotorcycle(any)).thenAnswer(
+          (_) async => Left(ErrorModel(errorCode: 'ERR', message: 'Not found')),
+        );
+
+        final result = await repository.getCompletedServicesByMotorcycle(
+          'moto-1',
+        );
+
+        expect(result.isLeft, true);
+        expect(result.left.message, 'Not found');
+      },
+    );
+
+    // ─── deleteCompletedService ────────────────────────────────────
+
+    test('deleteCompletedService delegates to datasource on success', () async {
+      when(
+        mockDataSource.deleteCompletedService(any),
+      ).thenAnswer((_) async => const Right('Servicio eliminado exitosamente'));
+
+      final result = await repository.deleteCompletedService('service-1');
+
+      expect(result.isRight, true);
+      expect(result.right, 'Servicio eliminado exitosamente');
+      verify(mockDataSource.deleteCompletedService('service-1')).called(1);
+    });
+
+    test('deleteCompletedService delegates to datasource on failure', () async {
+      when(mockDataSource.deleteCompletedService(any)).thenAnswer(
+        (_) async =>
+            Left(ErrorModel(errorCode: 'ERR', message: 'No se pudo eliminar')),
+      );
+
+      final result = await repository.deleteCompletedService('service-1');
+
+      expect(result.isLeft, true);
+      expect(result.left.message, 'No se pudo eliminar');
     });
   });
 }

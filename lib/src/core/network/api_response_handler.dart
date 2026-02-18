@@ -35,7 +35,8 @@ class ApiResponseHandler {
       return Left(DioErrorHandler.fromBackendError(responseData));
     }
 
-    final data = responseData['data'] as Map<String, dynamic>?;
+    final rawData = responseData['data'];
+    final data = rawData is Map<String, dynamic> ? rawData : null;
     return Right(data);
   }
 

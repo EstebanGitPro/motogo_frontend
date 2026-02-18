@@ -191,14 +191,14 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return fallback model when response is not Map', () async {
         when(
           mockDioClient.post('/branches/$testBranchId/schedules'),
         ).thenAnswer((_) async => createResponse('not a map'));
 
         final result = await dataSource.createSchedule(testBranchId);
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {
@@ -276,7 +276,7 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return fallback model when response is not Map', () async {
         when(
           mockDioClient.put(
             '/branches/$testBranchId/schedules',
@@ -286,7 +286,7 @@ void main() {
 
         final result = await dataSource.updateSchedule(testBranchId);
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {
@@ -431,14 +431,14 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return fallback model when response is not Map', () async {
         when(
           mockDioClient.put('/branches/$testBranchId/schedules/activate'),
         ).thenAnswer((_) async => createResponse('not a map'));
 
         final result = await dataSource.activateSchedule(testBranchId);
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {
@@ -749,7 +749,7 @@ void main() {
         expect(result.right.$2, 'Franja horaria creada exitosamente');
       });
 
-      test('should return ErrorModel when data is null', () async {
+      test('should return fallback model when data is null', () async {
         final responseData = {'success': true};
 
         when(
@@ -767,7 +767,7 @@ void main() {
           isClosed: false,
         );
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel when success is false', () async {
@@ -1136,7 +1136,7 @@ void main() {
         expect(result.right.$2, 'Excepción creada exitosamente');
       });
 
-      test('should return ErrorModel when data is null', () async {
+      test('should return fallback model when data is null', () async {
         final responseData = {'success': true};
 
         when(
@@ -1154,7 +1154,7 @@ void main() {
           isClosed: true,
         );
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel when success is false', () async {

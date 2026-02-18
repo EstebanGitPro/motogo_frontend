@@ -336,7 +336,7 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return default message when response is not Map', () async {
         when(
           mockDioClient.delete(
             '/motorcycles/$testMotorcycleId/permissions/$testBranchId',
@@ -348,7 +348,7 @@ void main() {
           branchId: testBranchId,
         );
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {

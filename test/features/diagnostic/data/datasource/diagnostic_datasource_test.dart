@@ -419,7 +419,7 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return default message when response is not Map', () async {
         when(
           mockDioClient.put(
             '/motorcycles/$testMotorcycleId/diagnostics/$testDiagnosticId',
@@ -433,7 +433,7 @@ void main() {
           data: {'problem_description': 'Updated'},
         );
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {
@@ -504,7 +504,7 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return default message when response is not Map', () async {
         when(
           mockDioClient.delete(
             '/motorcycles/$testMotorcycleId/diagnostics/$testDiagnosticId',
@@ -516,7 +516,7 @@ void main() {
           diagnosticId: testDiagnosticId,
         );
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
       });
 
       test('should return ErrorModel on DioException', () async {

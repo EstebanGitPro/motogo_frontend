@@ -181,14 +181,15 @@ void main() {
         expect(result.isLeft, isTrue);
       });
 
-      test('should return ErrorModel when response is not Map', () async {
+      test('should return empty list when response is not Map', () async {
         when(
           mockDioClient.get('/franchises'),
         ).thenAnswer((_) async => createResponse('not a map'));
 
         final result = await dataSource.listFranchises();
 
-        expect(result.isLeft, isTrue);
+        expect(result.isRight, isTrue);
+        expect(result.right, isEmpty);
       });
 
       test('should return ErrorModel on DioException', () async {

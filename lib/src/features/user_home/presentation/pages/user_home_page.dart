@@ -799,7 +799,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
       destLng: branch.longitude,
     );
 
-    if (!context.mounted) return; // NOSONAR
+    if (!mounted) return;
 
     if (result == null) {
       setState(() => _isLoadingRoute = false);

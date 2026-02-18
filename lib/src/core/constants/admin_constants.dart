@@ -2,19 +2,22 @@
 ///
 /// Use these constants instead of hardcoded strings for better maintainability.
 class AdminConstants {
+  // Shared labels
+  static const String serviceCatalogLabel = 'Catálogo de Servicios';
+
   // Page titles
   static const String adminHomeTitle = 'Panel de Administración';
-  static const String serviceCatalogTitle = 'Catálogo de Servicios';
+  static const String serviceCatalogTitle = serviceCatalogLabel;
   static const String editServiceTitle = 'Editar Servicio';
 
   // Menu items
   static const String menuHome = 'Inicio';
-  static const String menuServiceCatalog = 'Catálogo de Servicios';
+  static const String menuServiceCatalog = serviceCatalogLabel;
   static const String menuLogout = 'Cerrar Sesión';
   static const String menuAbout = 'Acerca de';
 
   // Dashboard cards
-  static const String cardServiceCatalog = 'Catálogo de Servicios';
+  static const String cardServiceCatalog = serviceCatalogLabel;
   static const String cardServiceCatalogSubtitle =
       'Gestionar servicios globales';
   static const String cardFuture = 'Próximamente';

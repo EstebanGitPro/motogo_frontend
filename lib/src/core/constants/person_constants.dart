@@ -2,8 +2,11 @@
 class PersonConstants {
   PersonConstants._();
 
+  // Shared labels
+  static const String deleteAccountLabel = 'Eliminar Cuenta';
+
   // Delete Account Dialog
-  static const String deleteAccountTitle = 'Eliminar Cuenta';
+  static const String deleteAccountTitle = deleteAccountLabel;
   static const String deleteAccountWarning =
       'Esta acción es IRREVERSIBLE.\n\n'
       'Al eliminar tu cuenta:\n'
@@ -13,10 +16,10 @@ class PersonConstants {
   static const String deleteAccountConfirmPrompt =
       'Escribe "eliminar" para confirmar:';
   static const String deleteAccountConfirmWord = 'eliminar';
-  static const String deleteAccountButton = 'Eliminar Cuenta';
+  static const String deleteAccountButton = deleteAccountLabel;
   static const String deleteAccountFallbackSuccess =
       'Cuenta eliminada exitosamente';
 
   // Menu
-  static const String deleteAccountMenuTitle = 'Eliminar Cuenta';
+  static const String deleteAccountMenuTitle = deleteAccountLabel;
 }

@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/core/catalogs/data/models/department_model.d
 import 'package:motogo_frontend/src/core/catalogs/data/models/displacement_range_model.dart';
 import 'package:motogo_frontend/src/core/catalogs/data/models/service_model.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/api_response_handler.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 
@@ -53,14 +54,11 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       final response = await _dioClient.get('/brands');
       final responseData = response.data;
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-        final brands = BrandModel.fromJsonList(responseData);
-        return Right(brands);
+      if (responseData is Map<String, dynamic>) {
+        return Right(BrandModel.fromJsonList(responseData));
       }
       return const Right([]);
     } on DioException catch (e) {
@@ -76,14 +74,11 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       final response = await _dioClient.get('/departments');
       final responseData = response.data;
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-        final departments = DepartmentModel.fromJsonList(responseData);
-        return Right(departments);
+      if (responseData is Map<String, dynamic>) {
+        return Right(DepartmentModel.fromJsonList(responseData));
       }
       return const Right([]);
     } on DioException catch (e) {
@@ -103,14 +98,11 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       );
       final responseData = response.data;
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-        final cities = CityModel.fromJsonList(responseData);
-        return Right(cities);
+      if (responseData is Map<String, dynamic>) {
+        return Right(CityModel.fromJsonList(responseData));
       }
       return const Right([]);
     } on DioException catch (e) {
@@ -126,19 +118,12 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       final response = await _dioClient.get('/branch-types');
       final responseData = response.data;
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-        // Extract data object that contains types array
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          final types = BranchTypeModel.fromJsonList(data);
-          return Right(types);
-        }
-        return const Right([]);
+      final data = validation.right;
+      if (data != null) {
+        return Right(BranchTypeModel.fromJsonList(data));
       }
       return const Right([]);
     } on DioException catch (e) {
@@ -159,29 +144,11 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       }
 
       final response = await _dioClient.get(endpoint);
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          final servicesList = data['services'] as List<dynamic>?;
-          if (servicesList != null) {
-            final services = servicesList
-                .map(
-                  (json) => ServiceModel.fromJson(json as Map<String, dynamic>),
-                )
-                .toList();
-            return Right(services);
-          }
-        }
-        return const Right([]);
-      }
-      return const Right([]);
+      return ApiResponseHandler.extractList(
+        response.data,
+        key: 'services',
+        fromJson: ServiceModel.fromJson,
+      );
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -193,27 +160,18 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
   Future<Either<ErrorModel, List<String>>> getServiceTypes() async {
     try {
       final response = await _dioClient.get('/service-types');
-      final responseData = response.data;
+      final validation = ApiResponseHandler.validate(response.data);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
+      final data = validation.right;
+      if (data != null) {
+        final typesList = data['types'] as List<dynamic>?;
+        if (typesList != null) {
+          final types = typesList
+              .map((json) => (json as Map<String, dynamic>)['value'] as String)
+              .toList();
+          return Right(types);
         }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          final typesList = data['types'] as List<dynamic>?;
-          if (typesList != null) {
-            final types = typesList
-                .map(
-                  (json) => (json as Map<String, dynamic>)['value'] as String,
-                )
-                .toList();
-            return Right(types);
-          }
-        }
-        return const Right([]);
       }
       return const Right([]);
     } on DioException catch (e) {
@@ -230,14 +188,11 @@ class CatalogsDataSourceImpl implements CatalogsDataSource {
       final response = await _dioClient.get('/engine-displacements');
       final responseData = response.data;
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-        final ranges = DisplacementRangeModel.fromJsonList(responseData);
-        return Right(ranges);
+      if (responseData is Map<String, dynamic>) {
+        return Right(DisplacementRangeModel.fromJsonList(responseData));
       }
       return const Right([]);
     } on DioException catch (e) {

@@ -65,7 +65,9 @@ class ServiceToggleCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(serviceType).withValues(alpha: 0.1),
+                      color: ServiceConstants.getServiceTypeColor(
+                        serviceType,
+                      ).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -73,7 +75,9 @@ class ServiceToggleCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: _getTypeColor(serviceType),
+                        color: ServiceConstants.getServiceTypeColor(
+                          serviceType,
+                        ),
                       ),
                     ),
                   ),
@@ -111,29 +115,6 @@ class ServiceToggleCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getTypeColor(String type) {
-    switch (type.toLowerCase()) {
-      case 'mantenimiento':
-        return const Color(0xFF3B82F6); // Blue
-      case 'reparación':
-        return const Color(0xFFF59E0B); // Orange
-      case 'llantas':
-        return const Color(0xFF10B981); // Green
-      case 'diagnóstico':
-        return const Color(0xFF8B5CF6); // Purple
-      case 'estética':
-        return const Color(0xFFEC4899); // Pink
-      case 'accesorios':
-        return const Color(0xFF06B6D4); // Cyan
-      case 'eléctrico':
-        return const Color(0xFFEAB308); // Yellow
-      case 'legal':
-        return const Color(0xFF6B7280); // Gray
-      default:
-        return Colors.grey;
-    }
   }
 
   String _formatDate(DateTime date) {

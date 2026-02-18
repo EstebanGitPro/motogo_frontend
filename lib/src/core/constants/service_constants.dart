@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Constants for the services feature.
 ///
 /// Use these constants instead of hardcoded strings for better maintainability.
@@ -83,4 +85,35 @@ class ServiceConstants {
     filterElectrical,
     filterLegal,
   ];
+
+  /// Returns the color associated with a service type.
+  ///
+  /// This mapping is the canonical source of truth for service type colors
+  /// used across service cards and toggle cards.
+  static Color getServiceTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'mantenimiento':
+        return const Color(0xFF3B82F6); // Blue
+      case 'reparación':
+      case 'reparacion':
+        return const Color(0xFFF59E0B); // Orange
+      case 'llantas':
+        return const Color(0xFF10B981); // Green
+      case 'diagnóstico':
+      case 'diagnostico':
+        return const Color(0xFF8B5CF6); // Purple
+      case 'estética':
+      case 'estetica':
+        return const Color(0xFFEC4899); // Pink
+      case 'accesorios':
+        return const Color(0xFF06B6D4); // Cyan
+      case 'eléctrico':
+      case 'electrico':
+        return const Color(0xFFEAB308); // Yellow
+      case 'legal':
+        return const Color(0xFF6B7280); // Gray
+      default:
+        return Colors.grey;
+    }
+  }
 }

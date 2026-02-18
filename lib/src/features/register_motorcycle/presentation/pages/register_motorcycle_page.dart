@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/widgets/gradient_header_card.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
 import 'package:motogo_frontend/src/core/widgets/image_picker_widget.dart';
@@ -111,7 +112,15 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _buildHeader(),
+                              GradientHeaderCard(
+                                icon: Icons.two_wheeler,
+                                title: MotorcycleConstants.basicInfoTitle,
+                                subtitle: MotorcycleConstants.basicInfoSubtitle,
+                                gradientColors: [
+                                  Colors.blue[600]!,
+                                  Colors.blue[400]!,
+                                ],
+                              ),
                               const SizedBox(height: 16),
                               _buildImageSection(isLoading),
                               const SizedBox(height: 24),
@@ -144,60 +153,6 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[600]!, Colors.blue[400]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.two_wheeler, size: 40, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  MotorcycleConstants.basicInfoTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  MotorcycleConstants.basicInfoSubtitle,
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

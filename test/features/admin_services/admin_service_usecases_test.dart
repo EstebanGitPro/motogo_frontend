@@ -17,6 +17,7 @@ void main() {
     id: 'svc-1',
     name: 'Cambio de aceite',
     serviceType: 'MAINTENANCE',
+    isActive: true,
   );
   final errorModel = ErrorModel(
     message: 'Error de prueba',
@@ -30,7 +31,9 @@ void main() {
   setUpAll(() {
     provideDummy<Either<ErrorModel, List<AdminServiceEntity>>>(const Right([]));
     provideDummy<Either<ErrorModel, AdminServiceEntity>>(
-      Right(AdminServiceEntity(id: '', name: '', serviceType: '')),
+      Right(
+        AdminServiceEntity(id: '', name: '', serviceType: '', isActive: false),
+      ),
     );
     provideDummy<Either<ErrorModel, String>>(const Right(''));
   });

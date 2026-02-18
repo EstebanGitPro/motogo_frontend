@@ -55,109 +55,118 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
   }
 
   Future<void> _onSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedBrandIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+    if (!_formKey.currentState!.validate()) return;
+
+    if (!_validateCatalogs()) return;
+
+    String? profileImageUrl = await _resolveImageUrl();
+    if (profileImageUrl == null && _selectedImage != null) return;
+
+    // Get selected city and department names for geocoding
+    final selectedCity = availableCities.firstWhere(
+      (c) => c.id == _selectedCityId,
+    );
+    final selectedDepartment = availableDepartments.firstWhere(
+      (d) => d.id == _selectedDepartmentId,
+    );
+
+    final branch = BranchEntity(
+      name: _nameController.text.trim(),
+      establishmentType: _selectedEstablishmentType!,
+      catalogs: BranchCatalogs(
+        brands: _selectedBrandIds,
+        displacementRanges: _selectedDisplacementRanges,
+      ),
+      location: BranchLocation(
+        address: _addressController.text.trim(),
+        cityId: _selectedCityId!,
+        cityName: selectedCity.name,
+        departmentId: _selectedDepartmentId!,
+        departmentName: selectedDepartment.name,
+      ),
+      profileImageUrl: profileImageUrl,
+    );
+
+    if (!mounted) return;
+
+    context.read<RegisterBranchBloc>().add(
+      RegisterBranchSubmitted(branch: branch),
+    );
+  }
+
+  bool _validateCatalogs() {
+    if (_selectedBrandIds.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
           const SnackBar(
             content: Text(BranchConstants.brandRequired),
             backgroundColor: Colors.orange,
           ),
         );
-        return;
-      }
-
-      if (_selectedCityId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      return false;
+    }
+    if (_selectedCityId == null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
           const SnackBar(
             content: Text(BranchConstants.locationRequired),
             backgroundColor: Colors.orange,
           ),
         );
-        return;
-      }
-
-      String? profileImageUrl = _uploadedImageUrl;
-
-      // Upload image if selected and not already uploaded
-      if (_selectedImage != null && _uploadedImageUrl == null) {
-        setState(() => _isUploadingImage = true);
-
-        final storageService = InjectorApp.resolve<StorageService>();
-
-        // Generate a temporary ID for the upload path
-        final tempBranchId = const Uuid().v4();
-
-        final uploadResult = await storageService.uploadBranchImage(
-          branchId: tempBranchId,
-          file: _selectedImage!,
-        );
-
-        if (!mounted) return;
-
-        uploadResult.fold(
-          (error) {
-            setState(() => _isUploadingImage = false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${BranchConstants.errorUploadingImage}: ${error.message}',
-                ),
-                backgroundColor: Colors.red,
-                action: SnackBarAction(
-                  label: BranchConstants.retry,
-                  textColor: Colors.white,
-                  onPressed: _onSubmit,
-                ),
-              ),
-            );
-            return;
-          },
-          (url) {
-            profileImageUrl = url;
-            setState(() {
-              _isUploadingImage = false;
-              _uploadedImageUrl = url;
-            });
-          },
-        );
-
-        // If upload failed, don't continue
-        if (profileImageUrl == null && _selectedImage != null) {
-          return;
-        }
-      }
-
-      // Get selected city and department names for geocoding
-      final selectedCity = availableCities.firstWhere(
-        (c) => c.id == _selectedCityId,
-      );
-      final selectedDepartment = availableDepartments.firstWhere(
-        (d) => d.id == _selectedDepartmentId,
-      );
-
-      final branch = BranchEntity(
-        name: _nameController.text.trim(),
-        establishmentType: _selectedEstablishmentType!,
-        catalogs: BranchCatalogs(
-          brands: _selectedBrandIds,
-          displacementRanges: _selectedDisplacementRanges,
-        ),
-        location: BranchLocation(
-          address: _addressController.text.trim(),
-          cityId: _selectedCityId!,
-          cityName: selectedCity.name,
-          departmentId: _selectedDepartmentId!,
-          departmentName: selectedDepartment.name,
-        ),
-        profileImageUrl: profileImageUrl,
-      );
-
-      if (!mounted) return;
-
-      context.read<RegisterBranchBloc>().add(
-        RegisterBranchSubmitted(branch: branch),
-      );
+      return false;
     }
+    return true;
+  }
+
+  /// Uploads the selected image if needed, and returns the profile image URL.
+  /// Returns null if the upload fails and an image was selected.
+  Future<String?> _resolveImageUrl() async {
+    if (_selectedImage == null || _uploadedImageUrl != null) {
+      return _uploadedImageUrl;
+    }
+
+    setState(() => _isUploadingImage = true);
+
+    final storageService = InjectorApp.resolve<StorageService>();
+    final tempBranchId = const Uuid().v4();
+
+    final uploadResult = await storageService.uploadBranchImage(
+      branchId: tempBranchId,
+      file: _selectedImage!,
+    );
+
+    if (!mounted) return null;
+
+    return uploadResult.fold(
+      (error) {
+        setState(() => _isUploadingImage = false);
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                '${BranchConstants.errorUploadingImage}: ${error.message}',
+              ),
+              backgroundColor: Colors.red,
+              action: SnackBarAction(
+                label: BranchConstants.retry,
+                textColor: Colors.white,
+                onPressed: _onSubmit,
+              ),
+            ),
+          );
+        return null;
+      },
+      (url) {
+        setState(() {
+          _isUploadingImage = false;
+          _uploadedImageUrl = url;
+        });
+        return url;
+      },
+    );
   }
 
   @override
@@ -174,23 +183,27 @@ class _RegisterBranchPageState extends State<RegisterBranchPage>
           ScaffoldMessenger.of(context).clearSnackBars();
 
           if (state is RegisterBranchSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             // Navigate back after success
             Navigator.pop(context, true);
           } else if (state is RegisterBranchFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.error.message),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
           }
         },
         builder: (context, state) {

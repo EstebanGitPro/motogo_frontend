@@ -30,7 +30,6 @@ class _$InjectorApp extends InjectorApp {
       ..registerFactory(
         (c) => RegisterPersonUseCase(c.resolve<RegisterPersonRepository>()),
       )
-      ..registerFactory((c) => RegisterPersonDataSource())
       ..registerFactory<LoginRepository>(
         (c) => LoginRepositoryImpl(c.resolve<LoginDataSource>()),
       )

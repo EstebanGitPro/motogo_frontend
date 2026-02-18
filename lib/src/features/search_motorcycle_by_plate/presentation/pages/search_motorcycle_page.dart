@@ -3,6 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/helpers/service_status_helpers.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_detail_page.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_list_page.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/register_service_bottom_sheet.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/domain/entities/motorcycle_evidence_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
@@ -59,34 +64,22 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
         foregroundColor: Colors.white,
       ),
       body: BlocConsumer<SearchMotorcycleBloc, SearchMotorcycleState>(
+        listenWhen: (previous, current) {
+          final previousPayload = _resolveSnackPayload(previous);
+          final currentPayload = _resolveSnackPayload(current);
+          return previousPayload?.key != currentPayload?.key;
+        },
         listener: (context, state) {
-          if (state is SearchMotorcycleError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+          final payload = _resolveSnackPayload(state);
+          if (payload != null) {
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
+                content: Text(payload.message),
+                backgroundColor: payload.backgroundColor,
               ),
             );
-          }
-          if (state is SearchMotorcycleLoaded) {
-            if (state.solutionMessage != null &&
-                state.solutionMessage!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.solutionMessage!),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            }
-            if (state.solutionError != null &&
-                state.solutionError!.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.solutionError!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
           }
         },
         builder: (context, state) {
@@ -103,6 +96,11 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                   _buildEvidenceGallery(state.motorcycle.evidence),
                   const SizedBox(height: 24),
                   _buildDiagnosticsSection(state.motorcycle.diagnostics),
+                  const SizedBox(height: 24),
+                  _buildPendingServicesAlert(state),
+                  _buildRegisterServiceButton(state),
+                  const SizedBox(height: 24),
+                  _buildServicesCard(state),
                 ],
                 if (state is SearchMotorcycleLoading)
                   const Center(
@@ -116,6 +114,51 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
           );
         },
       ),
+    );
+  }
+
+  _SnackPayload? _resolveSnackPayload(SearchMotorcycleState state) {
+    if (state is SearchMotorcycleError) {
+      return _tryBuildSnackPayload(state.message, 'search-error', Colors.red);
+    }
+
+    if (state is SearchMotorcycleLoaded) {
+      return _tryBuildSnackPayload(
+            state.solutionError,
+            'solution-error',
+            Colors.red,
+          ) ??
+          _tryBuildSnackPayload(
+            state.serviceRegistrationError,
+            'service-error',
+            Colors.red,
+          ) ??
+          _tryBuildSnackPayload(
+            state.solutionMessage,
+            'solution-success',
+            Colors.green,
+          ) ??
+          _tryBuildSnackPayload(
+            state.serviceRegistrationMessage,
+            'service-success',
+            Colors.green,
+          );
+    }
+
+    return null;
+  }
+
+  _SnackPayload? _tryBuildSnackPayload(
+    String? raw,
+    String keyPrefix,
+    Color backgroundColor,
+  ) {
+    final message = raw?.trim();
+    if (message == null || message.isEmpty) return null;
+    return _SnackPayload(
+      key: '$keyPrefix:$message',
+      message: message,
+      backgroundColor: backgroundColor,
     );
   }
 
@@ -711,6 +754,349 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
       ],
     );
   }
+
+  /// Returns the list of active (non-terminal) services for this motorcycle.
+  List<CompletedServiceEntity> _getActiveServices(
+    SearchMotorcycleLoaded state,
+  ) {
+    return state.serviceHistory
+        .where(
+          (s) =>
+              s.status.toUpperCase() != 'FINALIZADO' &&
+              s.status.toUpperCase() != 'CANCELADO',
+        )
+        .toList();
+  }
+
+  /// Shows a warning card when the motorcycle has active services
+  /// (SOLICITADO or EN_PROCESO) to prevent the representative from
+  /// filling out the form only to get a backend rejection.
+  Widget _buildPendingServicesAlert(SearchMotorcycleLoaded state) {
+    final activeServices = _getActiveServices(state);
+    if (activeServices.isEmpty) return const SizedBox.shrink();
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: Colors.amber[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.amber[800],
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    MotorcycleConstants.pendingServicesTitle,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[900],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${activeServices.length}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[800],
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              MotorcycleConstants.pendingServicesSubtitle,
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 12),
+            ...activeServices.map(
+              (service) => _buildPendingServiceTile(service),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingServiceTile(CompletedServiceEntity service) {
+    final statusLabel = getStatusLabel(service.status);
+    final statusColor = getStatusColor(service.status);
+    final dateLabel = formatServiceDate(service.requestDate);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => BlocProvider.value(
+                value: context.read<SearchMotorcycleBloc>(),
+                child: ServiceDetailPage(service: service),
+              ),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (service.branchName != null)
+                      Text(
+                        service.branchName!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    Text(
+                      dateLabel,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRegisterServiceButton(SearchMotorcycleLoaded state) {
+    final hasActiveServices = _getActiveServices(state).isNotEmpty;
+    final isDisabled = state.isRegisteringService || hasActiveServices;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDisabled ? Colors.grey[100] : Colors.blue[50],
+      child: InkWell(
+        onTap: isDisabled ? null : () => _showRegisterServiceSheet(state),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Icon(
+                Icons.build_circle,
+                size: 40,
+                color: isDisabled ? Colors.grey : Colors.blue[700],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MotorcycleConstants.registerServiceButton,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDisabled ? Colors.grey : Colors.blue[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasActiveServices
+                          ? MotorcycleConstants.registerBlockedSubtitle
+                          : MotorcycleConstants.registerServiceSubtitle,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              if (state.isRegisteringService)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: isDisabled ? Colors.grey[400] : Colors.blue[700],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRegisterServiceSheet(SearchMotorcycleLoaded state) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        return RegisterServiceBottomSheet(
+          motorcycleId: state.motorcycle.id,
+          onSubmit:
+              ({
+                required String branchId,
+                required List<String> serviceIds,
+                double? quotedPrice,
+                double? finalPrice,
+                String? representativeNotes,
+              }) {
+                context.read<SearchMotorcycleBloc>().add(
+                  RegisterCompletedService(
+                    branchId: branchId,
+                    motorcycleId: state.motorcycle.id,
+                    serviceIds: serviceIds,
+                    quotedPrice: quotedPrice,
+                    finalPrice: finalPrice,
+                    representativeNotes: representativeNotes,
+                  ),
+                );
+              },
+        );
+      },
+    );
+  }
+
+  Widget _buildServicesCard(SearchMotorcycleLoaded state) {
+    final count = state.serviceHistory.length;
+    final hasServices = count > 0;
+    final pluralSuffix = count > 1 ? 's' : '';
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: state.loadingHistory
+            ? null
+            : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<SearchMotorcycleBloc>(),
+                      child: ServiceListPage(services: state.serviceHistory),
+                    ),
+                  ),
+                );
+              },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(
+                Icons.build_circle,
+                size: 40,
+                color: state.loadingHistory ? Colors.grey : Colors.orange[700],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MotorcycleConstants.servicesCardTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: state.loadingHistory
+                            ? Colors.grey
+                            : Colors.orange[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasServices
+                          ? '$count servicio$pluralSuffix registrado$pluralSuffix'
+                          : MotorcycleConstants.servicesCardSubtitle,
+                      style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              if (state.loadingHistory)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              else ...[
+                if (hasServices)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$count',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange[800],
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 18,
+                  color: Colors.orange[700],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Formatter that converts all input text to uppercase.
@@ -725,4 +1111,16 @@ class UpperCaseTextFormatter extends TextInputFormatter {
       selection: newValue.selection,
     );
   }
+}
+
+class _SnackPayload {
+  final String key;
+  final String message;
+  final Color backgroundColor;
+
+  const _SnackPayload({
+    required this.key,
+    required this.message,
+    required this.backgroundColor,
+  });
 }

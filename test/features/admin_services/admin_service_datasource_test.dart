@@ -339,7 +339,7 @@ void main() {
         expect(result.left, isA<ErrorModel>());
       });
 
-      test('should return parse error when response is not Map', () async {
+      test('should return fallback model when response is not Map', () async {
         // Arrange
         when(
           mockDioClient.put(
@@ -356,8 +356,9 @@ void main() {
         );
 
         // Assert
-        expect(result.isLeft, isTrue);
-        expect(result.left.errorCode, 'PARSE_ERROR');
+        expect(result.isRight, isTrue);
+        expect(result.right.id, 'service-123');
+        expect(result.right.name, 'Test');
       });
 
       test('should return ErrorModel on DioException', () async {

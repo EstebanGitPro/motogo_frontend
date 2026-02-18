@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # Flag para deshabilitar coverage temporalmente
-SKIP_COVERAGE=true
+SKIP_COVERAGE=false
 
 if [ "$SKIP_COVERAGE" = true ]; then
     echo "⚠️ Coverage omitido para commits iniciales"

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/api_response_handler.dart';
+import 'package:motogo_frontend/src/core/network/datasource_response_mixin.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/data/datasources/branch_schedule_datasource.dart';
@@ -13,7 +15,9 @@ import 'package:motogo_frontend/src/features/branch_schedules/data/models/schedu
 /// Implementation of [BranchScheduleDataSource].
 ///
 /// Uses [DioClient] for HTTP requests with automatic token handling.
-class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
+class BranchScheduleDataSourceImpl
+    with DataSourceResponseMixin
+    implements BranchScheduleDataSource {
   final DioClient _dioClient;
 
   BranchScheduleDataSourceImpl(this._dioClient);
@@ -26,21 +30,10 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
       final response = await _dioClient.get(
         ScheduleConstants.getSchedulesPath(branchId),
       );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          return Right(ScheduleModel.fromJson(data));
-        }
-        return const Right(null);
-      }
-      return const Right(null);
+      return ApiResponseHandler.extractObject(
+        response.data,
+        fromJson: ScheduleModel.fromJson,
+      );
     } on DioException catch (e) {
       // 404 means no schedule exists - this is a valid state
       if (e.response?.statusCode == 404) {
@@ -61,34 +54,23 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
         ScheduleConstants.getSchedulesPath(branchId),
       );
       final responseData = response.data;
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.scheduleCreated;
-        if (data != null) {
-          return Right((ScheduleModel.fromJson(data), message));
-        }
-
-        // Fallback: create with minimal data
-        return Right((
-          ScheduleModel(id: '', branchId: branchId, active: true),
-          message,
-        ));
+      final message = ApiResponseHandler.extractMessage(
+        responseData,
+        ScheduleConstants.scheduleCreated,
+      );
+      final data = validation.right;
+      if (data != null) {
+        return Right((ScheduleModel.fromJson(data), message));
       }
 
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
-        ),
-      );
+      // Fallback: create with minimal data
+      return Right((
+        ScheduleModel(id: '', branchId: branchId, active: true),
+        message,
+      ));
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -115,40 +97,29 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
         data: body,
       );
       final responseData = response.data;
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.scheduleUpdated;
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          return Right((ScheduleModel.fromJson(data), message));
-        }
-
-        // Fallback: return with provided values
-        return Right((
-          ScheduleModel(
-            id: '',
-            branchId: branchId,
-            active: active ?? true,
-            startDate: startDate,
-            endDate: endDate,
-          ),
-          message,
-        ));
+      final message = ApiResponseHandler.extractMessage(
+        responseData,
+        ScheduleConstants.scheduleUpdated,
+      );
+      final data = validation.right;
+      if (data != null) {
+        return Right((ScheduleModel.fromJson(data), message));
       }
 
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
+      // Fallback: return with provided values
+      return Right((
+        ScheduleModel(
+          id: '',
+          branchId: branchId,
+          active: active ?? true,
+          startDate: startDate,
+          endDate: endDate,
         ),
-      );
+        message,
+      ));
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -165,112 +136,63 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
 
   @override
   Future<Either<ErrorModel, String>> deleteSchedule(String branchId) async {
-    try {
-      final response = await _dioClient.delete(
-        ScheduleConstants.getSchedulesPath(branchId),
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultDeleteMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultDeleteMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+    return handleMessageResponse(
+      () => _dioClient.delete(ScheduleConstants.getSchedulesPath(branchId)),
+      ScheduleConstants.defaultDeleteMessage,
+    );
   }
 
   @override
   Future<Either<ErrorModel, (ScheduleModel, String)>> activateSchedule(
     String branchId,
   ) async {
-    try {
-      final response = await _dioClient.put(
-        ScheduleConstants.getActivatePath(branchId),
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.scheduleActivated;
-        if (data != null) {
-          return Right((ScheduleModel.fromJson(data), message));
-        }
-
-        // Fallback: return with active = true
-        return Right((
-          ScheduleModel(id: '', branchId: branchId, active: true),
-          message,
-        ));
-      }
-
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
-        ),
-      );
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+    return _handleScheduleToggle(
+      ScheduleConstants.getActivatePath(branchId),
+      branchId,
+      true,
+      ScheduleConstants.scheduleActivated,
+    );
   }
 
   @override
   Future<Either<ErrorModel, (ScheduleModel, String)>> deactivateSchedule(
     String branchId,
   ) async {
+    return _handleScheduleToggle(
+      ScheduleConstants.getDeactivatePath(branchId),
+      branchId,
+      false,
+      ScheduleConstants.scheduleDeactivated,
+    );
+  }
+
+  /// Shared handler for activate/deactivate schedule operations.
+  Future<Either<ErrorModel, (ScheduleModel, String)>> _handleScheduleToggle(
+    String path,
+    String branchId,
+    bool activeState,
+    String defaultMessage,
+  ) async {
     try {
-      final response = await _dioClient.put(
-        ScheduleConstants.getDeactivatePath(branchId),
-      );
+      final response = await _dioClient.put(path);
       final responseData = response.data;
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.scheduleDeactivated;
-        if (data != null) {
-          return Right((ScheduleModel.fromJson(data), message));
-        }
-
-        // Fallback: return with active = false
-        return Right((
-          ScheduleModel(id: '', branchId: branchId, active: false),
-          message,
-        ));
+      final message = ApiResponseHandler.extractMessage(
+        responseData,
+        defaultMessage,
+      );
+      final data = validation.right;
+      if (data != null) {
+        return Right((ScheduleModel.fromJson(data), message));
       }
 
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
-        ),
-      );
+      // Fallback: return with active state
+      return Right((
+        ScheduleModel(id: '', branchId: branchId, active: activeState),
+        message,
+      ));
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -284,27 +206,11 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
       final response = await _dioClient.get(
         ScheduleConstants.daysCatalogEndpoint,
       );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          final daysList = data['days'] as List<dynamic>?;
-          if (daysList != null) {
-            final days = daysList
-                .map((json) => DayModel.fromJson(json as Map<String, dynamic>))
-                .toList();
-            return Right(days);
-          }
-        }
-        return const Right([]);
-      }
-      return const Right([]);
+      return ApiResponseHandler.extractList(
+        response.data,
+        key: 'days',
+        fromJson: DayModel.fromJson,
+      );
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -321,32 +227,11 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     try {
       final path = ScheduleConstants.getScheduleDetailsPath(branchId);
       final response = await _dioClient.get(path);
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'];
-        if (data is Map<String, dynamic>) {
-          // API returns { "data": { "details": [...], "_links": [...] } }
-          final detailsList = data['details'];
-          if (detailsList is List) {
-            final details = detailsList
-                .map(
-                  (json) => ScheduleDetailModel.fromJson(
-                    json as Map<String, dynamic>,
-                  ),
-                )
-                .toList();
-            return Right(details);
-          }
-        }
-        return const Right([]);
-      }
-      return const Right([]);
+      return ApiResponseHandler.extractList(
+        response.data,
+        key: 'details',
+        fromJson: ScheduleDetailModel.fromJson,
+      );
     } on DioException catch (e) {
       // 404 means no details exist - return empty list
       if (e.response?.statusCode == 404) {
@@ -367,47 +252,20 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     required String closingTime,
     required bool isClosed,
   }) async {
-    try {
-      final body = <String, dynamic>{
-        'entry_type': 'REGULAR',
-        'day_of_week': dayOfWeek,
-        'opening_time': openingTime,
-        'closing_time': closingTime,
-        'is_closed': isClosed,
-      };
-
-      final response = await _dioClient.post(
+    return handleModelWithMessageResponse(
+      () => _dioClient.post(
         ScheduleConstants.getScheduleDetailsPath(branchId),
-        data: body,
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.timeSlotCreated;
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          return Right((ScheduleDetailModel.fromJson(data), message));
-        }
-      }
-
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
-        ),
-      );
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+        data: <String, dynamic>{
+          'entry_type': 'REGULAR',
+          'day_of_week': dayOfWeek,
+          'opening_time': openingTime,
+          'closing_time': closingTime,
+          'is_closed': isClosed,
+        },
+      ),
+      ScheduleDetailModel.fromJson,
+      ScheduleConstants.timeSlotCreated,
+    );
   }
 
   @override
@@ -417,67 +275,29 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     required String closingTime,
     required bool isClosed,
   }) async {
-    try {
-      final body = <String, dynamic>{
-        'opening_time': openingTime,
-        'closing_time': closingTime,
-        'is_closed': isClosed,
-      };
-
-      final response = await _dioClient.put(
+    return handleMessageResponse(
+      () => _dioClient.put(
         '${ScheduleConstants.scheduleDetailEndpoint}/$detailId',
-        data: body,
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        // Backend returns success message without updated entity
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultUpdateDetailMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultUpdateDetailMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+        data: <String, dynamic>{
+          'opening_time': openingTime,
+          'closing_time': closingTime,
+          'is_closed': isClosed,
+        },
+      ),
+      ScheduleConstants.defaultUpdateDetailMessage,
+    );
   }
 
   @override
   Future<Either<ErrorModel, String>> deleteScheduleDetail(
     String detailId,
   ) async {
-    try {
-      final response = await _dioClient.delete(
+    return handleMessageResponse(
+      () => _dioClient.delete(
         '${ScheduleConstants.scheduleDetailEndpoint}/$detailId',
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultDeleteDetailMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultDeleteDetailMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+      ),
+      ScheduleConstants.defaultDeleteDetailMessage,
+    );
   }
 
   // ========== Schedule Exceptions Implementation (HU20-25) ==========
@@ -488,32 +308,11 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     try {
       final path = ScheduleConstants.getScheduleExceptionsPath(branchId);
       final response = await _dioClient.get(path);
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'];
-        if (data is Map<String, dynamic>) {
-          // API returns { "data": { "exceptions": [...], "_links": [...] } }
-          final exceptionsList = data['exceptions'];
-          if (exceptionsList is List) {
-            final exceptions = exceptionsList
-                .map(
-                  (json) => ScheduleExceptionModel.fromJson(
-                    json as Map<String, dynamic>,
-                  ),
-                )
-                .toList();
-            return Right(exceptions);
-          }
-        }
-        return const Right([]);
-      }
-      return const Right([]);
+      return ApiResponseHandler.extractList(
+        response.data,
+        key: 'exceptions',
+        fromJson: ScheduleExceptionModel.fromJson,
+      );
     } on DioException catch (e) {
       // 404 means no exceptions exist - return empty list
       if (e.response?.statusCode == 404) {
@@ -535,48 +334,21 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     required String closingTime,
     required bool isClosed,
   }) async {
-    try {
-      final body = <String, dynamic>{
-        'exception_start_date': exceptionStartDate,
-        if (exceptionEndDate != null && exceptionEndDate.isNotEmpty)
-          'exception_end_date': exceptionEndDate,
-        'opening_time': openingTime,
-        'closing_time': closingTime,
-        'is_closed': isClosed,
-      };
-
-      final response = await _dioClient.post(
+    return handleModelWithMessageResponse(
+      () => _dioClient.post(
         ScheduleConstants.getScheduleExceptionsPath(branchId),
-        data: body,
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.exceptionCreated;
-        if (data != null) {
-          return Right((ScheduleExceptionModel.fromJson(data), message));
-        }
-      }
-
-      return Left(
-        ErrorModel(
-          errorCode: ScheduleConstants.parseErrorCode,
-          message: ScheduleConstants.parseErrorMessage,
-        ),
-      );
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+        data: <String, dynamic>{
+          'exception_start_date': exceptionStartDate,
+          if (exceptionEndDate != null && exceptionEndDate.isNotEmpty)
+            'exception_end_date': exceptionEndDate,
+          'opening_time': openingTime,
+          'closing_time': closingTime,
+          'is_closed': isClosed,
+        },
+      ),
+      ScheduleExceptionModel.fromJson,
+      ScheduleConstants.exceptionCreated,
+    );
   }
 
   @override
@@ -586,129 +358,52 @@ class BranchScheduleDataSourceImpl implements BranchScheduleDataSource {
     required String closingTime,
     required bool isClosed,
   }) async {
-    try {
-      // Note: Dates cannot be modified per API spec
-      final body = <String, dynamic>{
-        'opening_time': openingTime,
-        'closing_time': closingTime,
-        'is_closed': isClosed,
-      };
-
-      final response = await _dioClient.put(
+    return handleMessageResponse(
+      () => _dioClient.put(
         '${ScheduleConstants.scheduleExceptionEndpoint}/$exceptionId',
-        data: body,
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        // Backend returns success message without data object
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.exceptionUpdated;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.exceptionUpdated);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+        data: <String, dynamic>{
+          'opening_time': openingTime,
+          'closing_time': closingTime,
+          'is_closed': isClosed,
+        },
+      ),
+      ScheduleConstants.exceptionUpdated,
+    );
   }
 
   @override
   Future<Either<ErrorModel, String>> deleteScheduleException(
     String exceptionId,
   ) async {
-    try {
-      final response = await _dioClient.delete(
+    return handleMessageResponse(
+      () => _dioClient.delete(
         '${ScheduleConstants.scheduleExceptionEndpoint}/$exceptionId',
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultDeleteExceptionMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultDeleteExceptionMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+      ),
+      ScheduleConstants.defaultDeleteExceptionMessage,
+    );
   }
 
   @override
   Future<Either<ErrorModel, String>> activateScheduleException(
     String exceptionId,
   ) async {
-    try {
-      final response = await _dioClient.put(
+    return handleMessageResponse(
+      () => _dioClient.put(
         ScheduleConstants.getExceptionActivatePath(exceptionId),
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        // Backend returns success message without updated entity
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultActivateExceptionMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultActivateExceptionMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+      ),
+      ScheduleConstants.defaultActivateExceptionMessage,
+    );
   }
 
   @override
   Future<Either<ErrorModel, String>> deactivateScheduleException(
     String exceptionId,
   ) async {
-    try {
-      final response = await _dioClient.put(
+    return handleMessageResponse(
+      () => _dioClient.put(
         ScheduleConstants.getExceptionDeactivatePath(exceptionId),
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        // Backend returns success message without updated entity
-        final message =
-            responseData['message'] as String? ??
-            ScheduleConstants.defaultDeactivateExceptionMessage;
-        return Right(message);
-      }
-
-      return const Right(ScheduleConstants.defaultDeactivateExceptionMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+      ),
+      ScheduleConstants.defaultDeactivateExceptionMessage,
+    );
   }
 }

@@ -152,6 +152,18 @@ import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/r
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/set_solution_usecase.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
+// Features - Completed Services
+import 'package:motogo_frontend/src/features/completed_services/data/datasources/completed_services_datasource.dart';
+import 'package:motogo_frontend/src/features/completed_services/data/repositories/completed_services_repository_impl.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/repositories/completed_services_repository.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_history_usecase.dart';
+// Features - Motorcycle History
+import 'package:motogo_frontend/src/features/motorcycle_history/domain/usecases/get_motorcycle_history_usecase.dart';
+import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart';
 // Features - Service Ratings
 import 'package:motogo_frontend/src/features/service_ratings/data/datasources/rating_range_datasource.dart';
 import 'package:motogo_frontend/src/features/service_ratings/data/repositories/rating_range_repository_impl.dart';
@@ -295,6 +307,11 @@ abstract class InjectorApp {
     // Email Recovery - has its own Dio (public endpoint, no auth)
     container.registerFactory<EmailRecoveryVerificationDataSource>(
       (c) => EmailRecoveryVerificationDataSource(),
+    );
+
+    // Register Person - has its own Dio (public endpoint, no auth)
+    container.registerFactory<RegisterPersonDataSource>(
+      (c) => RegisterPersonDataSource(),
     );
 
     // Register Franchise - uses DioClient
@@ -485,6 +502,49 @@ abstract class InjectorApp {
       (c) => SetSolutionUseCase(c.resolve<SearchMotorcycleRepository>()),
     );
 
+    // Completed Services
+    container.registerFactory<CompletedServicesDataSource>(
+      (c) => CompletedServicesDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<CompletedServicesRepository>(
+      (c) => CompletedServicesRepositoryImpl(
+        c.resolve<CompletedServicesDataSource>(),
+      ),
+    );
+    container.registerFactory<RegisterCompletedServiceUseCase>(
+      (c) => RegisterCompletedServiceUseCase(
+        c.resolve<CompletedServicesRepository>(),
+      ),
+    );
+    container.registerFactory<GetServiceHistoryUseCase>(
+      (c) => GetServiceHistoryUseCase(c.resolve<CompletedServicesRepository>()),
+    );
+
+    // Motorcycle History - UseCase and BLoC
+    container.registerFactory<GetMotorcycleHistoryUseCase>(
+      (c) =>
+          GetMotorcycleHistoryUseCase(c.resolve<CompletedServicesRepository>()),
+    );
+    container.registerFactory<MotorcycleHistoryBloc>(
+      (c) => MotorcycleHistoryBloc(
+        getMotorcycleHistoryUseCase: c.resolve<GetMotorcycleHistoryUseCase>(),
+      ),
+    );
+    container.registerFactory<UpdateServiceStatusUseCase>(
+      (c) =>
+          UpdateServiceStatusUseCase(c.resolve<CompletedServicesRepository>()),
+    );
+    container.registerFactory<GetServiceTransitionsUseCase>(
+      (c) => GetServiceTransitionsUseCase(
+        c.resolve<CompletedServicesRepository>(),
+      ),
+    );
+    container.registerFactory<DeleteCompletedServiceUseCase>(
+      (c) => DeleteCompletedServiceUseCase(
+        c.resolve<CompletedServicesRepository>(),
+      ),
+    );
+
     // Technical Catalogs - Brand Lines (HU40)
     container.registerFactory<BrandLinesDataSource>(
       (c) => BrandLinesDataSourceImpl(c.resolve<DioClient>()),
@@ -597,6 +657,13 @@ abstract class InjectorApp {
       (c) => SearchMotorcycleBloc(
         searchUseCase: c.resolve<SearchMotorcycleByPlateUseCase>(),
         setSolutionUseCase: c.resolve<SetSolutionUseCase>(),
+        registerServiceUseCase: c.resolve<RegisterCompletedServiceUseCase>(),
+        getServiceHistoryUseCase: c.resolve<GetServiceHistoryUseCase>(),
+        getBranchesUseCase: c.resolve<GetBranchesUseCase>(),
+        updateServiceStatusUseCase: c.resolve<UpdateServiceStatusUseCase>(),
+        getServiceTransitionsUseCase: c.resolve<GetServiceTransitionsUseCase>(),
+        deleteCompletedServiceUseCase: c
+            .resolve<DeleteCompletedServiceUseCase>(),
       ),
     );
 
@@ -685,7 +752,7 @@ abstract class InjectorApp {
   // Features - Repositories, UseCases, and remaining DataSources
   @Register.factory(RegisterPersonRepository, from: RegisterPersonRepositoryImp)
   @Register.factory(RegisterPersonUseCase)
-  @Register.factory(RegisterPersonDataSource)
+  // RegisterPersonDataSource - registered manually in _configureDioDataSources
   @Register.factory(LoginRepository, from: LoginRepositoryImpl)
   @Register.factory(LoginUseCase)
   @Register.factory(GetPersonUsecase)

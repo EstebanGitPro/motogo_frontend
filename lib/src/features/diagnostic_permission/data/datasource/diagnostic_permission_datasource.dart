@@ -3,6 +3,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/datasource_response_mixin.dart';
 import 'package:motogo_frontend/src/features/diagnostic_permission/data/model/diagnostic_permission_model.dart';
 
 /// Response wrapper for permission grant operations.
@@ -41,6 +42,7 @@ abstract class DiagnosticPermissionDataSource {
 }
 
 class DiagnosticPermissionDataSourceImpl
+    with DataSourceResponseMixin
     implements DiagnosticPermissionDataSource {
   final DioClient _dioClient;
 
@@ -98,22 +100,7 @@ class DiagnosticPermissionDataSourceImpl
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
-        final data = responseData['data'];
-        List<dynamic>? items;
-        if (data is List) {
-          items = data;
-        } else if (data is Map<String, dynamic>) {
-          // Backend wraps list under 'permissions' key
-          final permissions = data['permissions'];
-          if (permissions is List) {
-            items = permissions;
-          } else {
-            final nestedItems = data['items'];
-            if (nestedItems is List) {
-              items = nestedItems;
-            }
-          }
-        }
+        final items = _extractPermissionItems(responseData['data']);
 
         if (items == null) {
           return const Right([]);
@@ -134,32 +121,28 @@ class DiagnosticPermissionDataSourceImpl
     }
   }
 
+  /// Extracts the list of permission items from the response data,
+  /// handling different response structures.
+  List<dynamic>? _extractPermissionItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final permissions = data['permissions'];
+      if (permissions is List) return permissions;
+      final nestedItems = data['items'];
+      if (nestedItems is List) return nestedItems;
+    }
+    return null;
+  }
+
   @override
   Future<Either<ErrorModel, String>> revokePermission({
     required String motorcycleId,
     required String branchId,
   }) async {
-    try {
-      final response = await _dioClient.delete(
-        '/motorcycles/$motorcycleId/permissions/$branchId',
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message = responseData['message'] as String? ?? '';
-        return Right(message);
-      }
-
-      return Left(DioErrorHandler.fromBackendError(responseData));
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+    return handleMessageResponse(
+      () =>
+          _dioClient.delete('/motorcycles/$motorcycleId/permissions/$branchId'),
+      '',
+    );
   }
 }

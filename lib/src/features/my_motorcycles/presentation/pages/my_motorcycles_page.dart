@@ -6,6 +6,7 @@ import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/delete_motorcycle/domain/usecases/delete_motorcycle_usecase.dart';
 import 'package:motogo_frontend/src/features/edit_motorcycle/presentation/pages/edit_motorcycle_page.dart';
 import 'package:motogo_frontend/src/features/motorcycle_history/presentation/pages/motorcycle_history_page.dart';
+import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/domain/usecases/get_my_motorcycles_usecase.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/bloc/my_motorcycles_bloc.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
@@ -47,20 +48,24 @@ class _MyMotorcyclesView extends StatelessWidget {
       body: BlocConsumer<MyMotorcyclesBloc, MyMotorcyclesState>(
         listener: (context, state) {
           if (state is MyMotorcycleDeleted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green[600],
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green[600],
+                ),
+              );
           }
           if (state is MyMotorcycleDeleteError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red[600],
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red[600],
+                ),
+              );
           }
         },
         builder: (context, state) {
@@ -301,10 +306,16 @@ class _MotorcycleCard extends StatelessWidget {
   }
 
   void _navigateToHistory(BuildContext context) {
+    if (motorcycle.id == null) return;
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => MotorcycleHistoryPage(motorcycle: motorcycle),
+        builder: (_) => BlocProvider(
+          create: (_) =>
+              InjectorApp.resolve<MotorcycleHistoryBloc>()
+                ..add(LoadMotorcycleHistory(motorcycle.id!)),
+          child: MotorcycleHistoryPage(motorcycle: motorcycle),
+        ),
       ),
     );
   }

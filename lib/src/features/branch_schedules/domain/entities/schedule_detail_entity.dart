@@ -29,6 +29,7 @@ class ScheduleDetailEntity extends Equatable {
   final bool active;
 
   const ScheduleDetailEntity({
+    // NOSONAR - 8 campos atómicos de un slot horario
     required this.id,
     required this.scheduleId,
     required this.dayOfWeek,
@@ -41,6 +42,7 @@ class ScheduleDetailEntity extends Equatable {
 
   /// Creates a copy with specified values overridden.
   ScheduleDetailEntity copyWith({
+    // NOSONAR - copyWith refleja los mismos 8 campos del constructor
     String? id,
     String? scheduleId,
     int? dayOfWeek,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/entities/city_entity.dart';
+import 'package:motogo_frontend/src/core/widgets/dropdown_state_widgets.dart';
 
 /// Dropdown widget for selecting a city.
 class CityDropdown extends StatelessWidget {
@@ -25,15 +26,21 @@ class CityDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!hasDepartmentSelected) {
-      return _buildDisabledState();
+      return DropdownStateWidgets.buildDisabledState(
+        icon: Icons.location_city_outlined,
+        message: 'Primero selecciona un departamento',
+      );
     }
 
     if (isLoading) {
-      return _buildLoadingState();
+      return DropdownStateWidgets.buildLoadingState(
+        icon: Icons.location_city_outlined,
+        message: 'Cargando ciudades...',
+      );
     }
 
     if (errorMessage != null) {
-      return _buildErrorState();
+      return DropdownStateWidgets.buildErrorState(message: errorMessage!);
     }
 
     // Only use selected value if it exists in the list
@@ -71,75 +78,6 @@ class CityDropdown extends StatelessWidget {
       },
       isExpanded: true,
       icon: const Icon(Icons.keyboard_arrow_down),
-    );
-  }
-
-  Widget _buildDisabledState() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.location_city_outlined, color: Colors.grey[400]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Primero selecciona un departamento',
-              style: TextStyle(color: Colors.grey[500]),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.location_city_outlined, color: Colors.grey),
-          SizedBox(width: 12),
-          Expanded(child: Text('Cargando ciudades...')),
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.red[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.red[300]!),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.error_outline, color: Colors.red[700]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              errorMessage!,
-              style: TextStyle(color: Colors.red[700]),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

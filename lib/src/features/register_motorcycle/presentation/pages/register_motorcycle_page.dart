@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/widgets/gradient_header_card.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/firebase/storage_service.dart';
 import 'package:motogo_frontend/src/core/widgets/image_picker_widget.dart';
@@ -58,8 +59,10 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
       create: (context) => InjectorApp.resolve<RegisterMotorcycleBloc>(),
       child: BlocConsumer<RegisterMotorcycleBloc, RegisterMotorcycleState>(
         listener: (context, state) {
+          final messenger = ScaffoldMessenger.of(context);
           if (state is RegisterMotorcycleSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: Colors.green,
@@ -68,7 +71,8 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
             );
             Navigator.pop(context, true);
           } else if (state is RegisterMotorcycleFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.error.message),
                 backgroundColor: Colors.red,
@@ -108,7 +112,15 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              _buildHeader(),
+                              GradientHeaderCard(
+                                icon: Icons.two_wheeler,
+                                title: MotorcycleConstants.basicInfoTitle,
+                                subtitle: MotorcycleConstants.basicInfoSubtitle,
+                                gradientColors: [
+                                  Colors.blue[600]!,
+                                  Colors.blue[400]!,
+                                ],
+                              ),
                               const SizedBox(height: 16),
                               _buildImageSection(isLoading),
                               const SizedBox(height: 24),
@@ -141,60 +153,6 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue[600]!, Colors.blue[400]!],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.two_wheeler, size: 40, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  MotorcycleConstants.basicInfoTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  MotorcycleConstants.basicInfoSubtitle,
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -366,71 +324,82 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   }
 
   Future<void> _submitForm(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      // Capture bloc reference before async
-      final bloc = context.read<RegisterMotorcycleBloc>();
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      String? profileImageUrl = _uploadedImageUrl;
+    if (!_formKey.currentState!.validate()) return;
 
-      // Upload image if selected and not already uploaded
-      if (_selectedImage != null && _uploadedImageUrl == null) {
-        setState(() => _isUploadingImage = true);
+    final bloc = context.read<RegisterMotorcycleBloc>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-        final storageService = InjectorApp.resolve<StorageService>();
+    final imageUrl = await _resolveProfileImageUrl(scaffoldMessenger);
+    if (imageUrl == null && _selectedImage != null) return;
 
-        // Generate a temporary ID for the upload path
-        final tempMotorcycleId = const Uuid().v4();
+    if (!mounted) return;
 
-        final uploadResult = await storageService.uploadMotorcycleImage(
-          motorcycleId: tempMotorcycleId,
-          file: _selectedImage!,
-        );
+    bloc.add(_buildRegistrationEvent(imageUrl));
+  }
 
-        if (!mounted) return;
+  /// Uploads the profile image if one is selected and not yet uploaded.
+  /// Returns the image URL on success, or `null` on failure (with a SnackBar).
+  Future<String?> _resolveProfileImageUrl(
+    ScaffoldMessengerState scaffoldMessenger,
+  ) async {
+    if (_selectedImage == null || _uploadedImageUrl != null) {
+      return _uploadedImageUrl;
+    }
 
-        setState(() => _isUploadingImage = false);
+    setState(() => _isUploadingImage = true);
 
-        if (uploadResult.isLeft) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
-              ),
-              backgroundColor: Colors.red,
-              action: SnackBarAction(
-                label: MotorcycleConstants.retryButton,
-                textColor: Colors.white,
-                onPressed: () => _submitForm(context),
-              ),
-            ),
-          );
-          return; // This return now properly exits _submitForm()
-        }
+    final storageService = InjectorApp.resolve<StorageService>();
+    final tempMotorcycleId = const Uuid().v4();
 
-        // Upload succeeded - get the URL
-        profileImageUrl = uploadResult.right;
-        _uploadedImageUrl = profileImageUrl;
-      }
+    final uploadResult = await storageService.uploadMotorcycleImage(
+      motorcycleId: tempMotorcycleId,
+      file: _selectedImage!,
+    );
 
-      if (!mounted) return;
+    if (!mounted) return null;
 
-      bloc.add(
-        SubmitMotorcycleRegistration(
-          licensePlate: _licensePlateController.text.trim().replaceAll(' ', ''),
-          referenceId: _selectedReference?.id,
-          year: _yearController.text.isNotEmpty
-              ? int.parse(_yearController.text)
-              : null,
-          currentMileage: _mileageController.text.isNotEmpty
-              ? int.parse(_mileageController.text)
-              : null,
-          ownerNotes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          profileImageUrl: profileImageUrl,
+    setState(() => _isUploadingImage = false);
+
+    if (uploadResult.isLeft) {
+      scaffoldMessenger.clearSnackBars();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
+          ),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: MotorcycleConstants.retryButton,
+            textColor: Colors.white,
+            onPressed: () => _submitForm(context),
+          ),
         ),
       );
+      return null;
     }
+
+    _uploadedImageUrl = uploadResult.right;
+    return _uploadedImageUrl;
+  }
+
+  /// Builds the registration event from the form fields.
+  SubmitMotorcycleRegistration _buildRegistrationEvent(
+    String? profileImageUrl,
+  ) {
+    return SubmitMotorcycleRegistration(
+      licensePlate: _licensePlateController.text.trim().replaceAll(' ', ''),
+      referenceId: _selectedReference?.id,
+      year: _yearController.text.isNotEmpty
+          ? int.parse(_yearController.text)
+          : null,
+      currentMileage: _mileageController.text.isNotEmpty
+          ? int.parse(_mileageController.text)
+          : null,
+      ownerNotes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
+      profileImageUrl: profileImageUrl,
+    );
   }
 }
 

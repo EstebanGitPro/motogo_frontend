@@ -22,9 +22,11 @@ class NavigationService {
   static void showSnackBar(String message) {
     final context = navigatorKey.currentContext;
     if (context != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
+        );
     }
   }
 }

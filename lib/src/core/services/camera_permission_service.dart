@@ -1,4 +1,5 @@
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart'
+    as permission_handler;
 
 /// Service for handling camera permission requests.
 ///
@@ -11,27 +12,27 @@ class CameraPermissionService {
 
   /// Checks if camera permission is granted.
   Future<bool> isCameraPermissionGranted() async {
-    final status = await Permission.camera.status;
+    final status = await permission_handler.Permission.camera.status;
     return status.isGranted;
   }
 
   /// Requests camera permission from the user.
   /// Returns true if permission is granted, false otherwise.
   Future<bool> requestCameraPermission() async {
-    final status = await Permission.camera.request();
+    final status = await permission_handler.Permission.camera.request();
     return status.isGranted;
   }
 
   /// Checks if camera permission is permanently denied.
   /// When permanently denied, user must go to app settings to grant permission.
   Future<bool> isCameraPermissionPermanentlyDenied() async {
-    final status = await Permission.camera.status;
+    final status = await permission_handler.Permission.camera.status;
     return status.isPermanentlyDenied;
   }
 
   /// Opens the app settings page for permission management.
   Future<bool> openAppSettings() async {
-    return openAppSettings();
+    return permission_handler.openAppSettings();
   }
 
   /// Requests camera permission and handles all cases.
@@ -48,7 +49,7 @@ class CameraPermissionService {
     }
 
     // Request permission
-    final status = await Permission.camera.request();
+    final status = await permission_handler.Permission.camera.request();
 
     if (status.isGranted) {
       return CameraPermissionResult.granted;

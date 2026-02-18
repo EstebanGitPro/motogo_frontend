@@ -52,19 +52,23 @@ class _AdminServicesListPageState extends State<AdminServicesListPage> {
         child: BlocConsumer<AdminServicesBloc, AdminServicesState>(
           listener: (context, state) {
             if (state is AdminServicesUpdateSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..clearSnackBars()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.green,
+                  ),
+                );
             } else if (state is AdminServicesError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.error.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..clearSnackBars()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text(state.error.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
             }
           },
           builder: (context, state) {

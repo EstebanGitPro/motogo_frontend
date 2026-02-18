@@ -37,25 +37,34 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
     return BlocConsumer<ManageFranchiseBloc, ManageFranchiseState>(
       listener: (context, state) {
         if (state is ManageFranchiseError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
         } else if (state is ManageFranchiseDeleted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
           Navigator.pop(context, true);
         } else if (state is ManageFranchiseUpdated) {
           _markChanged();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
         } else if (state is ManageFranchiseLoaded) {
           // After initial load, any reload means link/unlink was performed
           if (_loadCount > 0) {
@@ -230,11 +239,11 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
         leading: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getTypeColor(branch.establishmentType),
+            color: FranchiseConstants.getTypeColor(branch.establishmentType),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            _getTypeLabel(branch.establishmentType),
+            FranchiseConstants.getTypeLabel(branch.establishmentType),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 11,
@@ -275,11 +284,11 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
         leading: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getTypeColor(branch.establishmentType),
+            color: FranchiseConstants.getTypeColor(branch.establishmentType),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            _getTypeLabel(branch.establishmentType),
+            FranchiseConstants.getTypeLabel(branch.establishmentType),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 11,
@@ -293,30 +302,6 @@ class _ManageFranchisePageState extends State<ManageFranchisePage> {
         ),
       ),
     );
-  }
-
-  Color _getTypeColor(String type) {
-    switch (type.toUpperCase()) {
-      case 'WORKSHOP':
-        return Colors.green;
-      case 'STORE':
-        return Colors.blue;
-      default:
-        return Colors.purple;
-    }
-  }
-
-  String _getTypeLabel(String type) {
-    switch (type.toUpperCase()) {
-      case 'WORKSHOP':
-        return FranchiseConstants.typeWorkshop;
-      case 'STORE':
-        return FranchiseConstants.typeStore;
-      case 'WORKSHOP_STORE':
-        return FranchiseConstants.typeWorkshopStore;
-      default:
-        return type;
-    }
   }
 
   void _unlinkBranch(BuildContext context, BranchEntity branch) {

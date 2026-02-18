@@ -1,8 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/datasource_response_mixin.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
-import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/data/models/motorcycle_model.dart';
 
 /// DataSource for motorcycle registration.
@@ -15,40 +14,18 @@ abstract class MotorcycleDataSource {
   Future<Either<ErrorModel, String>> registerMotorcycle(MotorcycleModel model);
 }
 
-class MotorcycleDataSourceImpl implements MotorcycleDataSource {
+class MotorcycleDataSourceImpl
+    with DataSourceResponseMixin
+    implements MotorcycleDataSource {
   final DioClient _dioClient;
 
   MotorcycleDataSourceImpl(this._dioClient);
 
   @override
-  Future<Either<ErrorModel, String>> registerMotorcycle(
-    MotorcycleModel model,
-  ) async {
-    try {
-      final response = await _dioClient.post(
-        '/motorcycles',
-        data: model.toJson(),
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        // Return success message from backend (following Success Message Hydration pattern)
-        final message =
-            responseData['message'] as String? ??
-            'Motocicleta registrada exitosamente';
-        return Right(message);
-      }
-
-      return const Right('Motocicleta registrada exitosamente');
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+  Future<Either<ErrorModel, String>> registerMotorcycle(MotorcycleModel model) {
+    return handleMessageResponse(
+      () => _dioClient.post('/motorcycles', data: model.toJson()),
+      'Motocicleta registrada exitosamente',
+    );
   }
 }

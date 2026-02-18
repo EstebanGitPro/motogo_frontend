@@ -1,6 +1,15 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/features/completed_services/data/model/register_completed_service_model.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/status_transition_entity.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_history_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
+import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/set_solution_usecase.dart';
@@ -12,21 +21,47 @@ part 'search_motorcycle_state.dart';
 ///
 /// Handles the HU47 workflow: user enters plate, search is performed,
 /// and results are displayed. Also allows workshop representatives
-/// to set diagnostic solutions.
+/// to set diagnostic solutions and register completed services.
 class SearchMotorcycleBloc
     extends Bloc<SearchMotorcycleEvent, SearchMotorcycleState> {
   final SearchMotorcycleByPlateUseCase _searchUseCase;
   final SetSolutionUseCase _setSolutionUseCase;
+  final RegisterCompletedServiceUseCase _registerServiceUseCase;
+  final GetServiceHistoryUseCase _getServiceHistoryUseCase;
+  final GetBranchesUseCase _getBranchesUseCase;
+  final UpdateServiceStatusUseCase _updateServiceStatusUseCase;
+  final GetServiceTransitionsUseCase _getServiceTransitionsUseCase;
+  final DeleteCompletedServiceUseCase _deleteCompletedServiceUseCase;
+
+  /// Maps branchId → branchName for enriching history entities.
+  Map<String, String> _branchNameMap = {};
 
   SearchMotorcycleBloc({
     required SearchMotorcycleByPlateUseCase searchUseCase,
     required SetSolutionUseCase setSolutionUseCase,
+    required RegisterCompletedServiceUseCase registerServiceUseCase,
+    required GetServiceHistoryUseCase getServiceHistoryUseCase,
+    required GetBranchesUseCase getBranchesUseCase,
+    required UpdateServiceStatusUseCase updateServiceStatusUseCase,
+    required GetServiceTransitionsUseCase getServiceTransitionsUseCase,
+    required DeleteCompletedServiceUseCase deleteCompletedServiceUseCase,
   }) : _searchUseCase = searchUseCase,
        _setSolutionUseCase = setSolutionUseCase,
+       _registerServiceUseCase = registerServiceUseCase,
+       _getServiceHistoryUseCase = getServiceHistoryUseCase,
+       _getBranchesUseCase = getBranchesUseCase,
+       _updateServiceStatusUseCase = updateServiceStatusUseCase,
+       _getServiceTransitionsUseCase = getServiceTransitionsUseCase,
+       _deleteCompletedServiceUseCase = deleteCompletedServiceUseCase,
        super(const SearchMotorcycleInitial()) {
     on<SearchByPlate>(_onSearchByPlate);
     on<ClearSearch>(_onClearSearch);
     on<SetDiagnosticSolution>(_onSetSolution);
+    on<RegisterCompletedService>(_onRegisterCompletedService);
+    on<FetchServiceHistory>(_onFetchServiceHistory);
+    on<UpdateServiceStatus>(_onUpdateServiceStatus);
+    on<FetchServiceTransitions>(_onFetchServiceTransitions);
+    on<DeleteCompletedService>(_onDeleteCompletedService);
   }
 
   Future<void> _onSearchByPlate(
@@ -37,10 +72,13 @@ class SearchMotorcycleBloc
 
     final result = await _searchUseCase(event.plate.toUpperCase().trim());
 
-    result.fold(
-      (error) => emit(SearchMotorcycleError(error.message)),
-      (motorcycle) => emit(SearchMotorcycleLoaded(motorcycle)),
-    );
+    result.fold((error) => emit(SearchMotorcycleError(error.message)), (
+      motorcycle,
+    ) {
+      emit(SearchMotorcycleLoaded(motorcycle));
+      // Auto-fetch service history using the representative's own branches
+      _fetchHistoryForMotorcycle(motorcycle.id);
+    });
   }
 
   void _onClearSearch(ClearSearch event, Emitter<SearchMotorcycleState> emit) {
@@ -96,6 +134,248 @@ class SearchMotorcycleBloc
             solutionMessage: message,
           ),
         );
+      },
+    );
+  }
+
+  Future<void> _onRegisterCompletedService(
+    RegisterCompletedService event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        registration: currentState.registration.copyWith(isRegistering: true),
+      ),
+    );
+
+    final request = RegisterCompletedServiceModel(
+      branchId: event.branchId,
+      motorcycleId: event.motorcycleId,
+      serviceIds: event.serviceIds,
+      quotedPrice: event.quotedPrice,
+      finalPrice: event.finalPrice,
+      representativeNotes: event.representativeNotes,
+    );
+
+    final result = await _registerServiceUseCase(request);
+
+    result.fold(
+      (error) => emit(
+        currentState.copyWith(
+          registration: currentState.registration.copyWith(
+            isRegistering: false,
+            error: error.message,
+          ),
+        ),
+      ),
+      (message) {
+        emit(
+          currentState.copyWith(
+            registration: currentState.registration.copyWith(
+              isRegistering: false,
+              message: message,
+            ),
+          ),
+        );
+        // Refresh service history with the newly registered service
+        _fetchHistoryForMotorcycle(event.motorcycleId);
+      },
+    );
+  }
+
+  Future<void> _onFetchServiceHistory(
+    FetchServiceHistory event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        history: currentState.history.copyWith(loading: true),
+      ),
+    );
+
+    final result = await _getServiceHistoryUseCase(
+      motorcycleId: event.motorcycleId,
+      branchIds: event.branchIds,
+    );
+
+    result.fold(
+      (error) => emit(
+        currentState.copyWith(
+          history: currentState.history.copyWith(
+            loading: false,
+            error: error.message,
+          ),
+        ),
+      ),
+      (historyList) {
+        // Enrich entities with branch name
+        final enriched = historyList.map((e) {
+          final name = _branchNameMap[e.branchId];
+          return name != null
+              ? CompletedServiceEntity(
+                  id: e.id,
+                  branchId: e.branchId,
+                  motorcycleId: e.motorcycleId,
+                  diagnosticId: e.diagnosticId,
+                  status: e.status,
+                  requestDate: e.requestDate,
+                  quotedPrice: e.quotedPrice,
+                  finalPrice: e.finalPrice,
+                  representativeNotes: e.representativeNotes,
+                  serviceIds: e.serviceIds,
+                  serviceNames: e.serviceNames,
+                  branchName: name,
+                )
+              : e;
+        }).toList();
+        emit(
+          currentState.copyWith(
+            history: currentState.history.copyWith(
+              loading: false,
+              services: enriched,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Fetches the representative's branches and dispatches FetchServiceHistory.
+  Future<void> _fetchHistoryForMotorcycle(String motorcycleId) async {
+    final branchResult = await _getBranchesUseCase();
+    branchResult.fold(
+      (_) {
+        // Silently skip — can't fetch branches
+      },
+      (branches) {
+        if (branches.isNotEmpty) {
+          // Build branch name map for enrichment
+          _branchNameMap = {
+            for (final b in branches)
+              if (b.id != null) b.id!: b.name,
+          };
+          add(
+            FetchServiceHistory(
+              motorcycleId: motorcycleId,
+              branchIds: branches
+                  .map((b) => b.id)
+                  .where((id) => id != null)
+                  .cast<String>()
+                  .toList(),
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Future<void> _onUpdateServiceStatus(
+    UpdateServiceStatus event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        action: currentState.action.copyWith(isUpdatingStatus: true),
+      ),
+    );
+
+    final result = await _updateServiceStatusUseCase(
+      event.serviceId,
+      event.newStatus,
+    );
+
+    result.fold(
+      (error) => emit(
+        currentState.copyWith(
+          action: currentState.action.copyWith(
+            isUpdatingStatus: false,
+            statusUpdateError: error.message,
+          ),
+        ),
+      ),
+      (message) {
+        emit(
+          currentState.copyWith(
+            action: currentState.action.copyWith(
+              isUpdatingStatus: false,
+              statusUpdateMessage: message,
+            ),
+          ),
+        );
+        // Refresh service history to reflect the status change
+        _fetchHistoryForMotorcycle(event.motorcycleId);
+      },
+    );
+  }
+
+  Future<void> _onFetchServiceTransitions(
+    FetchServiceTransitions event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    final result = await _getServiceTransitionsUseCase(event.serviceId);
+
+    result.fold(
+      (error) {
+        // Silently skip — transitions are supplementary
+      },
+      (transitions) {
+        final entities = transitions.map((t) => t.toEntity()).toList();
+        emit(
+          currentState.copyWith(
+            history: currentState.history.copyWith(transitions: entities),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onDeleteCompletedService(
+    DeleteCompletedService event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        action: currentState.action.copyWith(isDeletingService: true),
+      ),
+    );
+
+    final result = await _deleteCompletedServiceUseCase(event.serviceId);
+
+    result.fold(
+      (error) => emit(
+        currentState.copyWith(
+          action: currentState.action.copyWith(
+            isDeletingService: false,
+            deleteServiceError: error.message,
+          ),
+        ),
+      ),
+      (message) {
+        emit(
+          currentState.copyWith(
+            action: currentState.action.copyWith(
+              isDeletingService: false,
+              deleteServiceMessage: message,
+            ),
+          ),
+        );
+        // Refresh service history to reflect the deletion
+        _fetchHistoryForMotorcycle(event.motorcycleId);
       },
     );
   }

@@ -48,68 +48,22 @@ class ProfileImageDataSourceImpl implements ProfileImageDataSource {
   Future<Either<ErrorModel, ProfileImageResponse>> updateProfileImage(
     String motorcycleId,
     String imageUrl,
-  ) async {
-    try {
-      final response = await _dioClient.put(
+  ) {
+    return _handleProfileImageResponse(
+      () => _dioClient.put(
         '/motorcycles/$motorcycleId/profile-image',
         data: {'image_url': imageUrl},
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message = responseData['message'] as String? ?? '';
-        return Right(
-          ProfileImageResponse(
-            model: ProfileImageModel.fromJson(responseData),
-            message: message,
-          ),
-        );
-      }
-
-      return Left(DioErrorHandler.fromBackendError(responseData));
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+      ),
+    );
   }
 
   @override
   Future<Either<ErrorModel, ProfileImageResponse>> getProfileImage(
     String motorcycleId,
-  ) async {
-    try {
-      final response = await _dioClient.get(
-        '/motorcycles/$motorcycleId/profile-image',
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message = responseData['message'] as String? ?? '';
-        return Right(
-          ProfileImageResponse(
-            model: ProfileImageModel.fromJson(responseData),
-            message: message,
-          ),
-        );
-      }
-
-      return Left(DioErrorHandler.fromBackendError(responseData));
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+  ) {
+    return _handleProfileImageResponse(
+      () => _dioClient.get('/motorcycles/$motorcycleId/profile-image'),
+    );
   }
 
   @override
@@ -127,10 +81,42 @@ class ProfileImageDataSourceImpl implements ProfileImageDataSource {
         if (success == false) {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
-
-        // Use backend message directly
         final message = responseData['message'] as String? ?? '';
         return Right(message);
+      }
+
+      return Left(DioErrorHandler.fromBackendError(responseData));
+    } on DioException catch (e) {
+      return DioErrorHandler.handleDioException(e);
+    } catch (e) {
+      return DioErrorHandler.handleException(e);
+    }
+  }
+
+  /// Shared handler for update and get profile image responses.
+  ///
+  /// Both return `ProfileImageResponse` containing the parsed model
+  /// and the backend message.
+  Future<Either<ErrorModel, ProfileImageResponse>> _handleProfileImageResponse(
+    Future<Response<dynamic>> Function() request,
+  ) async {
+    try {
+      final response = await request();
+      final responseData = response.data;
+
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+
+        final message = responseData['message'] as String? ?? '';
+        return Right(
+          ProfileImageResponse(
+            model: ProfileImageModel.fromJson(responseData),
+            message: message,
+          ),
+        );
       }
 
       return Left(DioErrorHandler.fromBackendError(responseData));

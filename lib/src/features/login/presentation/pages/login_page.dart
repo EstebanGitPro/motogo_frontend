@@ -40,16 +40,18 @@ class _LoginPageState extends State<LoginPage> {
           ScaffoldMessenger.of(context).clearSnackBars();
 
           if (state is LoginFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error.message),
-                backgroundColor: Colors.red,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(
-                  seconds: LoginConstants.snackbarDurationSeconds,
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.error.message),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(
+                    seconds: LoginConstants.snackbarDurationSeconds,
+                  ),
                 ),
-              ),
-            );
+              );
           } else if (state is LoginNeedsVerification) {
             // Navegar a la pantalla de verificación
             Navigator.push(
@@ -60,16 +62,18 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           } else if (state is LoginSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(
-                  seconds: LoginConstants.successSnackbarDurationSeconds,
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(
+                    seconds: LoginConstants.successSnackbarDurationSeconds,
+                  ),
                 ),
-              ),
-            );
+              );
 
             // Conditional routing based on user role
             final userRole = state.user.role.toLowerCase();

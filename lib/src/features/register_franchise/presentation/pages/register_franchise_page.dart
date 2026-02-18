@@ -52,12 +52,14 @@ class _RegisterFranchisePageState extends State<RegisterFranchisePage> {
   void _submitFranchise() {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedBranchIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(FranchiseConstants.atLeastOneBranchRequired),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(FranchiseConstants.atLeastOneBranchRequired),
+            backgroundColor: Colors.orange,
+          ),
+        );
       return;
     }
 
@@ -77,17 +79,24 @@ class _RegisterFranchisePageState extends State<RegisterFranchisePage> {
     return BlocListener<RegisterFranchiseBloc, RegisterFranchiseState>(
       listener: (context, state) {
         if (state is RegisterFranchiseSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+              ),
+            );
           Navigator.pop(context, true);
         } else if (state is RegisterFranchiseError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-          );
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
         }
       },
       child: Scaffold(

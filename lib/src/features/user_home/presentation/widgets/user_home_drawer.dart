@@ -27,9 +27,6 @@ class UserHomeDrawer extends StatelessWidget {
           ),
           onTap: () => Navigator.pop(context),
         ),
-        const Divider(),
-        // Shared menu items (Edit Profile, Change Password, etc.)
-        ...SharedDrawerMenuItems.commonItems(context),
         // User-specific: My Motorcycles
         ListTile(
           leading: const Icon(Icons.two_wheeler, color: Colors.blue),
@@ -47,6 +44,9 @@ class UserHomeDrawer extends StatelessWidget {
             );
           },
         ),
+        const Divider(),
+        // Shared menu items (Edit Profile, Change Password, etc.)
+        ...SharedDrawerMenuItems.commonItems(context),
       ],
     );
   }

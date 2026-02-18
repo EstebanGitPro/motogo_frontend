@@ -9,6 +9,26 @@ import 'package:either_dart/either.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i7;
 import 'package:motogo_frontend/src/core/errors/error_model.dart' as _i5;
+import 'package:motogo_frontend/src/features/completed_services/data/model/register_completed_service_model.dart'
+    as _i10;
+import 'package:motogo_frontend/src/features/completed_services/data/model/status_transition_model.dart'
+    as _i17;
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart'
+    as _i12;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart'
+    as _i18;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_history_usecase.dart'
+    as _i11;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart'
+    as _i16;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart'
+    as _i9;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart'
+    as _i15;
+import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart'
+    as _i13;
+import 'package:motogo_frontend/src/features/register_branch/domain/entities/branch_entity.dart'
+    as _i14;
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/entities/motorcycle_detail_entity.dart'
     as _i6;
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/domain/usecases/search_motorcycle_by_plate_usecase.dart'
@@ -84,6 +104,174 @@ class MockSetSolutionUseCase extends _i1.Mock
                   #diagnosticId: diagnosticId,
                   #solution: solution,
                 }),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+}
+
+/// A class which mocks [RegisterCompletedServiceUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockRegisterCompletedServiceUseCase extends _i1.Mock
+    implements _i9.RegisterCompletedServiceUseCase {
+  MockRegisterCompletedServiceUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(
+    _i10.RegisterCompletedServiceModel? request,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [request]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [request]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+}
+
+/// A class which mocks [GetServiceHistoryUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetServiceHistoryUseCase extends _i1.Mock
+    implements _i11.GetServiceHistoryUseCase {
+  MockGetServiceHistoryUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>>
+  call({required String? motorcycleId, required List<String>? branchIds}) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [], {
+              #motorcycleId: motorcycleId,
+              #branchIds: branchIds,
+            }),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<
+                      _i5.ErrorModel,
+                      List<_i12.CompletedServiceEntity>
+                    >
+                  >(
+                    this,
+                    Invocation.method(#call, [], {
+                      #motorcycleId: motorcycleId,
+                      #branchIds: branchIds,
+                    }),
+                  ),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i12.CompletedServiceEntity>>
+          >);
+}
+
+/// A class which mocks [GetBranchesUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetBranchesUseCase extends _i1.Mock
+    implements _i13.GetBranchesUseCase {
+  MockGetBranchesUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>
+                  >(this, Invocation.method(#call, [])),
+                ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, List<_i14.BranchEntity>>>);
+}
+
+/// A class which mocks [UpdateServiceStatusUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUpdateServiceStatusUseCase extends _i1.Mock
+    implements _i15.UpdateServiceStatusUseCase {
+  MockUpdateServiceStatusUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(
+    String? serviceId,
+    String? newStatus,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [serviceId, newStatus]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [serviceId, newStatus]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+}
+
+/// A class which mocks [GetServiceTransitionsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetServiceTransitionsUseCase extends _i1.Mock
+    implements _i16.GetServiceTransitionsUseCase {
+  MockGetServiceTransitionsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>> call(
+    String? serviceId,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [serviceId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+                  >(this, Invocation.method(#call, [serviceId])),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, List<_i17.StatusTransitionModel>>
+          >);
+}
+
+/// A class which mocks [DeleteCompletedServiceUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockDeleteCompletedServiceUseCase extends _i1.Mock
+    implements _i18.DeleteCompletedServiceUseCase {
+  MockDeleteCompletedServiceUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(String? serviceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [serviceId]),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(#call, [serviceId]),
               ),
             ),
           )

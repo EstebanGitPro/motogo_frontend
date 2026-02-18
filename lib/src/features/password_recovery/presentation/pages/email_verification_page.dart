@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/widgets/responsive_scaffold_body.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/bloc/email_verification_bloc.dart';
 import 'package:motogo_frontend/src/features/password_recovery/presentation/widgets/email_verification_widget.dart';
 
@@ -35,28 +36,9 @@ class EmailRecoveryVerificationPage extends StatelessWidget {
             EmailRecoveryVerificationState
           >(
             listener: (context, state) {},
-            child: SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
-                      child: IntrinsicHeight(
-                        child: Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxWidth: isTablet ? 600 : double.infinity,
-                            ),
-                            child: _buildBody(context, isMobile),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
+            child: ResponsiveScaffoldBody(
+              maxWidth: isTablet ? 600 : double.infinity,
+              child: _buildBody(context, isMobile),
             ),
           ),
     );

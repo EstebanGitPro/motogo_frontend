@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
+import 'package:motogo_frontend/src/core/widgets/responsive_scaffold_body.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 
 class UserTypeSelectionPage extends StatelessWidget {
@@ -15,51 +16,28 @@ class UserTypeSelectionPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: _maxContentWidth(isTablet, isLargeTablet),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 20.0 : 32.0,
-                          vertical: isMobile ? 20.0 : 32.0,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildLogo(context, isMobile, isTablet),
-                            SizedBox(height: isMobile ? 24 : 32),
-                            _buildAppName(context, isMobile, isTablet),
-                            SizedBox(height: isMobile ? 16 : 24),
-                            _buildMainTitle(context, isMobile, isTablet),
-                            SizedBox(height: isMobile ? 12 : 16),
-                            _buildSubtitle(context, isMobile),
-                            SizedBox(height: isMobile ? 40 : 56),
-                            _buildUserTypeCards(
-                              context,
-                              isMobile,
-                              isLargeTablet,
-                            ),
-                            SizedBox(height: isMobile ? 40 : 56),
-                            _buildLoginLink(context, isMobile),
-                            SizedBox(height: isMobile ? 20 : 24),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+      body: ResponsiveScaffoldBody(
+        maxWidth: _maxContentWidth(isTablet, isLargeTablet),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 20.0 : 32.0,
+          vertical: isMobile ? 20.0 : 32.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildLogo(context, isMobile, isTablet),
+            SizedBox(height: isMobile ? 24 : 32),
+            _buildAppName(context, isMobile, isTablet),
+            SizedBox(height: isMobile ? 16 : 24),
+            _buildMainTitle(context, isMobile, isTablet),
+            SizedBox(height: isMobile ? 12 : 16),
+            _buildSubtitle(context, isMobile),
+            SizedBox(height: isMobile ? 40 : 56),
+            _buildUserTypeCards(context, isMobile, isLargeTablet),
+            SizedBox(height: isMobile ? 40 : 56),
+            _buildLoginLink(context, isMobile),
+            SizedBox(height: isMobile ? 20 : 24),
+          ],
         ),
       ),
     );

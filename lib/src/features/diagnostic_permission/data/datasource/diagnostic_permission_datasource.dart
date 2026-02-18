@@ -98,22 +98,7 @@ class DiagnosticPermissionDataSourceImpl
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
-        final data = responseData['data'];
-        List<dynamic>? items;
-        if (data is List) {
-          items = data;
-        } else if (data is Map<String, dynamic>) {
-          // Backend wraps list under 'permissions' key
-          final permissions = data['permissions'];
-          if (permissions is List) {
-            items = permissions;
-          } else {
-            final nestedItems = data['items'];
-            if (nestedItems is List) {
-              items = nestedItems;
-            }
-          }
-        }
+        final items = _extractPermissionItems(responseData['data']);
 
         if (items == null) {
           return const Right([]);
@@ -132,6 +117,19 @@ class DiagnosticPermissionDataSourceImpl
     } catch (e) {
       return DioErrorHandler.handleException(e);
     }
+  }
+
+  /// Extracts the list of permission items from the response data,
+  /// handling different response structures.
+  List<dynamic>? _extractPermissionItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final permissions = data['permissions'];
+      if (permissions is List) return permissions;
+      final nestedItems = data['items'];
+      if (nestedItems is List) return nestedItems;
+    }
+    return null;
   }
 
   @override

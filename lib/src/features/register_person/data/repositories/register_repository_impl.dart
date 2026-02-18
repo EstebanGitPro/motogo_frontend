@@ -4,6 +4,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_params.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/repositories/register_person_repository.dart';
 import 'package:motogo_frontend/src/features/register_person/exceptions/register_person_exceptions.dart';
 
@@ -14,26 +15,10 @@ class RegisterPersonRepositoryImp implements RegisterPersonRepository {
 
   @override
   Future<Either<ErrorModel, PersonEntity>> savePerson(
-    String identityNumber,
-    String firstName,
-    String lastName,
-    String? secondLastName,
-    String email,
-    String phoneNumber,
-    String password,
-    String role,
+    RegisterPersonParams params,
   ) async {
     try {
-      final result = await _registerPersonDataSource.registerPerson(
-        identityNumber,
-        firstName,
-        lastName,
-        secondLastName,
-        email,
-        phoneNumber,
-        password,
-        role,
-      );
+      final result = await _registerPersonDataSource.registerPerson(params);
 
       return result.fold(
         (error) => Left(error),

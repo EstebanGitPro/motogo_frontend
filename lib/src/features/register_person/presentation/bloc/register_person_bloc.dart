@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
+import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_params.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/usecases/register_person_usecase.dart';
 
 part 'register_person_event.dart';
@@ -26,16 +27,17 @@ class RegisterPersonBloc
   ) async {
     emit(RegisterPersonLoading());
     try {
-      final result = await registerUseCase(
-        event.identityNumber,
-        event.firstName,
-        event.lastName,
-        event.secondLastName,
-        event.email,
-        event.phoneNumber,
-        event.password,
-        event.role,
+      final params = RegisterPersonParams(
+        identityNumber: event.identityNumber,
+        firstName: event.firstName,
+        lastName: event.lastName,
+        secondLastName: event.secondLastName,
+        email: event.email,
+        phoneNumber: event.phoneNumber,
+        password: event.password,
+        role: event.role,
       );
+      final result = await registerUseCase(params);
 
       result.fold(
         (error) => emit(RegisterPersonFailure(errorModel: error)),

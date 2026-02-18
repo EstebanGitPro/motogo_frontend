@@ -3,6 +3,7 @@ import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
+import 'package:motogo_frontend/src/core/network/datasource_response_mixin.dart';
 import 'package:motogo_frontend/src/features/motorcycle_evidence/data/models/motorcycle_evidence_model.dart';
 
 /// Response wrapper that includes both model and backend message.
@@ -41,7 +42,9 @@ abstract class MotorcycleEvidenceDataSource {
   });
 }
 
-class MotorcycleEvidenceDataSourceImpl implements MotorcycleEvidenceDataSource {
+class MotorcycleEvidenceDataSourceImpl
+    with DataSourceResponseMixin
+    implements MotorcycleEvidenceDataSource {
   final DioClient _dioClient;
 
   MotorcycleEvidenceDataSourceImpl(this._dioClient);
@@ -138,27 +141,10 @@ class MotorcycleEvidenceDataSourceImpl implements MotorcycleEvidenceDataSource {
     required String motorcycleId,
     required String evidenceId,
   }) async {
-    try {
-      final response = await _dioClient.delete(
-        '/motorcycles/$motorcycleId/evidence/$evidenceId',
-      );
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final message = responseData['message'] as String? ?? '';
-        return Right(message);
-      }
-
-      return Left(DioErrorHandler.fromBackendError(responseData));
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
+    return handleMessageResponse(
+      () =>
+          _dioClient.delete('/motorcycles/$motorcycleId/evidence/$evidenceId'),
+      '',
+    );
   }
 }

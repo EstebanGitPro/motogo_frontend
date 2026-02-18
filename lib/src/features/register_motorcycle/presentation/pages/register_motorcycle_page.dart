@@ -369,72 +369,82 @@ class _RegisterMotorcyclePageState extends State<RegisterMotorcyclePage> {
   }
 
   Future<void> _submitForm(BuildContext context) async {
-    if (_formKey.currentState!.validate()) {
-      // Capture bloc reference before async
-      final bloc = context.read<RegisterMotorcycleBloc>();
-      final scaffoldMessenger = ScaffoldMessenger.of(context);
-      String? profileImageUrl = _uploadedImageUrl;
+    if (!_formKey.currentState!.validate()) return;
 
-      // Upload image if selected and not already uploaded
-      if (_selectedImage != null && _uploadedImageUrl == null) {
-        setState(() => _isUploadingImage = true);
+    final bloc = context.read<RegisterMotorcycleBloc>();
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
-        final storageService = InjectorApp.resolve<StorageService>();
+    final imageUrl = await _resolveProfileImageUrl(scaffoldMessenger);
+    if (imageUrl == null && _selectedImage != null) return;
 
-        // Generate a temporary ID for the upload path
-        final tempMotorcycleId = const Uuid().v4();
+    if (!mounted) return;
 
-        final uploadResult = await storageService.uploadMotorcycleImage(
-          motorcycleId: tempMotorcycleId,
-          file: _selectedImage!,
-        );
+    bloc.add(_buildRegistrationEvent(imageUrl));
+  }
 
-        if (!mounted) return;
+  /// Uploads the profile image if one is selected and not yet uploaded.
+  /// Returns the image URL on success, or `null` on failure (with a SnackBar).
+  Future<String?> _resolveProfileImageUrl(
+    ScaffoldMessengerState scaffoldMessenger,
+  ) async {
+    if (_selectedImage == null || _uploadedImageUrl != null) {
+      return _uploadedImageUrl;
+    }
 
-        setState(() => _isUploadingImage = false);
+    setState(() => _isUploadingImage = true);
 
-        if (uploadResult.isLeft) {
-          scaffoldMessenger.clearSnackBars();
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
-              ),
-              backgroundColor: Colors.red,
-              action: SnackBarAction(
-                label: MotorcycleConstants.retryButton,
-                textColor: Colors.white,
-                onPressed: () => _submitForm(context),
-              ),
-            ),
-          );
-          return; // This return now properly exits _submitForm()
-        }
+    final storageService = InjectorApp.resolve<StorageService>();
+    final tempMotorcycleId = const Uuid().v4();
 
-        // Upload succeeded - get the URL
-        profileImageUrl = uploadResult.right;
-        _uploadedImageUrl = profileImageUrl;
-      }
+    final uploadResult = await storageService.uploadMotorcycleImage(
+      motorcycleId: tempMotorcycleId,
+      file: _selectedImage!,
+    );
 
-      if (!mounted) return;
+    if (!mounted) return null;
 
-      bloc.add(
-        SubmitMotorcycleRegistration(
-          licensePlate: _licensePlateController.text.trim().replaceAll(' ', ''),
-          referenceId: _selectedReference?.id,
-          year: _yearController.text.isNotEmpty
-              ? int.parse(_yearController.text)
-              : null,
-          currentMileage: _mileageController.text.isNotEmpty
-              ? int.parse(_mileageController.text)
-              : null,
-          ownerNotes: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          profileImageUrl: profileImageUrl,
+    setState(() => _isUploadingImage = false);
+
+    if (uploadResult.isLeft) {
+      scaffoldMessenger.clearSnackBars();
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            '${MotorcycleConstants.profileImageUploadError}: ${uploadResult.left.message}',
+          ),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: MotorcycleConstants.retryButton,
+            textColor: Colors.white,
+            onPressed: () => _submitForm(context),
+          ),
         ),
       );
+      return null;
     }
+
+    _uploadedImageUrl = uploadResult.right;
+    return _uploadedImageUrl;
+  }
+
+  /// Builds the registration event from the form fields.
+  SubmitMotorcycleRegistration _buildRegistrationEvent(
+    String? profileImageUrl,
+  ) {
+    return SubmitMotorcycleRegistration(
+      licensePlate: _licensePlateController.text.trim().replaceAll(' ', ''),
+      referenceId: _selectedReference?.id,
+      year: _yearController.text.isNotEmpty
+          ? int.parse(_yearController.text)
+          : null,
+      currentMileage: _mileageController.text.isNotEmpty
+          ? int.parse(_mileageController.text)
+          : null,
+      ownerNotes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
+      profileImageUrl: profileImageUrl,
+    );
   }
 }
 

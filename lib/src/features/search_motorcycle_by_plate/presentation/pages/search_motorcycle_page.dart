@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/helpers/service_status_helpers.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_detail_page.dart';
 import 'package:motogo_frontend/src/features/completed_services/presentation/pages/service_list_page.dart';
 import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/register_service_bottom_sheet.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
@@ -94,6 +97,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                   const SizedBox(height: 24),
                   _buildDiagnosticsSection(state.motorcycle.diagnostics),
                   const SizedBox(height: 24),
+                  _buildPendingServicesAlert(state),
                   _buildRegisterServiceButton(state),
                   const SizedBox(height: 24),
                   _buildServicesCard(state),
@@ -115,54 +119,47 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
 
   _SnackPayload? _resolveSnackPayload(SearchMotorcycleState state) {
     if (state is SearchMotorcycleError) {
-      final message = state.message.trim();
-      if (message.isEmpty) return null;
-      return _SnackPayload(
-        key: 'search-error:$message',
-        message: message,
-        backgroundColor: Colors.red,
-      );
+      return _tryBuildSnackPayload(state.message, 'search-error', Colors.red);
     }
 
     if (state is SearchMotorcycleLoaded) {
-      final solutionError = state.solutionError?.trim();
-      if (solutionError != null && solutionError.isNotEmpty) {
-        return _SnackPayload(
-          key: 'solution-error:$solutionError',
-          message: solutionError,
-          backgroundColor: Colors.red,
-        );
-      }
-
-      final serviceError = state.serviceRegistrationError?.trim();
-      if (serviceError != null && serviceError.isNotEmpty) {
-        return _SnackPayload(
-          key: 'service-error:$serviceError',
-          message: serviceError,
-          backgroundColor: Colors.red,
-        );
-      }
-
-      final solutionMessage = state.solutionMessage?.trim();
-      if (solutionMessage != null && solutionMessage.isNotEmpty) {
-        return _SnackPayload(
-          key: 'solution-success:$solutionMessage',
-          message: solutionMessage,
-          backgroundColor: Colors.green,
-        );
-      }
-
-      final serviceMessage = state.serviceRegistrationMessage?.trim();
-      if (serviceMessage != null && serviceMessage.isNotEmpty) {
-        return _SnackPayload(
-          key: 'service-success:$serviceMessage',
-          message: serviceMessage,
-          backgroundColor: Colors.green,
-        );
-      }
+      return _tryBuildSnackPayload(
+            state.solutionError,
+            'solution-error',
+            Colors.red,
+          ) ??
+          _tryBuildSnackPayload(
+            state.serviceRegistrationError,
+            'service-error',
+            Colors.red,
+          ) ??
+          _tryBuildSnackPayload(
+            state.solutionMessage,
+            'solution-success',
+            Colors.green,
+          ) ??
+          _tryBuildSnackPayload(
+            state.serviceRegistrationMessage,
+            'service-success',
+            Colors.green,
+          );
     }
 
     return null;
+  }
+
+  _SnackPayload? _tryBuildSnackPayload(
+    String? raw,
+    String keyPrefix,
+    Color backgroundColor,
+  ) {
+    final message = raw?.trim();
+    if (message == null || message.isEmpty) return null;
+    return _SnackPayload(
+      key: '$keyPrefix:$message',
+      message: message,
+      backgroundColor: backgroundColor,
+    );
   }
 
   Widget _buildSearchCard(SearchMotorcycleState state) {
@@ -758,15 +755,169 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
     );
   }
 
-  Widget _buildRegisterServiceButton(SearchMotorcycleLoaded state) {
+  /// Returns the list of active (non-terminal) services for this motorcycle.
+  List<CompletedServiceEntity> _getActiveServices(
+    SearchMotorcycleLoaded state,
+  ) {
+    return state.serviceHistory
+        .where(
+          (s) =>
+              s.status.toUpperCase() != 'FINALIZADO' &&
+              s.status.toUpperCase() != 'CANCELADO',
+        )
+        .toList();
+  }
+
+  /// Shows a warning card when the motorcycle has active services
+  /// (SOLICITADO or EN_PROCESO) to prevent the representative from
+  /// filling out the form only to get a backend rejection.
+  Widget _buildPendingServicesAlert(SearchMotorcycleLoaded state) {
+    final activeServices = _getActiveServices(state);
+    if (activeServices.isEmpty) return const SizedBox.shrink();
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.blue[50],
+      color: Colors.amber[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.amber[800],
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    MotorcycleConstants.pendingServicesTitle,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[900],
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${activeServices.length}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber[800],
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              MotorcycleConstants.pendingServicesSubtitle,
+              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 12),
+            ...activeServices.map(
+              (service) => _buildPendingServiceTile(service),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingServiceTile(CompletedServiceEntity service) {
+    final statusLabel = getStatusLabel(service.status);
+    final statusColor = getStatusColor(service.status);
+    final dateLabel = formatServiceDate(service.requestDate);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
       child: InkWell(
-        onTap: state.isRegisteringService
-            ? null
-            : () => _showRegisterServiceSheet(state),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => BlocProvider.value(
+                value: context.read<SearchMotorcycleBloc>(),
+                child: ServiceDetailPage(service: service),
+              ),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey[300]!),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  statusLabel,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (service.branchName != null)
+                      Text(
+                        service.branchName!,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    Text(
+                      dateLabel,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[400]),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRegisterServiceButton(SearchMotorcycleLoaded state) {
+    final hasActiveServices = _getActiveServices(state).isNotEmpty;
+    final isDisabled = state.isRegisteringService || hasActiveServices;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDisabled ? Colors.grey[100] : Colors.blue[50],
+      child: InkWell(
+        onTap: isDisabled ? null : () => _showRegisterServiceSheet(state),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -775,9 +926,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
               Icon(
                 Icons.build_circle,
                 size: 40,
-                color: state.isRegisteringService
-                    ? Colors.grey
-                    : Colors.blue[700],
+                color: isDisabled ? Colors.grey : Colors.blue[700],
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -789,14 +938,14 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: state.isRegisteringService
-                            ? Colors.grey
-                            : Colors.blue[800],
+                        color: isDisabled ? Colors.grey : Colors.blue[800],
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Registrar un servicio realizado para esta motocicleta',
+                      hasActiveServices
+                          ? MotorcycleConstants.registerBlockedSubtitle
+                          : MotorcycleConstants.registerServiceSubtitle,
                       style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                     ),
                   ],
@@ -812,7 +961,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 18,
-                  color: Colors.blue[700],
+                  color: isDisabled ? Colors.grey[400] : Colors.blue[700],
                 ),
             ],
           ),

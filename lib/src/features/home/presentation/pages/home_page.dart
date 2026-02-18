@@ -87,109 +87,10 @@ class _HomeViewState extends State<_HomeView> {
         ),
         child: Column(
           children: [
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: BranchConstants.searchPlaceholder,
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Colors.blue),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-                onChanged: (value) {
-                  context.read<MyBranchesBloc>().add(
-                    SearchBranches(query: value),
-                  );
-                },
-              ),
-            ),
-            // Branches list
+            _buildSearchBar(context),
             Expanded(
               child: BlocBuilder<MyBranchesBloc, MyBranchesState>(
-                builder: (context, state) {
-                  if (state is MyBranchesLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (state is MyBranchesError) {
-                    return _buildErrorState(context, state.error.message);
-                  }
-
-                  if (state is MyBranchesLoaded) {
-                    if (state.branches.isEmpty) {
-                      return _buildEmptyState(context);
-                    }
-
-                    if (state.filteredBranches.isEmpty &&
-                        state.searchQuery.isNotEmpty) {
-                      return _buildNoSearchResults();
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        context.read<MyBranchesBloc>().add(RefreshBranches());
-                      },
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(top: 8, bottom: 80),
-                        itemCount: state.filteredBranches.length,
-                        itemBuilder: (context, index) {
-                          final branch = state.filteredBranches[index];
-                          // Get franchise name from the map if exists, fallback to "Franquicia" if has ID
-                          String? franchiseName;
-                          if (branch.franchiseId != null) {
-                            franchiseName =
-                                state.franchiseNames[branch.franchiseId] ??
-                                'Franquicia';
-                          }
-                          return BranchCard(
-                            branch: branch,
-                            franchiseName: franchiseName,
-                            onFranchiseTap: branch.franchiseId != null
-                                ? () => _navigateToManageFranchise(
-                                    context,
-                                    branch.franchiseId!,
-                                  )
-                                : null,
-                            onTap: () async {
-                              final result = await Navigator.push<dynamic>(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BranchDetailPage(branch: branch),
-                                ),
-                              );
-                              if (result != null && context.mounted) {
-                                context.read<MyBranchesBloc>().add(
-                                  RefreshBranches(),
-                                );
-                              }
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  }
-
-                  return const SizedBox.shrink();
-                },
+                builder: (context, state) => _buildBranchesBody(context, state),
               ),
             ),
           ],
@@ -201,6 +102,103 @@ class _HomeViewState extends State<_HomeView> {
         foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: BranchConstants.searchPlaceholder,
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.blue),
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+        ),
+        onChanged: (value) {
+          context.read<MyBranchesBloc>().add(SearchBranches(query: value));
+        },
+      ),
+    );
+  }
+
+  Widget _buildBranchesBody(BuildContext context, MyBranchesState state) {
+    if (state is MyBranchesLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (state is MyBranchesError) {
+      return _buildErrorState(context, state.error.message);
+    }
+    if (state is MyBranchesLoaded) {
+      return _buildLoadedBranches(context, state);
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildLoadedBranches(BuildContext context, MyBranchesLoaded state) {
+    if (state.branches.isEmpty) {
+      return _buildEmptyState(context);
+    }
+    if (state.filteredBranches.isEmpty && state.searchQuery.isNotEmpty) {
+      return _buildNoSearchResults();
+    }
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<MyBranchesBloc>().add(RefreshBranches());
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        itemCount: state.filteredBranches.length,
+        itemBuilder: (context, index) =>
+            _buildBranchItem(context, state, index),
+      ),
+    );
+  }
+
+  Widget _buildBranchItem(
+    BuildContext context,
+    MyBranchesLoaded state,
+    int index,
+  ) {
+    final branch = state.filteredBranches[index];
+    String? franchiseName;
+    if (branch.franchiseId != null) {
+      franchiseName = state.franchiseNames[branch.franchiseId] ?? 'Franquicia';
+    }
+    return BranchCard(
+      branch: branch,
+      franchiseName: franchiseName,
+      onFranchiseTap: branch.franchiseId != null
+          ? () => _navigateToManageFranchise(context, branch.franchiseId!)
+          : null,
+      onTap: () async {
+        final result = await Navigator.push<dynamic>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BranchDetailPage(branch: branch),
+          ),
+        );
+        if (result != null && context.mounted) {
+          context.read<MyBranchesBloc>().add(RefreshBranches());
+        }
+      },
     );
   }
 

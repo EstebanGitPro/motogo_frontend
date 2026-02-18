@@ -25,9 +25,7 @@ class UserTypeSelectionPage extends StatelessWidget {
                   child: Center(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: isTablet
-                            ? (isLargeTablet ? 800 : 600)
-                            : double.infinity,
+                        maxWidth: _maxContentWidth(isTablet, isLargeTablet),
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
@@ -37,227 +35,21 @@ class UserTypeSelectionPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Logo container
-                            Container(
-                              height: isMobile ? 80 : (isTablet ? 100 : 120),
-                              width: isMobile ? 80 : (isTablet ? 100 : 120),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Theme.of(
-                                      context,
-                                    ).primaryColor.withAlpha(75),
-                                    spreadRadius: 2,
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.motorcycle,
-                                color: Colors.white,
-                                size: isMobile ? 40 : (isTablet ? 50 : 60),
-                              ),
-                            ),
-
+                            _buildLogo(context, isMobile, isTablet),
                             SizedBox(height: isMobile ? 24 : 32),
-
-                            // App name
-                            Text(
-                              getTranslateText(
-                                context: context,
-                                key: 'app_name',
-                              ),
-                              style: Theme.of(context).textTheme.headlineLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                    fontSize: isMobile
-                                        ? 32
-                                        : (isTablet ? 40 : 48),
-                                    letterSpacing: -0.5,
-                                  ),
-                            ),
-
+                            _buildAppName(context, isMobile, isTablet),
                             SizedBox(height: isMobile ? 16 : 24),
-
-                            // Main title
-                            Text(
-                              getTranslateText(
-                                context: context,
-                                key: 'user_type_selection_title',
-                              ),
-                              style: Theme.of(context).textTheme.headlineSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black87,
-                                    fontSize: isMobile
-                                        ? 24
-                                        : (isTablet ? 28 : 32),
-                                  ),
-                              textAlign: TextAlign.center,
-                            ),
-
+                            _buildMainTitle(context, isMobile, isTablet),
                             SizedBox(height: isMobile ? 12 : 16),
-
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: isMobile ? 16.0 : 24.0,
-                              ),
-                              child: Text(
-                                getTranslateText(
-                                  context: context,
-                                  key: 'user_type_selection_subtitle',
-                                ),
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: Colors.grey[600],
-                                      fontSize: isMobile ? 16 : 18,
-                                      height: 1.4,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-
+                            _buildSubtitle(context, isMobile),
                             SizedBox(height: isMobile ? 40 : 56),
-
-                            if (isLargeTablet)
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildUserTypeCard(
-                                      context: context,
-                                      title: getTranslateText(
-                                        context: context,
-                                        key: 'motorcyclist_title',
-                                      ),
-                                      subtitle: getTranslateText(
-                                        context: context,
-                                        key: 'motorcyclist_subtitle',
-                                      ),
-                                      icon: Icons.motorcycle,
-                                      iconColor: Colors.blue[600]!,
-                                      onTap: () => Navigator.pushNamed(
-                                        context,
-                                        '/register/user',
-                                      ),
-                                      isCompact: false,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 24),
-                                  Expanded(
-                                    child: _buildUserTypeCard(
-                                      context: context,
-                                      title: getTranslateText(
-                                        context: context,
-                                        key: 'representative_title',
-                                      ),
-                                      subtitle: getTranslateText(
-                                        context: context,
-                                        key: 'representative_subtitle',
-                                      ),
-                                      icon: Icons.store,
-                                      iconColor: Colors.orange[600]!,
-                                      onTap: () => Navigator.pushNamed(
-                                        context,
-                                        '/register/representative',
-                                      ),
-                                      isCompact: false,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            else
-                              Column(
-                                children: [
-                                  _buildUserTypeCard(
-                                    context: context,
-                                    title: getTranslateText(
-                                      context: context,
-                                      key: 'motorcyclist_title',
-                                    ),
-                                    subtitle: getTranslateText(
-                                      context: context,
-                                      key: 'motorcyclist_subtitle',
-                                    ),
-                                    icon: Icons.motorcycle,
-                                    iconColor: Colors.blue[600]!,
-                                    onTap: () => Navigator.pushNamed(
-                                      context,
-                                      '/register/user',
-                                    ),
-                                    isCompact: isMobile,
-                                  ),
-                                  SizedBox(height: isMobile ? 16 : 20),
-                                  _buildUserTypeCard(
-                                    context: context,
-                                    title: getTranslateText(
-                                      context: context,
-                                      key: 'representative_title',
-                                    ),
-                                    subtitle: getTranslateText(
-                                      context: context,
-                                      key: 'representative_subtitle',
-                                    ),
-                                    icon: Icons.store,
-                                    iconColor: Colors.orange[600]!,
-                                    onTap: () => Navigator.pushNamed(
-                                      context,
-                                      '/register/representative',
-                                    ),
-                                    isCompact: isMobile,
-                                  ),
-                                ],
-                              ),
-
-                            SizedBox(height: isMobile ? 40 : 56),
-
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              children: [
-                                Text(
-                                  getTranslateText(
-                                    context: context,
-                                    key: 'already_have_account',
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: isMobile ? 16 : 18,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const LoginPage(),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    getTranslateText(
-                                      context: context,
-                                      key: 'sign_in',
-                                    ),
-                                    style: TextStyle(
-                                      color: Colors.blue[600],
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            _buildUserTypeCards(
+                              context,
+                              isMobile,
+                              isLargeTablet,
                             ),
-
+                            SizedBox(height: isMobile ? 40 : 56),
+                            _buildLoginLink(context, isMobile),
                             SizedBox(height: isMobile ? 20 : 24),
                           ],
                         ),
@@ -270,6 +62,206 @@ class UserTypeSelectionPage extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  /// Calculates the max content width based on screen breakpoints.
+  double _maxContentWidth(bool isTablet, bool isLargeTablet) {
+    if (isLargeTablet) return 800;
+    if (isTablet) return 600;
+    return double.infinity;
+  }
+
+  /// Returns a responsive value for mobile / tablet / large screens.
+  double _responsiveValue({
+    required bool isMobile,
+    required bool isTablet,
+    required double mobile,
+    required double tablet,
+    required double large,
+  }) {
+    if (isMobile) return mobile;
+    if (isTablet) return tablet;
+    return large;
+  }
+
+  /// Logo icon container with responsive sizing.
+  Widget _buildLogo(BuildContext context, bool isMobile, bool isTablet) {
+    final dimension = _responsiveValue(
+      isMobile: isMobile,
+      isTablet: isTablet,
+      mobile: 80,
+      tablet: 100,
+      large: 120,
+    );
+    final iconSize = _responsiveValue(
+      isMobile: isMobile,
+      isTablet: isTablet,
+      mobile: 40,
+      tablet: 50,
+      large: 60,
+    );
+
+    return Container(
+      height: dimension,
+      width: dimension,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).primaryColor.withAlpha(75),
+            spreadRadius: 2,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Icon(Icons.motorcycle, color: Colors.white, size: iconSize),
+    );
+  }
+
+  /// App name heading with responsive font size.
+  Widget _buildAppName(BuildContext context, bool isMobile, bool isTablet) {
+    final fontSize = _responsiveValue(
+      isMobile: isMobile,
+      isTablet: isTablet,
+      mobile: 32,
+      tablet: 40,
+      large: 48,
+    );
+
+    return Text(
+      getTranslateText(context: context, key: 'app_name'),
+      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).primaryColor,
+        fontSize: fontSize,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
+  /// Main title with responsive font size.
+  Widget _buildMainTitle(BuildContext context, bool isMobile, bool isTablet) {
+    final fontSize = _responsiveValue(
+      isMobile: isMobile,
+      isTablet: isTablet,
+      mobile: 24,
+      tablet: 28,
+      large: 32,
+    );
+
+    return Text(
+      getTranslateText(context: context, key: 'user_type_selection_title'),
+      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w700,
+        color: Colors.black87,
+        fontSize: fontSize,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  /// Subtitle text.
+  Widget _buildSubtitle(BuildContext context, bool isMobile) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 24.0),
+      child: Text(
+        getTranslateText(context: context, key: 'user_type_selection_subtitle'),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: Colors.grey[600],
+          fontSize: isMobile ? 16 : 18,
+          height: 1.4,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  /// Lays out user type cards side-by-side on large tablets, stacked otherwise.
+  Widget _buildUserTypeCards(
+    BuildContext context,
+    bool isMobile,
+    bool isLargeTablet,
+  ) {
+    final motorcyclistCard = _buildUserTypeCard(
+      context: context,
+      title: getTranslateText(context: context, key: 'motorcyclist_title'),
+      subtitle: getTranslateText(
+        context: context,
+        key: 'motorcyclist_subtitle',
+      ),
+      icon: Icons.motorcycle,
+      iconColor: Colors.blue[600]!,
+      onTap: () => Navigator.pushNamed(context, '/register/user'),
+      isCompact: isMobile,
+    );
+    final representativeCard = _buildUserTypeCard(
+      context: context,
+      title: getTranslateText(context: context, key: 'representative_title'),
+      subtitle: getTranslateText(
+        context: context,
+        key: 'representative_subtitle',
+      ),
+      icon: Icons.store,
+      iconColor: Colors.orange[600]!,
+      onTap: () => Navigator.pushNamed(context, '/register/representative'),
+      isCompact: isMobile,
+    );
+
+    if (isLargeTablet) {
+      return Row(
+        children: [
+          Expanded(child: motorcyclistCard),
+          const SizedBox(width: 24),
+          Expanded(child: representativeCard),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        motorcyclistCard,
+        SizedBox(height: isMobile ? 16 : 20),
+        representativeCard,
+      ],
+    );
+  }
+
+  /// "Already have an account? Sign in" link.
+  Widget _buildLoginLink(BuildContext context, bool isMobile) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Text(
+          getTranslateText(context: context, key: 'already_have_account'),
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 18,
+            color: Colors.grey[600],
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginPage()),
+              (route) => false,
+            );
+          },
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          child: Text(
+            getTranslateText(context: context, key: 'sign_in'),
+            style: TextStyle(
+              color: Colors.blue[600],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

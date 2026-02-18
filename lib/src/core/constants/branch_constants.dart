@@ -102,4 +102,20 @@ class BranchConstants {
   // FAB menu options
   static const String newBranchOption = 'Nueva Sede';
   static const String newFranchiseOption = 'Nueva Franquicia';
+
+  /// Maps backend establishment type codes to Spanish display labels.
+  ///
+  /// Used by [BranchCard] and [BranchInfoCard] to render the type chip.
+  static String mapTypeToLabel(String type) {
+    switch (type.toUpperCase()) {
+      case 'WORKSHOP':
+        return 'Taller';
+      case 'STORE':
+        return 'Tienda';
+      case 'WORKSHOP_STORE':
+        return 'Taller y Tienda';
+      default:
+        return type;
+    }
+  }
 }

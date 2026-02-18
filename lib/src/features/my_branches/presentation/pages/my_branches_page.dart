@@ -72,141 +72,10 @@ class _MyBranchesViewState extends State<_MyBranchesView>
       ),
       body: Column(
         children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: BranchConstants.searchPlaceholder,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.blue),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-              onChanged: (value) {
-                context.read<MyBranchesBloc>().add(
-                  SearchBranches(query: value),
-                );
-              },
-            ),
-          ),
-          // Branches list
+          _buildSearchBar(context),
           Expanded(
             child: BlocBuilder<MyBranchesBloc, MyBranchesState>(
-              builder: (context, state) {
-                if (state is MyBranchesLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is MyBranchesError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.grey[400],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.error.message,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            context.read<MyBranchesBloc>().add(LoadBranches());
-                          },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text(BranchConstants.retry),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (state is MyBranchesLoaded) {
-                  if (state.filteredBranches.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            state.searchQuery.isNotEmpty
-                                ? Icons.search_off
-                                : Icons.storefront_outlined,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            state.searchQuery.isNotEmpty
-                                ? BranchConstants.noSearchResults
-                                : BranchConstants.noRegisteredBranches,
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      context.read<MyBranchesBloc>().add(RefreshBranches());
-                    },
-                    child: ListView.builder(
-                      padding: const EdgeInsets.only(top: 8, bottom: 80),
-                      itemCount: state.filteredBranches.length,
-                      itemBuilder: (context, index) {
-                        final branch = state.filteredBranches[index];
-                        return BranchCard(
-                          branch: branch,
-                          onTap: () async {
-                            final result = await Navigator.push<dynamic>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BranchDetailPage(branch: branch),
-                              ),
-                            );
-                            if (result != null && context.mounted) {
-                              context.read<MyBranchesBloc>().add(
-                                RefreshBranches(),
-                              );
-                            }
-                          },
-                        );
-                      },
-                    ),
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
+              builder: (context, state) => _buildBranchesBody(context, state),
             ),
           ),
         ],
@@ -222,6 +91,132 @@ class _MyBranchesViewState extends State<_MyBranchesView>
           }
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: BranchConstants.searchPlaceholder,
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey[300]!),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.blue),
+          ),
+          filled: true,
+          fillColor: Colors.grey[50],
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+        ),
+        onChanged: (value) {
+          context.read<MyBranchesBloc>().add(SearchBranches(query: value));
+        },
+      ),
+    );
+  }
+
+  Widget _buildBranchesBody(BuildContext context, MyBranchesState state) {
+    if (state is MyBranchesLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (state is MyBranchesError) {
+      return _buildErrorState(context, state.error.message);
+    }
+    if (state is MyBranchesLoaded) {
+      return _buildLoadedBranches(context, state);
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildLoadedBranches(BuildContext context, MyBranchesLoaded state) {
+    if (state.filteredBranches.isEmpty) {
+      return _buildEmptyState(state.searchQuery.isNotEmpty);
+    }
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<MyBranchesBloc>().add(RefreshBranches());
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.only(top: 8, bottom: 80),
+        itemCount: state.filteredBranches.length,
+        itemBuilder: (context, index) {
+          final branch = state.filteredBranches[index];
+          return BranchCard(
+            branch: branch,
+            onTap: () async {
+              final result = await Navigator.push<dynamic>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BranchDetailPage(branch: branch),
+                ),
+              );
+              if (result != null && context.mounted) {
+                context.read<MyBranchesBloc>().add(RefreshBranches());
+              }
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(bool hasSearchQuery) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            hasSearchQuery ? Icons.search_off : Icons.storefront_outlined,
+            size: 64,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            hasSearchQuery
+                ? BranchConstants.noSearchResults
+                : BranchConstants.noRegisteredBranches,
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              context.read<MyBranchesBloc>().add(LoadBranches());
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text(BranchConstants.retry),
+          ),
+        ],
       ),
     );
   }

@@ -55,6 +55,20 @@ class DayAccordionTile extends StatelessWidget {
     return timeSlots.any((s) => s.isClosed);
   }
 
+  /// Badge background color based on slot state.
+  Color _badgeBackgroundColor() {
+    if (_isClosed) return Colors.red[50]!;
+    if (timeSlots.isEmpty) return Colors.grey[100]!;
+    return const Color(0xFF10B981).withValues(alpha: 0.1);
+  }
+
+  /// Badge text color based on slot state.
+  Color _badgeTextColor() {
+    if (_isClosed) return Colors.red[700]!;
+    if (timeSlots.isEmpty) return Colors.grey[500]!;
+    return const Color(0xFF10B981);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -64,107 +78,98 @@ class DayAccordionTile extends StatelessWidget {
         border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
       ),
       child: Column(
+        children: [_buildHeader(), if (isExpanded) _buildExpandedContent()],
+      ),
+    );
+  }
+
+  Color get _dayNameColor {
+    if (_isClosed) return Colors.red[700]!;
+    return Colors.grey[800]!;
+  }
+
+  Widget _buildHeader() {
+    return InkWell(
+      onTap: onToggleExpand,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(
+              isExpanded
+                  ? Icons.keyboard_arrow_down
+                  : Icons.keyboard_arrow_right,
+              color: Colors.grey[600],
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                day.label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: _dayNameColor,
+                ),
+              ),
+            ),
+            if (!isExpanded)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: _badgeBackgroundColor(),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _summary,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: _badgeTextColor(),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExpandedContent() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(48, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header (always visible)
-          InkWell(
-            onTap: onToggleExpand,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  // Expand/collapse icon
-                  Icon(
-                    isExpanded
-                        ? Icons.keyboard_arrow_down
-                        : Icons.keyboard_arrow_right,
-                    color: Colors.grey[600],
-                    size: 24,
-                  ),
-                  const SizedBox(width: 8),
-                  // Day name
-                  Expanded(
-                    child: Text(
-                      day.label,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: _isClosed ? Colors.red[700] : Colors.grey[800],
-                      ),
-                    ),
-                  ),
-                  // Summary when collapsed
-                  if (!isExpanded)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _isClosed
-                            ? Colors.red[50]
-                            : timeSlots.isEmpty
-                            ? Colors.grey[100]
-                            : const Color(0xFF10B981).withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        _summary,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: _isClosed
-                              ? Colors.red[700]
-                              : timeSlots.isEmpty
-                              ? Colors.grey[500]
-                              : const Color(0xFF10B981),
-                        ),
-                      ),
-                    ),
-                ],
+          if (timeSlots.isNotEmpty)
+            ...timeSlots.map(
+              (slot) => TimeSlotCard(
+                detail: slot,
+                onEdit: () => onEditTimeSlot(slot),
+                onDelete: () => onDeleteTimeSlot(slot),
+              ),
+            ),
+          TextButton.icon(
+            onPressed: onAddTimeSlot,
+            icon: Icon(Icons.add, size: 18, color: Colors.blue[600]),
+            label: Text(
+              ScheduleConstants.addTimeSlot,
+              style: TextStyle(color: Colors.blue[600]),
+            ),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(
+                  color: Colors.blue[200]!,
+                  style: BorderStyle.solid,
+                ),
               ),
             ),
           ),
-          // Expanded content
-          if (isExpanded)
-            Container(
-              padding: const EdgeInsets.fromLTRB(48, 0, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Time slots list
-                  if (timeSlots.isNotEmpty)
-                    ...timeSlots.map(
-                      (slot) => TimeSlotCard(
-                        detail: slot,
-                        onEdit: () => onEditTimeSlot(slot),
-                        onDelete: () => onDeleteTimeSlot(slot),
-                      ),
-                    ),
-                  // Add button
-                  TextButton.icon(
-                    onPressed: onAddTimeSlot,
-                    icon: Icon(Icons.add, size: 18, color: Colors.blue[600]),
-                    label: Text(
-                      ScheduleConstants.addTimeSlot,
-                      style: TextStyle(color: Colors.blue[600]),
-                    ),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: Colors.blue[200]!,
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

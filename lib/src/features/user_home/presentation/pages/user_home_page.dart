@@ -70,6 +70,11 @@ class _UserHomeViewState extends State<_UserHomeView> {
   double? _liveDistanceKm;
   double? _liveDurationMin;
 
+  // Mapbox style layer/source IDs (avoids duplicated literals)
+  static const _routeLayerId = 'route-layer';
+  static const _routeSourceId = 'route-source';
+  static const _routeArrowsId = 'route-arrows';
+
   @override
   void initState() {
     super.initState();
@@ -766,18 +771,19 @@ class _UserHomeViewState extends State<_UserHomeView> {
   ) async {
     final bloc = context.read<UserHomeBloc>();
     final state = bloc.state;
+    // Capture ScaffoldMessenger before async gap to avoid BuildContext usage
+    // across async boundaries.
+    final messenger = ScaffoldMessenger.of(context);
 
     if (state is! UserHomeLoaded || !state.hasUserLocation) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text(CommonConstants.noLocationForNavigation),
-              backgroundColor: Colors.orange,
-            ),
-          );
-      }
+      messenger
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(CommonConstants.noLocationForNavigation),
+            backgroundColor: Colors.orange,
+          ),
+        );
       return;
     }
 
@@ -797,7 +803,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     if (result == null) {
       setState(() => _isLoadingRoute = false);
-      ScaffoldMessenger.of(context)
+      messenger
         ..clearSnackBars()
         ..showSnackBar(
           const SnackBar(
@@ -926,19 +932,19 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     // Remove previous route if exists
     try {
-      await style.removeStyleLayer('route-layer');
-      await style.removeStyleSource('route-source');
+      await style.removeStyleLayer(_routeLayerId);
+      await style.removeStyleSource(_routeSourceId);
     } catch (_) {
       // Layer/source might not exist yet
     }
 
     // Add source and layer
-    await style.addSource(GeoJsonSource(id: 'route-source', data: geoJson));
+    await style.addSource(GeoJsonSource(id: _routeSourceId, data: geoJson));
 
     await style.addLayer(
       LineLayer(
-        id: 'route-layer',
-        sourceId: 'route-source',
+        id: _routeLayerId,
+        sourceId: _routeSourceId,
         lineColor: Colors.blue.toARGB32(),
         lineWidth: 5.0,
         lineCap: LineCap.ROUND,
@@ -955,14 +961,14 @@ class _UserHomeViewState extends State<_UserHomeView> {
     try {
       // Remove previous arrows
       try {
-        await style.removeStyleLayer('route-arrows');
+        await style.removeStyleLayer(_routeArrowsId);
       } catch (_) {}
 
       // Add text-based arrow symbols along the route line
       await style.addLayer(
         SymbolLayer(
-          id: 'route-arrows',
-          sourceId: 'route-source',
+          id: _routeArrowsId,
+          sourceId: _routeSourceId,
           symbolPlacement: SymbolPlacement.LINE,
           symbolSpacing: 80.0,
           textField: '▶',
@@ -1033,9 +1039,9 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
     if (_mapController != null) {
       try {
-        await _mapController!.style.removeStyleLayer('route-arrows');
-        await _mapController!.style.removeStyleLayer('route-layer');
-        await _mapController!.style.removeStyleSource('route-source');
+        await _mapController!.style.removeStyleLayer(_routeArrowsId);
+        await _mapController!.style.removeStyleLayer(_routeLayerId);
+        await _mapController!.style.removeStyleSource(_routeSourceId);
       } catch (_) {}
 
       // Reset camera pitch/bearing

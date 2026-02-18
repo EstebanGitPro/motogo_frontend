@@ -309,6 +309,11 @@ abstract class InjectorApp {
       (c) => EmailRecoveryVerificationDataSource(),
     );
 
+    // Register Person - has its own Dio (public endpoint, no auth)
+    container.registerFactory<RegisterPersonDataSource>(
+      (c) => RegisterPersonDataSource(),
+    );
+
     // Register Franchise - uses DioClient
     container.registerFactory<RegisterFranchiseDataSource>(
       (c) => RegisterFranchiseDataSourceImpl(c.resolve<DioClient>()),
@@ -747,7 +752,7 @@ abstract class InjectorApp {
   // Features - Repositories, UseCases, and remaining DataSources
   @Register.factory(RegisterPersonRepository, from: RegisterPersonRepositoryImp)
   @Register.factory(RegisterPersonUseCase)
-  @Register.factory(RegisterPersonDataSource)
+  // RegisterPersonDataSource - registered manually in _configureDioDataSources
   @Register.factory(LoginRepository, from: LoginRepositoryImpl)
   @Register.factory(LoginUseCase)
   @Register.factory(GetPersonUsecase)

@@ -31,51 +31,46 @@ class BranchScheduleTab extends StatelessWidget {
         repository: InjectorApp.resolve<BranchScheduleRepository>(),
       )..add(LoadSchedule(branchId)),
       child: BlocListener<BranchScheduleBloc, BranchScheduleState>(
-        listenWhen: (prev, curr) {
-          // Listen for messages in loaded or not found states
-          if (curr is BranchScheduleLoaded && curr.message != null) {
-            return true;
-          }
-          if (curr is BranchScheduleNotFound && curr.message != null) {
-            return true;
-          }
-          if (curr is BranchScheduleError) {
-            return true;
-          }
-          return false;
-        },
-        listener: (context, state) {
-          String? message;
-          bool isSuccess = true;
-
-          if (state is BranchScheduleLoaded && state.message != null) {
-            message = state.message;
-            isSuccess = state.isSuccess;
-          } else if (state is BranchScheduleNotFound && state.message != null) {
-            message = state.message;
-            isSuccess = state.isSuccess;
-          } else if (state is BranchScheduleError) {
-            message = state.message;
-            isSuccess = false;
-          }
-
-          if (message != null) {
-            ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(message),
-                  backgroundColor: isSuccess
-                      ? Colors.green[600]
-                      : Colors.red[600],
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-          }
-        },
+        listenWhen: (prev, curr) => _hasMessage(curr),
+        listener: _onStateChanged,
         child: _BranchScheduleContent(branchId: branchId),
       ),
     );
+  }
+
+  bool _hasMessage(BranchScheduleState state) {
+    if (state is BranchScheduleLoaded && state.message != null) return true;
+    if (state is BranchScheduleNotFound && state.message != null) return true;
+    if (state is BranchScheduleError) return true;
+    return false;
+  }
+
+  void _onStateChanged(BuildContext context, BranchScheduleState state) {
+    final (message, isSuccess) = _extractMessage(state);
+    if (message != null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: isSuccess ? Colors.green[600] : Colors.red[600],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+  }
+
+  (String?, bool) _extractMessage(BranchScheduleState state) {
+    if (state is BranchScheduleLoaded && state.message != null) {
+      return (state.message, state.isSuccess);
+    }
+    if (state is BranchScheduleNotFound && state.message != null) {
+      return (state.message, state.isSuccess);
+    }
+    if (state is BranchScheduleError) {
+      return (state.message, false);
+    }
+    return (null, true);
   }
 }
 
@@ -238,95 +233,134 @@ class _BranchScheduleContent extends StatelessWidget {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Start date picker
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.calendar_today, color: Colors.blue[600]),
-                  title: const Text(ScheduleConstants.startDateLabel),
-                  subtitle: Text(
-                    '${startDate.day}/${startDate.month}/${startDate.year}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: dialogContext,
-                      initialDate: startDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2100),
-                      locale: const Locale('es', 'ES'),
-                    );
-                    if (picked != null) {
-                      setState(() => startDate = picked);
-                    }
-                  },
-                ),
+                _buildStartDatePicker(dialogContext, startDate, (picked) {
+                  setState(() => startDate = picked);
+                }),
                 const Divider(),
-                // End date picker
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(Icons.event, color: Colors.orange[600]),
-                  title: const Text(ScheduleConstants.endDateLabel),
-                  subtitle: Text(
-                    endDate != null
-                        ? '${endDate!.day}/${endDate!.month}/${endDate!.year}'
-                        : ScheduleConstants.validityIndefinite,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontStyle: endDate == null
-                          ? FontStyle.italic
-                          : FontStyle.normal,
-                    ),
-                  ),
-                  trailing: endDate != null
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.grey),
-                          onPressed: () => setState(() => endDate = null),
-                        )
-                      : null,
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: dialogContext,
-                      initialDate:
-                          endDate ?? startDate.add(const Duration(days: 365)),
-                      firstDate: startDate,
-                      lastDate: DateTime(2100),
-                      locale: const Locale('es', 'ES'),
-                    );
-                    if (picked != null) {
-                      setState(() => endDate = picked);
-                    }
+                _buildEndDatePicker(
+                  dialogContext,
+                  startDate,
+                  endDate,
+                  (picked) {
+                    setState(() => endDate = picked);
+                  },
+                  () {
+                    setState(() => endDate = null);
                   },
                 ),
               ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: const Text(ScheduleConstants.cancel),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                  context.read<BranchScheduleBloc>().add(
-                    UpdateSchedule(
-                      branchId: branchId,
-                      active: state.schedule.active,
-                      startDate: startDate,
-                      endDate: endDate,
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text(ScheduleConstants.save),
-              ),
-            ],
+            actions: _buildValidityDialogActions(
+              dialogContext,
+              context,
+              state,
+              startDate,
+              endDate,
+            ),
           );
         },
       ),
     );
+  }
+
+  Widget _buildStartDatePicker(
+    BuildContext dialogContext,
+    DateTime startDate,
+    ValueChanged<DateTime> onPicked,
+  ) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(Icons.calendar_today, color: Colors.blue[600]),
+      title: const Text(ScheduleConstants.startDateLabel),
+      subtitle: Text(
+        '${startDate.day}/${startDate.month}/${startDate.year}',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: dialogContext,
+          initialDate: startDate,
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2100),
+          locale: const Locale('es', 'ES'),
+        );
+        if (picked != null) onPicked(picked);
+      },
+    );
+  }
+
+  Widget _buildEndDatePicker(
+    BuildContext dialogContext,
+    DateTime startDate,
+    DateTime? endDate,
+    ValueChanged<DateTime> onPicked,
+    VoidCallback onClear,
+  ) {
+    final endLabel = endDate != null
+        ? '${endDate.day}/${endDate.month}/${endDate.year}'
+        : ScheduleConstants.validityIndefinite;
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(Icons.event, color: Colors.orange[600]),
+      title: const Text(ScheduleConstants.endDateLabel),
+      subtitle: Text(
+        endLabel,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontStyle: endDate == null ? FontStyle.italic : FontStyle.normal,
+        ),
+      ),
+      trailing: endDate != null
+          ? IconButton(
+              icon: const Icon(Icons.clear, color: Colors.grey),
+              onPressed: onClear,
+            )
+          : null,
+      onTap: () async {
+        final picked = await showDatePicker(
+          context: dialogContext,
+          initialDate: endDate ?? startDate.add(const Duration(days: 365)),
+          firstDate: startDate,
+          lastDate: DateTime(2100),
+          locale: const Locale('es', 'ES'),
+        );
+        if (picked != null) onPicked(picked);
+      },
+    );
+  }
+
+  List<Widget> _buildValidityDialogActions(
+    BuildContext dialogContext,
+    BuildContext context,
+    BranchScheduleLoaded state,
+    DateTime startDate,
+    DateTime? endDate,
+  ) {
+    return [
+      TextButton(
+        onPressed: () => Navigator.pop(dialogContext),
+        child: const Text(ScheduleConstants.cancel),
+      ),
+      ElevatedButton(
+        onPressed: () {
+          Navigator.pop(dialogContext);
+          context.read<BranchScheduleBloc>().add(
+            UpdateSchedule(
+              branchId: branchId,
+              active: state.schedule.active,
+              startDate: startDate,
+              endDate: endDate,
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue[600],
+          foregroundColor: Colors.white,
+        ),
+        child: const Text(ScheduleConstants.save),
+      ),
+    ];
   }
 
   Widget _buildErrorState(BuildContext context, String message) {

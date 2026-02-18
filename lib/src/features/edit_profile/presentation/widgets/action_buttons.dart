@@ -33,29 +33,7 @@ class ActionButtons extends StatelessWidget {
               elevation: 2,
               shadowColor: Theme.of(context).colorScheme.primary.withAlpha(75),
             ),
-            child: isLoading
-                ? const SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: Colors.white,
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.save_outlined, size: isMobile ? 20 : 22),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Guardar Cambios',
-                        style: TextStyle(
-                          fontSize: isMobile ? 16 : 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+            child: _buildSaveButtonContent(isMobile),
           ),
         ),
         const SizedBox(height: 16),
@@ -78,6 +56,30 @@ class ActionButtons extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveButtonContent(bool isMobile) {
+    if (isLoading) {
+      return const SizedBox(
+        height: 24,
+        width: 24,
+        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
+      );
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.save_outlined, size: isMobile ? 20 : 22),
+        const SizedBox(width: 8),
+        Text(
+          'Guardar Cambios',
+          style: TextStyle(
+            fontSize: isMobile ? 16 : 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ],

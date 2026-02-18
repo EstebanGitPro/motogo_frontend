@@ -60,57 +60,62 @@ class BrandsSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-
-        // Loading state
-        if (isLoading)
-          const CatalogLoadingState()
-        // Error state
-        else if (errorMessage != null)
-          CatalogErrorState(message: errorMessage!)
-        // Normal state with brands
-        else if (availableBrands.isEmpty)
-          const CatalogEmptyState(message: 'No hay marcas disponibles')
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: availableBrands.map((brand) {
-              final isSelected = selectedBrandIds.contains(brand.id);
-              return FilterChip(
-                label: Text(brand.name),
-                selected: isSelected,
-                onSelected: enabled ? (_) => _toggleBrand(brand.id) : null,
-                selectedColor: Colors.blue[100],
-                checkmarkColor: Colors.blue[700],
-                backgroundColor: Colors.grey[100],
-                labelStyle: TextStyle(
-                  color: isSelected ? Colors.blue[700] : Colors.grey[700],
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: BorderSide(
-                    color: isSelected ? Colors.blue[400]! : Colors.grey[300]!,
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-
-        // Validation hint
+        _buildBrandsContent(),
         if (selectedBrandIds.isEmpty && availableBrands.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Selecciona al menos una marca',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[500],
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
+          _buildValidationHint(),
       ],
+    );
+  }
+
+  /// Builds the content area based on loading/error/empty/normal states.
+  Widget _buildBrandsContent() {
+    if (isLoading) return const CatalogLoadingState();
+    if (errorMessage != null) return CatalogErrorState(message: errorMessage!);
+    if (availableBrands.isEmpty) {
+      return const CatalogEmptyState(message: 'No hay marcas disponibles');
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: availableBrands.map(_buildBrandChip).toList(),
+    );
+  }
+
+  /// Builds a single brand chip.
+  Widget _buildBrandChip(BrandEntity brand) {
+    final isSelected = selectedBrandIds.contains(brand.id);
+    return FilterChip(
+      label: Text(brand.name),
+      selected: isSelected,
+      onSelected: enabled ? (_) => _toggleBrand(brand.id) : null,
+      selectedColor: Colors.blue[100],
+      checkmarkColor: Colors.blue[700],
+      backgroundColor: Colors.grey[100],
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.blue[700] : Colors.grey[700],
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isSelected ? Colors.blue[400]! : Colors.grey[300]!,
+        ),
+      ),
+    );
+  }
+
+  /// Validation hint shown when no brands are selected.
+  Widget _buildValidationHint() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        'Selecciona al menos una marca',
+        style: TextStyle(
+          fontSize: 12,
+          color: Colors.grey[500],
+          fontStyle: FontStyle.italic,
+        ),
+      ),
     );
   }
 }

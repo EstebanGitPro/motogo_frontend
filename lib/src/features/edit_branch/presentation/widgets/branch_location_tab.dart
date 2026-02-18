@@ -68,35 +68,7 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
     _departmentName = widget.branch.departmentName ?? '';
 
     if (_cityName.isEmpty || _departmentName.isEmpty) {
-      final catalogsRepo = InjectorApp.resolve<CatalogsRepository>();
-
-      // Get department name
-      if (_departmentName.isEmpty && widget.branch.departmentId.isNotEmpty) {
-        final deptResult = await catalogsRepo.getDepartments();
-        deptResult.fold((_) {}, (departments) {
-          final dept = departments
-              .where((d) => d.id == widget.branch.departmentId)
-              .firstOrNull;
-          if (dept != null) {
-            _departmentName = dept.name;
-          }
-        });
-      }
-
-      // Get city name
-      if (_cityName.isEmpty && widget.branch.cityId.isNotEmpty) {
-        final citiesResult = await catalogsRepo.getCitiesByDepartment(
-          widget.branch.departmentId,
-        );
-        citiesResult.fold((_) {}, (cities) {
-          final city = cities
-              .where((c) => c.id == widget.branch.cityId)
-              .firstOrNull;
-          if (city != null) {
-            _cityName = city.name;
-          }
-        });
-      }
+      await _resolveCatalogNames();
     }
 
     // Now call geocoding API with resolved names
@@ -124,6 +96,38 @@ class _BranchLocationTabState extends State<BranchLocationTab> {
         });
       },
     );
+  }
+
+  Future<void> _resolveCatalogNames() async {
+    final catalogsRepo = InjectorApp.resolve<CatalogsRepository>();
+
+    // Get department name
+    if (_departmentName.isEmpty && widget.branch.departmentId.isNotEmpty) {
+      final deptResult = await catalogsRepo.getDepartments();
+      deptResult.fold((_) {}, (departments) {
+        final dept = departments
+            .where((d) => d.id == widget.branch.departmentId)
+            .firstOrNull;
+        if (dept != null) {
+          _departmentName = dept.name;
+        }
+      });
+    }
+
+    // Get city name
+    if (_cityName.isEmpty && widget.branch.cityId.isNotEmpty) {
+      final citiesResult = await catalogsRepo.getCitiesByDepartment(
+        widget.branch.departmentId,
+      );
+      citiesResult.fold((_) {}, (cities) {
+        final city = cities
+            .where((c) => c.id == widget.branch.cityId)
+            .firstOrNull;
+        if (city != null) {
+          _cityName = city.name;
+        }
+      });
+    }
   }
 
   void _onMapCreated(MapboxMap mapboxMap) async {

@@ -90,39 +90,9 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
   }
 
   void _handleLoadedState(BuildContext context, RequestDiagnosticLoaded state) {
-    final errorMessage = state.errorMessage?.trim();
-    if (errorMessage != null && errorMessage.isNotEmpty) {
-      if (_lastErrorMessage != errorMessage) {
-        _lastErrorMessage = errorMessage;
-        _showSnackBar(context, errorMessage);
-      }
-    } else {
-      _lastErrorMessage = null;
-    }
-
-    final permissionMessage = state.permissionMessage?.trim();
-    if (permissionMessage != null && permissionMessage.isNotEmpty) {
-      if (_lastPermissionMessage != permissionMessage) {
-        _lastPermissionMessage = permissionMessage;
-        _showSnackBar(
-          context,
-          permissionMessage,
-          backgroundColor: Colors.green[600],
-        );
-      }
-    } else {
-      _lastPermissionMessage = null;
-    }
-
-    final successMessage = state.successMessage?.trim();
-    if (successMessage != null && successMessage.isNotEmpty) {
-      if (_lastSuccessMessage != successMessage) {
-        _lastSuccessMessage = successMessage;
-        _openWhatsApp(context, state);
-      }
-    } else {
-      _lastSuccessMessage = null;
-    }
+    _handleErrorMessage(context, state.errorMessage);
+    _handlePermissionMessage(context, state.permissionMessage);
+    _handleSuccessMessage(context, state);
 
     // Load evidence when motorcycle is selected and not yet loaded
     if (state.selectedMotorcycle?.id != null &&
@@ -131,6 +101,45 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
       context.read<RequestDiagnosticBloc>().add(
         LoadEvidence(state.selectedMotorcycle!.id!),
       );
+    }
+  }
+
+  void _handleErrorMessage(BuildContext context, String? rawMessage) {
+    final message = rawMessage?.trim();
+    if (message != null && message.isNotEmpty) {
+      if (_lastErrorMessage != message) {
+        _lastErrorMessage = message;
+        _showSnackBar(context, message);
+      }
+    } else {
+      _lastErrorMessage = null;
+    }
+  }
+
+  void _handlePermissionMessage(BuildContext context, String? rawMessage) {
+    final message = rawMessage?.trim();
+    if (message != null && message.isNotEmpty) {
+      if (_lastPermissionMessage != message) {
+        _lastPermissionMessage = message;
+        _showSnackBar(context, message, backgroundColor: Colors.green[600]);
+      }
+    } else {
+      _lastPermissionMessage = null;
+    }
+  }
+
+  void _handleSuccessMessage(
+    BuildContext context,
+    RequestDiagnosticLoaded state,
+  ) {
+    final message = state.successMessage?.trim();
+    if (message != null && message.isNotEmpty) {
+      if (_lastSuccessMessage != message) {
+        _lastSuccessMessage = message;
+        _openWhatsApp(context, state);
+      }
+    } else {
+      _lastSuccessMessage = null;
     }
   }
 
@@ -541,30 +550,8 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     try {
       // Request camera permission before using camera
       if (source == ImageSource.camera) {
-        final permissionResult = await CameraPermissionService.instance
-            .requestPermissionWithResult();
-
-        if (permissionResult == CameraPermissionResult.permanentlyDenied) {
-          if (mounted) {
-            _showSnackBar(
-              context,
-              ImagePickerConstants.permissionMessage,
-              backgroundColor: Colors.orange,
-            );
-          }
-          return;
-        }
-
-        if (permissionResult == CameraPermissionResult.denied) {
-          if (mounted) {
-            _showSnackBar(
-              context,
-              ImagePickerConstants.permissionDenied,
-              backgroundColor: Colors.orange,
-            );
-          }
-          return;
-        }
+        final hasPermission = await _requestCameraPermission();
+        if (!hasPermission) return;
       }
 
       // Create new picker each time to prevent Android resource leaks
@@ -595,6 +582,37 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
         });
       }
     }
+  }
+
+  /// Requests camera permission and shows snackbar on denial.
+  /// Returns true if permission was granted, false otherwise.
+  Future<bool> _requestCameraPermission() async {
+    final result = await CameraPermissionService.instance
+        .requestPermissionWithResult();
+
+    if (result == CameraPermissionResult.permanentlyDenied) {
+      if (mounted) {
+        _showSnackBar(
+          context,
+          ImagePickerConstants.permissionMessage,
+          backgroundColor: Colors.orange,
+        );
+      }
+      return false;
+    }
+
+    if (result == CameraPermissionResult.denied) {
+      if (mounted) {
+        _showSnackBar(
+          context,
+          ImagePickerConstants.permissionDenied,
+          backgroundColor: Colors.orange,
+        );
+      }
+      return false;
+    }
+
+    return true;
   }
 
   Widget _buildPermissionSection(

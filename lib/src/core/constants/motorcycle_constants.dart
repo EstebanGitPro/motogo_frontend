@@ -1,3 +1,5 @@
+import 'person_constants.dart';
+
 /// Constants for the Motorcycle module (MOTORCYCLIST role).
 ///
 /// Use these constants instead of hardcoded strings for better maintainability.
@@ -20,7 +22,7 @@ class MotorcycleConstants {
   static const String menuMyMotorcycles = 'Mis Motocicletas';
   static const String menuEditProfile = 'Editar Perfil';
   static const String menuChangePassword = 'Cambiar Contraseña';
-  static const String menuDeleteAccount = 'Eliminar Cuenta';
+  static const String menuDeleteAccount = PersonConstants.deleteAccountLabel;
   static const String menuLogout = 'Cerrar Sesión';
   static const String menuAbout = 'Acerca de';
 
@@ -201,7 +203,7 @@ class MotorcycleConstants {
 
   // Completed Service Registration (Representative)
   static const String registerServiceButton = 'Registrar Servicio';
-  static const String registerServiceTitle = 'Registrar Servicio Realizado';
+  static const String registerServiceTitle = 'Registrar Servicio';
   static const String selectBranchLabel = 'Seleccionar Sede';
   static const String selectBranchHint = 'Elige una sede';
   static const String selectServicesLabel = 'Servicios Realizados';
@@ -224,4 +226,14 @@ class MotorcycleConstants {
   static const String selectAtLeastOneService =
       'Selecciona al menos un servicio';
   static const String registeringService = 'Registrando servicio...';
+
+  // Pending Services Alert (workshop view)
+  static const String pendingServicesTitle = 'Servicios Pendientes';
+  static const String pendingServicesSubtitle =
+      'Esta motocicleta tiene servicios activos en tu sede';
+  static const String goToServiceDetail = 'Ver Detalle';
+  static const String registerServiceSubtitle =
+      'Registrar un servicio para esta motocicleta';
+  static const String registerBlockedSubtitle =
+      'Gestiona los servicios pendientes antes de registrar uno nuevo';
 }

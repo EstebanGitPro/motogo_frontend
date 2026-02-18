@@ -238,158 +238,153 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
-        children: [
-          Icon(
-            _isEditing ? Icons.edit : Icons.add_circle_outline,
-            color: Colors.orange[600],
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              _isEditing
-                  ? ScheduleConstants.editExceptionTitle
-                  : ScheduleConstants.newExceptionTitle,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
+      title: _buildDialogTitle(),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Start date picker
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Icon(Icons.calendar_today, color: Colors.orange[600]),
-              title: Text(
-                _isDateRange
-                    ? ScheduleConstants.exceptionStartDateLabel
-                    : ScheduleConstants.exceptionDateLabel,
-              ),
-              subtitle: Text(
-                _formatDisplayDate(_selectedStartDate),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-              onTap: _isEditing ? null : _pickStartDate,
-              trailing: _isEditing
-                  ? Icon(Icons.lock_outline, color: Colors.grey[400], size: 18)
-                  : Icon(Icons.chevron_right, color: Colors.grey[400]),
-            ),
-
-            // Date range toggle (only for new exceptions)
-            if (!_isEditing) ...[
-              SwitchListTile(
-                title: const Text(ScheduleConstants.dateRangeToggle),
-                value: _isDateRange,
-                onChanged: (value) {
-                  setState(() {
-                    _isDateRange = value;
-                    if (!value) _selectedEndDate = null;
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
-                activeThumbColor: Colors.orange[600],
-              ),
-            ],
-
-            // End date picker (only if date range enabled)
-            if (_isDateRange) ...[
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(Icons.event, color: Colors.orange[600]),
-                title: const Text(ScheduleConstants.exceptionEndDateLabel),
-                subtitle: Text(
-                  _selectedEndDate != null
-                      ? _formatDisplayDate(_selectedEndDate!)
-                      : ScheduleConstants.selectDate,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: _selectedEndDate == null
-                        ? Colors.grey[500]
-                        : Colors.black87,
-                  ),
-                ),
-                onTap: _isEditing ? null : _pickEndDate,
-                trailing: _isEditing
-                    ? Icon(
-                        Icons.lock_outline,
-                        color: Colors.grey[400],
-                        size: 18,
-                      )
-                    : Icon(Icons.chevron_right, color: Colors.grey[400]),
-              ),
-            ],
-
+            _buildStartDateTile(),
+            if (!_isEditing) _buildDateRangeToggle(),
+            if (_isDateRange) _buildEndDateTile(),
             const Divider(),
-
-            // Closed toggle
-            SwitchListTile(
-              title: const Text(ScheduleConstants.closedThisDay),
-              value: _isClosed,
-              onChanged: (value) => setState(() => _isClosed = value),
-              contentPadding: EdgeInsets.zero,
-              activeTrackColor: Colors.red[400],
-            ),
-            if (!_isClosed) ...[
-              const Divider(),
-              // Opening time picker
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  Icons.wb_sunny_outlined,
-                  color: Colors.orange[600],
-                ),
-                title: const Text(ScheduleConstants.exceptionOpeningTimeLabel),
-                subtitle: Text(
-                  _formatTime(_openingTime),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () => _pickTime(true),
-              ),
-              // Closing time picker
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(
-                  Icons.nights_stay_outlined,
-                  color: Colors.blue[600],
-                ),
-                title: const Text(ScheduleConstants.exceptionClosingTimeLabel),
-                subtitle: Text(
-                  _formatTime(_closingTime),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                onTap: () => _pickTime(false),
-              ),
-            ],
+            _buildClosedToggle(),
+            if (!_isClosed) _buildTimeSection(),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(ScheduleConstants.cancel),
+      actions: _buildActions(),
+    );
+  }
+
+  Widget _buildDialogTitle() {
+    return Row(
+      children: [
+        Icon(
+          _isEditing ? Icons.edit : Icons.add_circle_outline,
+          color: Colors.orange[600],
         ),
-        ElevatedButton(
-          onPressed: _onConfirm,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.orange[600],
-            foregroundColor: Colors.white,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            _isEditing
+                ? ScheduleConstants.editExceptionTitle
+                : ScheduleConstants.newExceptionTitle,
+            overflow: TextOverflow.ellipsis,
           ),
-          child: const Text(ScheduleConstants.save),
         ),
       ],
     );
+  }
+
+  Widget _buildStartDateTile() {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(Icons.calendar_today, color: Colors.orange[600]),
+      title: Text(
+        _isDateRange
+            ? ScheduleConstants.exceptionStartDateLabel
+            : ScheduleConstants.exceptionDateLabel,
+      ),
+      subtitle: Text(
+        _formatDisplayDate(_selectedStartDate),
+        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+      ),
+      onTap: _isEditing ? null : _pickStartDate,
+      trailing: _isEditing
+          ? Icon(Icons.lock_outline, color: Colors.grey[400], size: 18)
+          : Icon(Icons.chevron_right, color: Colors.grey[400]),
+    );
+  }
+
+  Widget _buildDateRangeToggle() {
+    return SwitchListTile(
+      title: const Text(ScheduleConstants.dateRangeToggle),
+      value: _isDateRange,
+      onChanged: (value) {
+        setState(() {
+          _isDateRange = value;
+          if (!value) _selectedEndDate = null;
+        });
+      },
+      contentPadding: EdgeInsets.zero,
+      activeThumbColor: Colors.orange[600],
+    );
+  }
+
+  Widget _buildEndDateTile() {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(Icons.event, color: Colors.orange[600]),
+      title: const Text(ScheduleConstants.exceptionEndDateLabel),
+      subtitle: Text(
+        _selectedEndDate != null
+            ? _formatDisplayDate(_selectedEndDate!)
+            : ScheduleConstants.selectDate,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          color: _selectedEndDate == null ? Colors.grey[500] : Colors.black87,
+        ),
+      ),
+      onTap: _isEditing ? null : _pickEndDate,
+      trailing: _isEditing
+          ? Icon(Icons.lock_outline, color: Colors.grey[400], size: 18)
+          : Icon(Icons.chevron_right, color: Colors.grey[400]),
+    );
+  }
+
+  Widget _buildClosedToggle() {
+    return SwitchListTile(
+      title: const Text(ScheduleConstants.closedThisDay),
+      value: _isClosed,
+      onChanged: (value) => setState(() => _isClosed = value),
+      contentPadding: EdgeInsets.zero,
+      activeTrackColor: Colors.red[400],
+    );
+  }
+
+  Widget _buildTimeSection() {
+    return Column(
+      children: [
+        const Divider(),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.wb_sunny_outlined, color: Colors.orange[600]),
+          title: const Text(ScheduleConstants.exceptionOpeningTimeLabel),
+          subtitle: Text(
+            _formatTime(_openingTime),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          ),
+          onTap: () => _pickTime(true),
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(Icons.nights_stay_outlined, color: Colors.blue[600]),
+          title: const Text(ScheduleConstants.exceptionClosingTimeLabel),
+          subtitle: Text(
+            _formatTime(_closingTime),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          ),
+          onTap: () => _pickTime(false),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _buildActions() {
+    return [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text(ScheduleConstants.cancel),
+      ),
+      ElevatedButton(
+        onPressed: _onConfirm,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange[600],
+          foregroundColor: Colors.white,
+        ),
+        child: const Text(ScheduleConstants.save),
+      ),
+    ];
   }
 }

@@ -90,11 +90,7 @@ class RegisterRepresentativePage extends StatelessWidget {
           child: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width > 800
-                    ? 600
-                    : (MediaQuery.of(context).size.width > 600
-                          ? 500
-                          : double.infinity),
+                maxWidth: _maxContentWidth(MediaQuery.of(context).size.width),
               ),
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -129,5 +125,12 @@ class RegisterRepresentativePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Calculates the max content width based on screen breakpoints.
+  double _maxContentWidth(double screenWidth) {
+    if (screenWidth > 800) return 600;
+    if (screenWidth > 600) return 500;
+    return double.infinity;
   }
 }

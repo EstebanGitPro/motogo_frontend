@@ -13,6 +13,7 @@ class UserEntity extends Equatable {
   final String role;
 
   const UserEntity({
+    // NOSONAR - 8 parámetros atómicos del dominio, agruparlos artificialmente no se justifica
     required this.id,
     required this.identityNumber,
     required this.firstName,
@@ -34,6 +35,7 @@ class UserEntity extends Equatable {
 
   /// Crea una copia de la entidad con los valores especificados
   UserEntity copyWith({
+    // NOSONAR - copyWith refleja los mismos 8 campos del constructor
     String? id,
     String? identityNumber,
     String? firstName,

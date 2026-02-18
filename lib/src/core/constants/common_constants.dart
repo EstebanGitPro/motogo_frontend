@@ -43,6 +43,8 @@ class CommonConstants {
   static const String chooseFromGallery = 'Elegir de galería';
 
   // Form
+  static const String fieldRequired = 'Campo requerido';
+  static const String unknownError = 'Error desconocido';
   static const String unsavedChangesTitle = 'Cambios sin guardar';
   static const String continueEditing = 'Continuar editando';
   static const String exitWithoutSaving = 'Salir sin guardar';

@@ -96,61 +96,19 @@ class BranchDetailEntity extends Equatable {
     List<ScheduleExceptionEntity> exceptions = const [],
   ]) {
     final now = DateTime.now();
-    final todayOnly = DateTime(now.year, now.month, now.day);
 
     // Check exceptions first — they override the regular schedule
-    for (final exception in exceptions) {
-      if (!exception.active) continue;
-
-      final startDate = DateTime.tryParse(exception.exceptionStartDate);
-      if (startDate == null) continue;
-      // Single-day exceptions may have empty endDate — treat as same day
-      final endDate =
-          DateTime.tryParse(exception.exceptionEndDate) ?? startDate;
-
-      final startOnly = DateTime(
-        startDate.year,
-        startDate.month,
-        startDate.day,
+    final exception = _findOverridingException(exceptions, now);
+    if (exception != null) {
+      if (exception.isClosed) return false;
+      return _isWithinTimeRange(
+        now,
+        exception.openingTime,
+        exception.closingTime,
       );
-      final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
-
-      // Check if today falls within the exception date range
-      if (!todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly)) {
-        if (exception.isClosed) {
-          return false; // Closed due to exception
-        }
-        // Exception overrides with custom hours — check those hours
-        final openParts = exception.openingTime.split(':');
-        final closeParts = exception.closingTime.split(':');
-        if (openParts.length >= 2 && closeParts.length >= 2) {
-          final openHour = int.tryParse(openParts[0]) ?? 0;
-          final openMinute = int.tryParse(openParts[1]) ?? 0;
-          final closeHour = int.tryParse(closeParts[0]) ?? 0;
-          final closeMinute = int.tryParse(closeParts[1]) ?? 0;
-
-          final openTime = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            openHour,
-            openMinute,
-          );
-          final closeTime = DateTime(
-            now.year,
-            now.month,
-            now.day,
-            closeHour,
-            closeMinute,
-          );
-
-          return now.isAfter(openTime) && now.isBefore(closeTime);
-        }
-      }
     }
 
     // No applicable exception — check regular schedule
-    // weekday: 1 = Monday, 7 = Sunday (same as backend)
     final todaySchedules = schedules
         .where((s) => s.dayOfWeek == now.weekday)
         .toList();
@@ -159,38 +117,73 @@ class BranchDetailEntity extends Equatable {
 
     for (final schedule in todaySchedules) {
       if (schedule.isClosed) continue;
-
-      final openParts = schedule.openingTime.split(':');
-      final closeParts = schedule.closingTime.split(':');
-
-      if (openParts.length >= 2 && closeParts.length >= 2) {
-        final openHour = int.tryParse(openParts[0]) ?? 0;
-        final openMinute = int.tryParse(openParts[1]) ?? 0;
-        final closeHour = int.tryParse(closeParts[0]) ?? 0;
-        final closeMinute = int.tryParse(closeParts[1]) ?? 0;
-
-        final openTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          openHour,
-          openMinute,
-        );
-        final closeTime = DateTime(
-          now.year,
-          now.month,
-          now.day,
-          closeHour,
-          closeMinute,
-        );
-
-        if (now.isAfter(openTime) && now.isBefore(closeTime)) {
-          return true;
-        }
+      if (_isWithinTimeRange(now, schedule.openingTime, schedule.closingTime)) {
+        return true;
       }
     }
 
     return false;
+  }
+
+  /// Finds an active exception that covers today's date.
+  ScheduleExceptionEntity? _findOverridingException(
+    List<ScheduleExceptionEntity> exceptions,
+    DateTime now,
+  ) {
+    final todayOnly = DateTime(now.year, now.month, now.day);
+
+    for (final exception in exceptions) {
+      if (!exception.active) continue;
+
+      final startDate = DateTime.tryParse(exception.exceptionStartDate);
+      if (startDate == null) continue;
+
+      final endDate =
+          DateTime.tryParse(exception.exceptionEndDate) ?? startDate;
+      final startOnly = DateTime(
+        startDate.year,
+        startDate.month,
+        startDate.day,
+      );
+      final endOnly = DateTime(endDate.year, endDate.month, endDate.day);
+
+      if (!todayOnly.isBefore(startOnly) && !todayOnly.isAfter(endOnly)) {
+        return exception;
+      }
+    }
+
+    return null;
+  }
+
+  /// Checks if [now] falls within the given opening/closing time range.
+  ///
+  /// Times are expected in HH:mm format (e.g., "08:00", "18:00").
+  bool _isWithinTimeRange(
+    DateTime now,
+    String openingTime,
+    String closingTime,
+  ) {
+    final openParts = openingTime.split(':');
+    final closeParts = closingTime.split(':');
+
+    if (openParts.length < 2 || closeParts.length < 2) return false;
+
+    final openTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.tryParse(openParts[0]) ?? 0,
+      int.tryParse(openParts[1]) ?? 0,
+    );
+    final closeTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.tryParse(closeParts[0]) ?? 0,
+      int.tryParse(closeParts[1]) ?? 0,
+    );
+
+    return now.isAfter(openTime) && now.isBefore(closeTime);
   }
 
   /// Gets today's schedule formatted as a string.

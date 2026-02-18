@@ -40,6 +40,7 @@ class ScheduleExceptionEntity extends Equatable {
   final bool active;
 
   const ScheduleExceptionEntity({
+    // NOSONAR - 11 campos atómicos de excepción de horario
     required this.id,
     required this.scheduleId,
     required this.exceptionStartDate,
@@ -55,6 +56,7 @@ class ScheduleExceptionEntity extends Equatable {
 
   /// Creates a copy with specified values overridden.
   ScheduleExceptionEntity copyWith({
+    // NOSONAR - copyWith refleja los mismos 11 campos del constructor
     String? id,
     String? scheduleId,
     String? exceptionStartDate,

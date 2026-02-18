@@ -13,14 +13,19 @@ import 'package:motogo_frontend/src/features/register_person/domain/entities/reg
 /// endpoint de registro es público y no requiere token.
 class RegisterPersonDataSource {
   // Dio instance without auth interceptor (register is public endpoint)
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: Config.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
+  final Dio _dio;
+
+  RegisterPersonDataSource({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              baseUrl: Config.baseUrl,
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 15),
+              headers: {'Content-Type': 'application/json'},
+            ),
+          );
 
   String _deriveIdFromLocationHeader(Headers headers) {
     final location = headers.value('location') ?? headers.value('Location');

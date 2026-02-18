@@ -65,44 +65,43 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     );
   }
 
-  Future<void> _pickImage(BuildContext context, ImageSource source) async {
-    if (_isPickingImage) return;
-    if (mounted) {
-      setState(() {
-        _isPickingImage = true;
-      });
+  /// Handles camera permission check. Returns true if permission granted.
+  Future<bool> _handleCameraPermission(BuildContext context) async {
+    final permissionResult = await CameraPermissionService.instance
+        .requestPermissionWithResult();
+
+    if (permissionResult == CameraPermissionResult.permanentlyDenied) {
+      if (context.mounted) _showPermissionDeniedDialog(context);
+      return false;
     }
 
-    final picker = ImagePicker();
+    if (permissionResult == CameraPermissionResult.denied) {
+      if (context.mounted) {
+        _showSnackBar(
+          context,
+          ImagePickerConstants.permissionDenied,
+          backgroundColor: Colors.orange,
+        );
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _pickImage(BuildContext context, ImageSource source) async {
+    if (_isPickingImage) return;
+    if (mounted) setState(() => _isPickingImage = true);
 
     try {
-      // Request camera permission before using camera
       if (source == ImageSource.camera) {
-        final permissionResult = await CameraPermissionService.instance
-            .requestPermissionWithResult();
-
-        if (permissionResult == CameraPermissionResult.permanentlyDenied) {
-          if (context.mounted) {
-            _showPermissionDeniedDialog(context);
-          }
-          return;
-        }
-
-        if (permissionResult == CameraPermissionResult.denied) {
-          if (context.mounted) {
-            _showSnackBar(
-              context,
-              ImagePickerConstants.permissionDenied,
-              backgroundColor: Colors.orange,
-            );
-          }
-          return;
-        }
+        final granted = await _handleCameraPermission(context);
+        if (!granted) return;
       }
 
-      final pickedFile = await picker.pickImage(
+      final pickedFile = await ImagePicker().pickImage(
         source: source,
-        imageQuality: 80, // Compress to reduce upload time
+        imageQuality: 80,
         maxWidth: 1024,
         maxHeight: 1024,
       );
@@ -124,11 +123,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isPickingImage = false;
-        });
-      }
+      if (mounted) setState(() => _isPickingImage = false);
     }
   }
 
@@ -233,7 +228,6 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
               : null,
           child: LayoutBuilder(
             builder: (context, constraints) {
-              // Responsive height: 20% of screen height with min/max bounds
               final screenHeight = MediaQuery.of(context).size.height;
               final responsiveHeight = (screenHeight * 0.18).clamp(
                 120.0,
@@ -252,125 +246,117 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     width: widget.selectedImage != null ? 2 : 1,
                   ),
                 ),
-                child: widget.isUploading
-                    ? const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 8),
-                            Text(ImagePickerConstants.uploadingImage),
-                          ],
-                        ),
-                      )
-                    : widget.selectedImage != null
-                    ? Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(11),
-                            child: Image.file(
-                              widget.selectedImage!,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                onPressed: widget.enabled && !_isPickingImage
-                                    ? () => _showPickerOptions(context)
-                                    : null,
-                                tooltip: ImagePickerConstants.changeImage,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : widget.existingImageUrl != null &&
-                          widget.existingImageUrl!.isNotEmpty
-                    ? Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(11),
-                            child: Image.network(
-                              widget.existingImageUrl!,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Center(
-                                    child: Icon(
-                                      Icons.broken_image,
-                                      size: 40,
-                                      color: Colors.grey[400],
-                                    ),
-                                  ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                                onPressed: widget.enabled && !_isPickingImage
-                                    ? () => _showPickerOptions(context)
-                                    : null,
-                                tooltip: ImagePickerConstants.changeImage,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.add_a_photo_outlined,
-                            size: 40,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            widget.hint,
-                            style: TextStyle(
-                              color: Colors.grey[500],
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            ImagePickerConstants.optionalLabel,
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
-              ); // End Container
-            }, // End builder
-          ), // End LayoutBuilder
-        ), // End GestureDetector
+                child: _buildContainerChild(context),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Selects the appropriate child widget for the image container.
+  Widget _buildContainerChild(BuildContext context) {
+    if (widget.isUploading) return _buildUploadingState();
+    if (widget.selectedImage != null) {
+      return _buildSelectedImagePreview(context);
+    }
+
+    final hasExistingImage =
+        widget.existingImageUrl != null && widget.existingImageUrl!.isNotEmpty;
+    if (hasExistingImage) return _buildExistingImagePreview(context);
+
+    return _buildPlaceholder();
+  }
+
+  Widget _buildUploadingState() {
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 8),
+          Text(ImagePickerConstants.uploadingImage),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedImagePreview(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(11),
+          child: Image.file(widget.selectedImage!, fit: BoxFit.cover),
+        ),
+        _buildEditButton(context),
+      ],
+    );
+  }
+
+  Widget _buildExistingImagePreview(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(11),
+          child: Image.network(
+            widget.existingImageUrl!,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Center(
+              child: Icon(
+                Icons.broken_image,
+                size: 40,
+                color: Colors.grey[400],
+              ),
+            ),
+          ),
+        ),
+        _buildEditButton(context),
+      ],
+    );
+  }
+
+  Widget _buildEditButton(BuildContext context) {
+    return Positioned(
+      top: 8,
+      right: 8,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: IconButton(
+          icon: const Icon(Icons.edit, color: Colors.white, size: 20),
+          onPressed: widget.enabled && !_isPickingImage
+              ? () => _showPickerOptions(context)
+              : null,
+          tooltip: ImagePickerConstants.changeImage,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.add_a_photo_outlined, size: 40, color: Colors.grey[400]),
+        const SizedBox(height: 8),
+        Text(
+          widget.hint,
+          style: TextStyle(color: Colors.grey[500], fontSize: 13),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          ImagePickerConstants.optionalLabel,
+          style: TextStyle(
+            color: Colors.grey[400],
+            fontSize: 12,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
       ],
     );
   }

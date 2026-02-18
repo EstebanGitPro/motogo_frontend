@@ -64,159 +64,162 @@ class BranchServicesPage extends StatelessWidget {
           },
           child: Column(
             children: [
-              // Filter chips
-              ColoredBox(
-                color: Colors.white,
-                child: BlocBuilder<BranchServicesBloc, BranchServicesState>(
-                  buildWhen: (prev, curr) =>
-                      prev is! BranchServicesLoaded ||
-                      curr is! BranchServicesLoaded ||
-                      prev.filterType != curr.filterType,
-                  builder: (context, state) {
-                    String? selectedType;
-                    if (state is BranchServicesLoaded) {
-                      selectedType = state.filterType;
-                    }
-                    return ServiceTypeChips(
-                      selectedType: selectedType,
-                      onTypeSelected: (type) {
-                        context.read<BranchServicesBloc>().add(
-                          FilterServicesByType(type),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-
-              // Search bar
-              Container(
-                color: Colors.white,
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: ServiceConstants.searchPlaceholder,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                  onChanged: (query) {
-                    context.read<BranchServicesBloc>().add(
-                      SearchServices(query),
-                    );
-                  },
-                ),
-              ),
-
-              // Services list
-              Expanded(
-                child: BlocBuilder<BranchServicesBloc, BranchServicesState>(
-                  builder: (context, state) {
-                    if (state is BranchServicesLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (state is BranchServicesError) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.error_outline,
-                              size: 48,
-                              color: Colors.grey[400],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              state.message,
-                              style: TextStyle(color: Colors.grey[600]),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                context.read<BranchServicesBloc>().add(
-                                  LoadBranchServices(branchId),
-                                );
-                              },
-                              child: const Text('Reintentar'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    if (state is BranchServicesLoaded) {
-                      if (state.displayedServices.isEmpty) {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                size: 48,
-                                color: Colors.grey[400],
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                ServiceConstants.noServicesFound,
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      return ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: state.displayedServices.length,
-                        itemBuilder: (context, index) {
-                          final service = state.displayedServices[index];
-                          final isAssociated = state.associatedServiceIds
-                              .contains(service.id);
-
-                          // Find branch service for added_at date
-                          final branchService = state.branchServices
-                              .where((bs) => bs.id == service.id)
-                              .firstOrNull;
-
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: ServiceToggleCard(
-                              serviceName: service.name,
-                              serviceType: service.serviceType,
-                              description: service.description,
-                              isAssociated: isAssociated,
-                              addedAt: branchService?.addedAt,
-                              onToggle: (value) {
-                                context.read<BranchServicesBloc>().add(
-                                  ToggleServiceAssociation(
-                                    serviceId: service.id,
-                                    associate: value,
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-              ),
+              _buildFilterChips(),
+              _buildSearchBar(),
+              Expanded(child: _buildServicesBody()),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildFilterChips() {
+    return ColoredBox(
+      color: Colors.white,
+      child: BlocBuilder<BranchServicesBloc, BranchServicesState>(
+        buildWhen: (prev, curr) =>
+            prev is! BranchServicesLoaded ||
+            curr is! BranchServicesLoaded ||
+            prev.filterType != curr.filterType,
+        builder: (context, state) {
+          String? selectedType;
+          if (state is BranchServicesLoaded) {
+            selectedType = state.filterType;
+          }
+          return ServiceTypeChips(
+            selectedType: selectedType,
+            onTypeSelected: (type) {
+              context.read<BranchServicesBloc>().add(
+                FilterServicesByType(type),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Builder(
+      builder: (context) => Container(
+        color: Colors.white,
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: ServiceConstants.searchPlaceholder,
+            prefixIcon: const Icon(Icons.search),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+          ),
+          onChanged: (query) {
+            context.read<BranchServicesBloc>().add(SearchServices(query));
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildServicesBody() {
+    return BlocBuilder<BranchServicesBloc, BranchServicesState>(
+      builder: (context, state) {
+        if (state is BranchServicesLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state is BranchServicesError) {
+          return _buildErrorState(context, state.message);
+        }
+        if (state is BranchServicesLoaded) {
+          if (state.displayedServices.isEmpty) {
+            return _buildEmptyState();
+          }
+          return _buildServicesList(context, state);
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            style: TextStyle(color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              context.read<BranchServicesBloc>().add(
+                LoadBranchServices(branchId),
+              );
+            },
+            child: const Text('Reintentar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search_off, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            ServiceConstants.noServicesFound,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServicesList(BuildContext context, BranchServicesLoaded state) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: state.displayedServices.length,
+      itemBuilder: (context, index) {
+        final service = state.displayedServices[index];
+        final isAssociated = state.associatedServiceIds.contains(service.id);
+        final branchService = state.branchServices
+            .where((bs) => bs.id == service.id)
+            .firstOrNull;
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: ServiceToggleCard(
+            serviceName: service.name,
+            serviceType: service.serviceType,
+            description: service.description,
+            isAssociated: isAssociated,
+            addedAt: branchService?.addedAt,
+            onToggle: (value) {
+              context.read<BranchServicesBloc>().add(
+                ToggleServiceAssociation(
+                  serviceId: service.id,
+                  associate: value,
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

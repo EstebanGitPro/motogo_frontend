@@ -84,123 +84,132 @@ class _EditBranchPageState extends State<EditBranchPage>
   }
 
   Future<void> _onSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedBrandIds.isEmpty) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text(BranchConstants.brandRequired),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        return;
-      }
+    if (!_formKey.currentState!.validate()) return;
+    if (!_validateBrands() || !_validateCity()) return;
 
-      if (_selectedCityId == null) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text(BranchConstants.locationRequired),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        return;
-      }
+    String? profileImageUrl = _uploadedImageUrl;
 
-      String? profileImageUrl = _uploadedImageUrl;
-
-      // Upload image if a new one was selected
-      if (_selectedImage != null &&
-          _uploadedImageUrl == widget.branch.profileImageUrl) {
-        setState(() => _isUploadingImage = true);
-
-        final storageService = InjectorApp.resolve<StorageService>();
-        final branchId = widget.branch.id ?? const Uuid().v4();
-
-        final uploadResult = await storageService.uploadBranchImage(
-          branchId: branchId,
-          file: _selectedImage!,
-        );
-
-        if (!mounted) return;
-
-        uploadResult.fold(
-          (error) {
-            setState(() => _isUploadingImage = false);
-            ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(
-                SnackBar(
-                  content: Text(
-                    '${BranchConstants.errorUploadingImage}: ${error.message}',
-                  ),
-                  backgroundColor: Colors.red,
-                  action: SnackBarAction(
-                    label: BranchConstants.retry,
-                    textColor: Colors.white,
-                    onPressed: _onSubmit,
-                  ),
-                ),
-              );
-            return;
-          },
-          (url) {
-            profileImageUrl = url;
-            setState(() {
-              _isUploadingImage = false;
-              _uploadedImageUrl = url;
-            });
-          },
-        );
-
-        // If upload failed, don't continue
-        if (profileImageUrl == widget.branch.profileImageUrl &&
-            _selectedImage != null) {
-          return;
-        }
-      }
-
-      // Get selected city and department names for geocoding
-      final selectedCity = availableCities.firstWhere(
-        (c) => c.id == _selectedCityId,
-        orElse: () => CityEntity(
-          id: _selectedCityId!,
-          name: widget.branch.cityName ?? '',
-        ),
-      );
-      final selectedDepartment = availableDepartments.firstWhere(
-        (d) => d.id == _selectedDepartmentId,
-        orElse: () => DepartmentEntity(
-          id: _selectedDepartmentId!,
-          name: widget.branch.departmentName ?? '',
-        ),
-      );
-
-      final updatedBranch = widget.branch.copyWith(
-        name: _nameController.text.trim(),
-        establishmentType: _selectedEstablishmentType,
-        catalogs: BranchCatalogs(
-          brands: _selectedBrandIds,
-          displacementRanges: _selectedDisplacementRanges,
-        ),
-        location: BranchLocation(
-          address: _addressController.text.trim(),
-          cityId: _selectedCityId!,
-          cityName: selectedCity.name,
-          departmentId: _selectedDepartmentId!,
-          departmentName: selectedDepartment.name,
-        ),
-        profileImageUrl: profileImageUrl,
-      );
-
-      if (!mounted) return;
-
-      _editBranchBloc.add(
-        EditBranchSubmitted(branchId: widget.branch.id!, branch: updatedBranch),
-      );
+    // Upload image if a new one was selected
+    if (_selectedImage != null &&
+        _uploadedImageUrl == widget.branch.profileImageUrl) {
+      final url = await _uploadBranchImage();
+      if (url == null) return;
+      profileImageUrl = url;
     }
+
+    if (!mounted) return;
+
+    final updatedBranch = _buildUpdatedBranch(profileImageUrl);
+    _editBranchBloc.add(
+      EditBranchSubmitted(branchId: widget.branch.id!, branch: updatedBranch),
+    );
+  }
+
+  bool _validateBrands() {
+    if (_selectedBrandIds.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(BranchConstants.brandRequired),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      return false;
+    }
+    return true;
+  }
+
+  bool _validateCity() {
+    if (_selectedCityId == null) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(BranchConstants.locationRequired),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      return false;
+    }
+    return true;
+  }
+
+  Future<String?> _uploadBranchImage() async {
+    setState(() => _isUploadingImage = true);
+
+    final storageService = InjectorApp.resolve<StorageService>();
+    final branchId = widget.branch.id ?? const Uuid().v4();
+
+    final uploadResult = await storageService.uploadBranchImage(
+      branchId: branchId,
+      file: _selectedImage!,
+    );
+
+    if (!mounted) return null;
+
+    String? resultUrl;
+    uploadResult.fold(
+      (error) {
+        setState(() => _isUploadingImage = false);
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                '${BranchConstants.errorUploadingImage}: ${error.message}',
+              ),
+              backgroundColor: Colors.red,
+              action: SnackBarAction(
+                label: BranchConstants.retry,
+                textColor: Colors.white,
+                onPressed: _onSubmit,
+              ),
+            ),
+          );
+      },
+      (url) {
+        resultUrl = url;
+        setState(() {
+          _isUploadingImage = false;
+          _uploadedImageUrl = url;
+        });
+      },
+    );
+
+    return resultUrl;
+  }
+
+  BranchEntity _buildUpdatedBranch(String? profileImageUrl) {
+    final selectedCity = availableCities.firstWhere(
+      (c) => c.id == _selectedCityId,
+      orElse: () =>
+          CityEntity(id: _selectedCityId!, name: widget.branch.cityName ?? ''),
+    );
+    final selectedDepartment = availableDepartments.firstWhere(
+      (d) => d.id == _selectedDepartmentId,
+      orElse: () => DepartmentEntity(
+        id: _selectedDepartmentId!,
+        name: widget.branch.departmentName ?? '',
+      ),
+    );
+
+    return widget.branch.copyWith(
+      name: _nameController.text.trim(),
+      establishmentType: _selectedEstablishmentType,
+      catalogs: BranchCatalogs(
+        brands: _selectedBrandIds,
+        displacementRanges: _selectedDisplacementRanges,
+      ),
+      location: BranchLocation(
+        address: _addressController.text.trim(),
+        cityId: _selectedCityId!,
+        cityName: selectedCity.name,
+        departmentId: _selectedDepartmentId!,
+        departmentName: selectedDepartment.name,
+      ),
+      profileImageUrl: profileImageUrl,
+    );
   }
 
   @override

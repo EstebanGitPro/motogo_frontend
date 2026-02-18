@@ -39,13 +39,7 @@ class EditableField extends StatelessWidget {
           color: enabled ? Colors.grey[600] : Colors.grey[400],
           fontSize: isMobile ? 16 : 18,
         ),
-        prefixIcon: prefixIcon != null
-            ? Icon(
-                prefixIcon,
-                color: enabled ? Colors.grey[600] : Colors.grey[400],
-                size: 22,
-              )
-            : null,
+        prefixIcon: _buildPrefixIcon(),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.grey[300]!),
@@ -77,6 +71,15 @@ class EditableField extends StatelessWidget {
           vertical: isMobile ? 16 : 18,
         ),
       ),
+    );
+  }
+
+  Widget? _buildPrefixIcon() {
+    if (prefixIcon == null) return null;
+    return Icon(
+      prefixIcon,
+      color: enabled ? Colors.grey[600] : Colors.grey[400],
+      size: 22,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 
 /// Card widget for displaying a service in the admin catalog.
 ///
@@ -46,10 +47,16 @@ class AdminServiceCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: _getTypeColor().withValues(alpha: 0.1),
+                  color: ServiceConstants.getServiceTypeColor(
+                    serviceType,
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(_getTypeIcon(), color: _getTypeColor(), size: 24),
+                child: Icon(
+                  _getTypeIcon(),
+                  color: ServiceConstants.getServiceTypeColor(serviceType),
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               // Name, type, and description
@@ -75,14 +82,18 @@ class AdminServiceCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: _getTypeColor().withValues(alpha: 0.1),
+                            color: ServiceConstants.getServiceTypeColor(
+                              serviceType,
+                            ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
                             serviceType,
                             style: TextStyle(
                               fontSize: 11,
-                              color: _getTypeColor(),
+                              color: ServiceConstants.getServiceTypeColor(
+                                serviceType,
+                              ),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -136,24 +147,6 @@ class AdminServiceCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getTypeColor() {
-    switch (serviceType.toLowerCase()) {
-      case 'mantenimiento':
-        return Colors.blue;
-      case 'reparación':
-      case 'reparacion':
-        return Colors.orange;
-      case 'diagnóstico':
-      case 'diagnostico':
-        return Colors.purple;
-      case 'estética':
-      case 'estetica':
-        return Colors.pink;
-      default:
-        return Colors.blue;
-    }
   }
 
   IconData _getTypeIcon() {

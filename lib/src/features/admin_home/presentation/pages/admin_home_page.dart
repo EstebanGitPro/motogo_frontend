@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
+import 'package:motogo_frontend/src/core/widgets/gradient_header_card.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
 import 'package:motogo_frontend/src/core/widgets/logout_dialog.dart';
@@ -45,7 +46,11 @@ class AdminHomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Welcome header
-                _buildWelcomeHeader(),
+                const GradientHeaderCard(
+                  icon: Icons.admin_panel_settings,
+                  title: AdminConstants.welcomeTitle,
+                  subtitle: AdminConstants.welcomeSubtitle,
+                ),
                 const SizedBox(height: 24),
                 // Menu grid
                 Expanded(child: _buildMenuGrid(context)),
@@ -53,64 +58,6 @@ class AdminHomePage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildWelcomeHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.blue, Colors.blueAccent],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.admin_panel_settings,
-              size: 40,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AdminConstants.welcomeTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  AdminConstants.welcomeSubtitle,
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

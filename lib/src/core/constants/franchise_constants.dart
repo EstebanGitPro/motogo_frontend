@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Constants for the franchise feature.
 ///
 /// Use these constants instead of hardcoded strings for better maintainability.
@@ -77,4 +79,30 @@ class FranchiseConstants {
   static const String typeWorkshop = 'Taller';
   static const String typeStore = 'Tienda';
   static const String typeWorkshopStore = 'Taller y Tienda';
+
+  /// Returns the color associated with an establishment type.
+  static Color getTypeColor(String type) {
+    switch (type.toUpperCase()) {
+      case 'WORKSHOP':
+        return Colors.green;
+      case 'STORE':
+        return Colors.blue;
+      default:
+        return Colors.purple;
+    }
+  }
+
+  /// Returns the display label for an establishment type.
+  static String getTypeLabel(String type) {
+    switch (type.toUpperCase()) {
+      case 'WORKSHOP':
+        return typeWorkshop;
+      case 'STORE':
+        return typeStore;
+      case 'WORKSHOP_STORE':
+        return typeWorkshopStore;
+      default:
+        return type;
+    }
+  }
 }

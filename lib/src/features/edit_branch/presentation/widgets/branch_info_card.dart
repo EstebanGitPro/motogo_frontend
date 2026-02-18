@@ -140,7 +140,8 @@ class BranchInfoCard extends StatelessWidget {
 
   Widget _buildTypeChip() {
     final displayText =
-        establishmentTypeLabel ?? _mapTypeToLabel(branch.establishmentType);
+        establishmentTypeLabel ??
+        BranchConstants.mapTypeToLabel(branch.establishmentType);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -157,20 +158,6 @@ class BranchInfoCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  /// Maps backend establishment type codes to Spanish display labels.
-  static String _mapTypeToLabel(String type) {
-    switch (type.toUpperCase()) {
-      case 'WORKSHOP':
-        return 'Taller';
-      case 'STORE':
-        return 'Tienda';
-      case 'WORKSHOP_STORE':
-        return 'Taller y Tienda';
-      default:
-        return type;
-    }
   }
 
   Widget _buildBrandChip(String brandId) {

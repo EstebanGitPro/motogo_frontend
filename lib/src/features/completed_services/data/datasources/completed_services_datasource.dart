@@ -1,8 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/datasource_response_mixin.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
-import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/completed_service_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/register_completed_service_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/status_transition_model.dart';
@@ -54,7 +53,9 @@ abstract class CompletedServicesDataSource {
   Future<Either<ErrorModel, String>> deleteCompletedService(String serviceId);
 }
 
-class CompletedServicesDataSourceImpl implements CompletedServicesDataSource {
+class CompletedServicesDataSourceImpl
+    with DataSourceResponseMixin
+    implements CompletedServicesDataSource {
   final DioClient _dioClient;
 
   CompletedServicesDataSourceImpl(this._dioClient);
@@ -62,8 +63,8 @@ class CompletedServicesDataSourceImpl implements CompletedServicesDataSource {
   @override
   Future<Either<ErrorModel, String>> registerCompletedService(
     RegisterCompletedServiceModel request,
-  ) async {
-    return _handleMessageResponse(
+  ) {
+    return handleMessageResponse(
       () => _dioClient.post('/completed-services', data: request.toJson()),
       'Servicio registrado exitosamente',
     );
@@ -71,9 +72,18 @@ class CompletedServicesDataSourceImpl implements CompletedServicesDataSource {
 
   @override
   Future<Either<ErrorModel, List<CompletedServiceModel>>>
-  getCompletedServicesByBranch(String branchId) async {
-    return _handleListResponse(
+  getCompletedServicesByBranch(String branchId) {
+    return handleListResponse(
       () => _dioClient.get('/branches/$branchId/completed-services'),
+      CompletedServiceModel.fromJson,
+    );
+  }
+
+  @override
+  Future<Either<ErrorModel, List<CompletedServiceModel>>>
+  getCompletedServicesByMotorcycle(String motorcycleId) {
+    return handleListResponse(
+      () => _dioClient.get('/motorcycles/$motorcycleId/completed-services'),
       CompletedServiceModel.fromJson,
     );
   }
@@ -82,8 +92,8 @@ class CompletedServicesDataSourceImpl implements CompletedServicesDataSource {
   Future<Either<ErrorModel, String>> updateServiceStatus(
     String serviceId,
     String newStatus,
-  ) async {
-    return _handleMessageResponse(
+  ) {
+    return handleMessageResponse(
       () => _dioClient.patch(
         '/completed-services/$serviceId/status',
         data: {'status': newStatus},
@@ -95,84 +105,18 @@ class CompletedServicesDataSourceImpl implements CompletedServicesDataSource {
   @override
   Future<Either<ErrorModel, List<StatusTransitionModel>>> getServiceTransitions(
     String serviceId,
-  ) async {
-    return _handleListResponse(
+  ) {
+    return handleListResponse(
       () => _dioClient.get('/completed-services/$serviceId/transitions'),
       StatusTransitionModel.fromJson,
     );
   }
 
   @override
-  Future<Either<ErrorModel, String>> deleteCompletedService(
-    String serviceId,
-  ) async {
-    return _handleMessageResponse(
+  Future<Either<ErrorModel, String>> deleteCompletedService(String serviceId) {
+    return handleMessageResponse(
       () => _dioClient.delete('/completed-services/$serviceId'),
       'Servicio eliminado exitosamente',
     );
-  }
-
-  @override
-  Future<Either<ErrorModel, List<CompletedServiceModel>>>
-  getCompletedServicesByMotorcycle(String motorcycleId) async {
-    return _handleListResponse(
-      () => _dioClient.get('/motorcycles/$motorcycleId/completed-services'),
-      CompletedServiceModel.fromJson,
-    );
-  }
-
-  /// Handles POST/PATCH responses that return a success message.
-  Future<Either<ErrorModel, String>> _handleMessageResponse(
-    Future<dynamic> Function() request,
-    String defaultMessage,
-  ) async {
-    try {
-      final response = await request();
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message = responseData['message'] as String? ?? defaultMessage;
-        return Right(message);
-      }
-
-      return Right(defaultMessage);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
-  }
-
-  /// Handles GET responses that return a list of items.
-  Future<Either<ErrorModel, List<T>>> _handleListResponse<T>(
-    Future<dynamic> Function() request,
-    T Function(Map<String, dynamic>) fromJson,
-  ) async {
-    try {
-      final response = await request();
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final dataList = responseData['data'] as List<dynamic>? ?? [];
-        final items = dataList
-            .map((item) => fromJson(item as Map<String, dynamic>))
-            .toList();
-        return Right(items);
-      }
-
-      return const Right([]);
-    } on DioException catch (e) {
-      return DioErrorHandler.handleDioException(e);
-    } catch (e) {
-      return DioErrorHandler.handleException(e);
-    }
   }
 }

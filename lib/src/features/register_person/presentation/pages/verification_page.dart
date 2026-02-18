@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
+import 'package:motogo_frontend/src/core/widgets/responsive_scaffold_body.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
 
 class VerificationPage extends StatefulWidget {
@@ -64,49 +65,30 @@ class _VerificationPageState extends State<VerificationPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context, isMobile),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isTablet ? 600 : double.infinity,
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: isMobile ? 16.0 : 24.0,
-                          vertical: isMobile ? 16.0 : 24.0,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Spacer(),
-                            _buildSuccessIcon(isMobile),
-                            SizedBox(height: isMobile ? 32 : 40),
-                            _buildSuccessTitle(context, isMobile),
-                            SizedBox(height: isMobile ? 16 : 20),
-                            _buildEmailInstruction(context, isMobile),
-                            SizedBox(height: isMobile ? 24 : 32),
-                            _buildInfoBanner(isMobile),
-                            SizedBox(height: isMobile ? 32 : 40),
-                            _buildCountdownIndicator(context, isMobile),
-                            SizedBox(height: isMobile ? 24 : 32),
-                            _buildRedirectButton(context, isMobile),
-                            const Spacer(),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+      body: ResponsiveScaffoldBody(
+        maxWidth: isTablet ? 600 : double.infinity,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 16.0 : 24.0,
+          vertical: isMobile ? 16.0 : 24.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Spacer(),
+            _buildSuccessIcon(isMobile),
+            SizedBox(height: isMobile ? 32 : 40),
+            _buildSuccessTitle(context, isMobile),
+            SizedBox(height: isMobile ? 16 : 20),
+            _buildEmailInstruction(context, isMobile),
+            SizedBox(height: isMobile ? 24 : 32),
+            _buildInfoBanner(isMobile),
+            SizedBox(height: isMobile ? 32 : 40),
+            _buildCountdownIndicator(context, isMobile),
+            SizedBox(height: isMobile ? 24 : 32),
+            _buildRedirectButton(context, isMobile),
+            const Spacer(),
+          ],
         ),
       ),
     );

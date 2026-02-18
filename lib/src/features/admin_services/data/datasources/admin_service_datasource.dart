@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/api_response_handler.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/features/admin_services/data/models/admin_service_model.dart';
@@ -42,32 +43,11 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
   Future<Either<ErrorModel, List<AdminServiceModel>>> getServices() async {
     try {
       final response = await _dioClient.get('/services');
-      final responseData = response.data;
-
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-
-        if (data != null) {
-          final servicesList = data['services'] as List<dynamic>?;
-
-          if (servicesList != null) {
-            final services = servicesList
-                .map(
-                  (json) =>
-                      AdminServiceModel.fromJson(json as Map<String, dynamic>),
-                )
-                .toList();
-            return Right(services);
-          }
-        }
-        return const Right([]);
-      }
-      return const Right([]);
+      return ApiResponseHandler.extractList(
+        response.data,
+        key: 'services',
+        fromJson: AdminServiceModel.fromJson,
+      );
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -101,34 +81,22 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
       );
 
       final responseData = response.data;
+      final validation = ApiResponseHandler.validate(responseData);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-
-        final data = responseData['data'] as Map<String, dynamic>?;
-        if (data != null) {
-          return Right(AdminServiceModel.fromJson(data));
-        }
-
-        // Fallback: reconstruct from request data
-        return Right(
-          AdminServiceModel(
-            id: serviceId,
-            name: name,
-            description: description,
-            serviceType: serviceType,
-            isActive: isActive ?? true,
-          ),
-        );
+      final data = validation.right;
+      if (data != null) {
+        return Right(AdminServiceModel.fromJson(data));
       }
 
-      return Left(
-        ErrorModel(
-          errorCode: 'PARSE_ERROR',
-          message: ServiceConstants.parseError,
+      // Fallback: reconstruct from request data
+      return Right(
+        AdminServiceModel(
+          id: serviceId,
+          name: name,
+          description: description,
+          serviceType: serviceType,
+          isActive: isActive ?? true,
         ),
       );
     } on DioException catch (e) {
@@ -144,20 +112,15 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
       final response = await _dioClient.patch(
         '/admin/services/$serviceId/activate',
       );
-      final responseData = response.data;
+      final validation = ApiResponseHandler.validate(response.data);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message =
-            responseData['message'] as String? ??
-            ServiceConstants.serviceActivated;
-        return Right(message);
-      }
-
-      return const Right(ServiceConstants.serviceActivated);
+      return Right(
+        ApiResponseHandler.extractMessage(
+          response.data,
+          ServiceConstants.serviceActivated,
+        ),
+      );
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {
@@ -171,20 +134,15 @@ class AdminServiceDataSourceImpl implements AdminServiceDataSource {
       final response = await _dioClient.patch(
         '/admin/services/$serviceId/deactivate',
       );
-      final responseData = response.data;
+      final validation = ApiResponseHandler.validate(response.data);
+      if (validation.isLeft) return Left(validation.left);
 
-      if (responseData is Map<String, dynamic>) {
-        final success = responseData['success'] as bool?;
-        if (success == false) {
-          return Left(DioErrorHandler.fromBackendError(responseData));
-        }
-        final message =
-            responseData['message'] as String? ??
-            ServiceConstants.serviceDeactivated;
-        return Right(message);
-      }
-
-      return const Right(ServiceConstants.serviceDeactivated);
+      return Right(
+        ApiResponseHandler.extractMessage(
+          response.data,
+          ServiceConstants.serviceDeactivated,
+        ),
+      );
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {

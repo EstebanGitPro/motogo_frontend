@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:motogo_frontend/src/core/constants/schedule_constants.dart';
+import 'package:motogo_frontend/src/core/utils/time_utils.dart';
 import 'package:motogo_frontend/src/features/branch_schedules/domain/entities/schedule_exception_entity.dart';
 
 /// Dialog for creating or editing a schedule exception.
@@ -53,10 +54,10 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
           : null;
       _isDateRange = _selectedEndDate != null;
       _openingTime =
-          _parseTime(widget.exception!.openingTime) ??
+          TimeUtils.parseTime(widget.exception!.openingTime) ??
           const TimeOfDay(hour: 9, minute: 0);
       _closingTime =
-          _parseTime(widget.exception!.closingTime) ??
+          TimeUtils.parseTime(widget.exception!.closingTime) ??
           const TimeOfDay(hour: 18, minute: 0);
       _isClosed = widget.exception!.isClosed;
     } else {
@@ -67,21 +68,6 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
       _closingTime = const TimeOfDay(hour: 18, minute: 0);
       _isClosed = true;
     }
-  }
-
-  TimeOfDay? _parseTime(String? timeString) {
-    if (timeString == null || timeString.isEmpty) return null;
-    final parts = timeString.split(':');
-    if (parts.length < 2) return null;
-    return TimeOfDay(
-      hour: int.tryParse(parts[0]) ?? 0,
-      minute: int.tryParse(parts[1]) ?? 0,
-    );
-  }
-
-  String _formatTime(TimeOfDay time) {
-    return '${time.hour.toString().padLeft(2, '0')}:'
-        '${time.minute.toString().padLeft(2, '0')}';
   }
 
   String _formatDate(DateTime date) {
@@ -140,16 +126,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
 
   Future<void> _pickTime(bool isOpening) async {
     final initialTime = isOpening ? _openingTime : _closingTime;
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: initialTime,
-      builder: (context, child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-          child: child!,
-        );
-      },
-    );
+    final picked = await TimeUtils.pickTime(context, initialTime);
 
     if (picked != null) {
       setState(() {
@@ -164,10 +141,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
 
   bool get _isValid {
     if (_isClosed) return true;
-    // Opening time must be before closing time
-    final openMinutes = _openingTime.hour * 60 + _openingTime.minute;
-    final closeMinutes = _closingTime.hour * 60 + _closingTime.minute;
-    return openMinutes < closeMinutes;
+    return TimeUtils.isValidTimeRange(_openingTime, _closingTime);
   }
 
   /// Check if the selected date range overlaps with any existing exception
@@ -229,8 +203,8 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
       _isDateRange && _selectedEndDate != null
           ? _formatDate(_selectedEndDate!)
           : null,
-      _formatTime(_openingTime),
-      _formatTime(_closingTime),
+      TimeUtils.formatTime(_openingTime),
+      TimeUtils.formatTime(_closingTime),
       _isClosed,
     );
   }
@@ -352,7 +326,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
           leading: Icon(Icons.wb_sunny_outlined, color: Colors.orange[600]),
           title: const Text(ScheduleConstants.exceptionOpeningTimeLabel),
           subtitle: Text(
-            _formatTime(_openingTime),
+            TimeUtils.formatTime(_openingTime),
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           onTap: () => _pickTime(true),
@@ -362,7 +336,7 @@ class _ScheduleExceptionDialogState extends State<ScheduleExceptionDialog> {
           leading: Icon(Icons.nights_stay_outlined, color: Colors.blue[600]),
           title: const Text(ScheduleConstants.exceptionClosingTimeLabel),
           subtitle: Text(
-            _formatTime(_closingTime),
+            TimeUtils.formatTime(_closingTime),
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           onTap: () => _pickTime(false),

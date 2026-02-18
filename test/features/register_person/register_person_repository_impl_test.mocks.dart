@@ -11,7 +11,7 @@ import 'package:mockito/src/dummies.dart' as _i8;
 import 'package:motogo_frontend/src/core/errors/error_model.dart' as _i5;
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart'
     as _i2;
-import 'package:motogo_frontend/src/features/register_person/data/models/person_register_model.dart'
+import 'package:motogo_frontend/src/features/register_person/data/models/person_model.dart'
     as _i6;
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_params.dart'
     as _i7;

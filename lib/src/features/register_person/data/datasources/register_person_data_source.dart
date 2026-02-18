@@ -4,7 +4,7 @@ import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
-import 'package:motogo_frontend/src/features/register_person/data/models/person_register_model.dart';
+import 'package:motogo_frontend/src/features/register_person/data/models/person_model.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_params.dart';
 
 /// DataSource para el registro de personas.

@@ -844,4 +844,312 @@ void main() {
       ],
     );
   });
+
+  // ─── UpdateServiceDetails Handler ──────────────────────────────────
+
+  group('UpdateServiceDetails Handler', () {
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'emits updated state on success',
+      build: () {
+        when(
+          mockUpdateServiceDetailsUseCase.call(
+            any,
+            quotedPrice: anyNamed('quotedPrice'),
+            finalPrice: anyNamed('finalPrice'),
+            representativeNotes: anyNamed('representativeNotes'),
+          ),
+        ).thenAnswer(
+          (_) async => const Right('Detalles actualizados exitosamente'),
+        );
+        return bloc;
+      },
+      seed: () => SearchMotorcycleLoaded(testEntity),
+      act: (bloc) => bloc.add(
+        const UpdateServiceDetails(
+          serviceId: 'svc-1',
+          motorcycleId: 'moto-1',
+          quotedPrice: 200000,
+          finalPrice: 180000,
+          representativeNotes: 'Notas actualizadas',
+        ),
+      ),
+      wait: const Duration(milliseconds: 100),
+      expect: () => [
+        // isUpdatingDetails = true
+        isA<SearchMotorcycleLoaded>()
+            .having((s) => s.isUpdatingDetails, 'isUpdatingDetails', true)
+            .having((s) => s.detailsUpdateMessage, 'detailsUpdateMessage', null)
+            .having((s) => s.detailsUpdateError, 'detailsUpdateError', null),
+        // isUpdatingDetails = false, message set
+        isA<SearchMotorcycleLoaded>()
+            .having((s) => s.isUpdatingDetails, 'isUpdatingDetails', false)
+            .having(
+              (s) => s.detailsUpdateMessage,
+              'detailsUpdateMessage',
+              'Detalles actualizados exitosamente',
+            ),
+      ],
+    );
+
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'emits error state on failure',
+      build: () {
+        when(
+          mockUpdateServiceDetailsUseCase.call(
+            any,
+            quotedPrice: anyNamed('quotedPrice'),
+            finalPrice: anyNamed('finalPrice'),
+            representativeNotes: anyNamed('representativeNotes'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              Left(ErrorModel(errorCode: 'ERR', message: 'Error actualizando')),
+        );
+        return bloc;
+      },
+      seed: () => SearchMotorcycleLoaded(testEntity),
+      act: (bloc) => bloc.add(
+        const UpdateServiceDetails(
+          serviceId: 'svc-1',
+          motorcycleId: 'moto-1',
+          quotedPrice: 200000,
+        ),
+      ),
+      expect: () => [
+        isA<SearchMotorcycleLoaded>().having(
+          (s) => s.isUpdatingDetails,
+          'isUpdatingDetails',
+          true,
+        ),
+        isA<SearchMotorcycleLoaded>()
+            .having((s) => s.isUpdatingDetails, 'isUpdatingDetails', false)
+            .having(
+              (s) => s.detailsUpdateError,
+              'detailsUpdateError',
+              'Error actualizando',
+            ),
+      ],
+    );
+
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'does nothing when state is not Loaded',
+      build: () => bloc,
+      act: (bloc) => bloc.add(
+        const UpdateServiceDetails(
+          serviceId: 'svc-1',
+          motorcycleId: 'moto-1',
+          quotedPrice: 200000,
+        ),
+      ),
+      expect: () => [],
+    );
+  });
+
+  // ─── FetchServiceHistory Handler ──────────────────────────────────
+
+  group('FetchServiceHistory Handler', () {
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'emits state with services on success',
+      build: () {
+        when(
+          mockGetServiceHistoryUseCase.call(
+            motorcycleId: anyNamed('motorcycleId'),
+            branchIds: anyNamed('branchIds'),
+          ),
+        ).thenAnswer(
+          (_) async => Right([
+            CompletedServiceEntity(
+              id: 'cs-1',
+              branchId: 'branch-1',
+              motorcycleId: 'moto-123',
+              status: 'FINALIZADO',
+              requestDate: DateTime(2026, 1, 1),
+              services: [],
+            ),
+          ]),
+        );
+        return bloc;
+      },
+      seed: () => SearchMotorcycleLoaded(testEntity),
+      act: (bloc) => bloc.add(
+        const FetchServiceHistory(
+          motorcycleId: 'moto-123',
+          branchIds: ['branch-1'],
+        ),
+      ),
+      wait: const Duration(milliseconds: 100),
+      expect: () => [
+        // loading = true
+        isA<SearchMotorcycleLoaded>().having(
+          (s) => s.loadingHistory,
+          'loadingHistory',
+          true,
+        ),
+        // loading = false, services set
+        isA<SearchMotorcycleLoaded>()
+            .having((s) => s.loadingHistory, 'loadingHistory', false)
+            .having((s) => s.serviceHistory.length, 'serviceHistory count', 1),
+      ],
+    );
+
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'emits error state on failure',
+      build: () {
+        when(
+          mockGetServiceHistoryUseCase.call(
+            motorcycleId: anyNamed('motorcycleId'),
+            branchIds: anyNamed('branchIds'),
+          ),
+        ).thenAnswer(
+          (_) async => Left(
+            ErrorModel(errorCode: 'ERR', message: 'Error al obtener historial'),
+          ),
+        );
+        return bloc;
+      },
+      seed: () => SearchMotorcycleLoaded(testEntity),
+      act: (bloc) => bloc.add(
+        const FetchServiceHistory(
+          motorcycleId: 'moto-123',
+          branchIds: ['branch-1'],
+        ),
+      ),
+      expect: () => [
+        isA<SearchMotorcycleLoaded>().having(
+          (s) => s.loadingHistory,
+          'loadingHistory',
+          true,
+        ),
+        isA<SearchMotorcycleLoaded>()
+            .having((s) => s.loadingHistory, 'loadingHistory', false)
+            .having(
+              (s) => s.historyError,
+              'historyError',
+              'Error al obtener historial',
+            ),
+      ],
+    );
+
+    blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
+      'does nothing when state is not Loaded',
+      build: () => bloc,
+      act: (bloc) => bloc.add(
+        const FetchServiceHistory(
+          motorcycleId: 'moto-123',
+          branchIds: ['branch-1'],
+        ),
+      ),
+      expect: () => [],
+    );
+  });
+
+  // ─── Sub-state copyWith tests ──────────────────────────────────────
+
+  group('ServiceRegistrationStatus', () {
+    test('copyWith returns updated instance', () {
+      const status = ServiceRegistrationStatus();
+      final updated = status.copyWith(
+        isRegistering: true,
+        message: 'OK',
+        error: 'Fail',
+      );
+
+      expect(updated.isRegistering, true);
+      expect(updated.message, 'OK');
+      expect(updated.error, 'Fail');
+    });
+
+    test('copyWith preserves isRegistering when not provided', () {
+      const status = ServiceRegistrationStatus(isRegistering: true);
+      final updated = status.copyWith(message: 'Done');
+
+      expect(updated.isRegistering, true);
+      expect(updated.message, 'Done');
+    });
+
+    test('props includes all fields', () {
+      const status = ServiceRegistrationStatus(
+        isRegistering: true,
+        message: 'msg',
+        error: 'err',
+      );
+      expect(status.props, [true, 'msg', 'err']);
+    });
+  });
+
+  group('ServiceHistoryStatus', () {
+    test('copyWith returns updated instance', () {
+      const status = ServiceHistoryStatus();
+      final updated = status.copyWith(loading: true, error: 'Error');
+
+      expect(updated.loading, true);
+      expect(updated.error, 'Error');
+      expect(updated.services, isEmpty);
+    });
+
+    test('copyWith preserves services when not provided', () {
+      final service = CompletedServiceEntity(
+        id: 'cs-1',
+        branchId: 'b-1',
+        motorcycleId: 'm-1',
+        status: 'FINALIZADO',
+        requestDate: DateTime(2026, 1, 1),
+        services: [],
+      );
+      final status = ServiceHistoryStatus(services: [service]);
+      final updated = status.copyWith(loading: true);
+
+      expect(updated.services, hasLength(1));
+    });
+
+    test('props includes all fields', () {
+      const status = ServiceHistoryStatus(loading: true, error: 'e');
+      expect(status.props, [const [], true, 'e', const []]);
+    });
+  });
+
+  group('ServiceActionStatus', () {
+    test('copyWith returns updated instance with all fields', () {
+      const status = ServiceActionStatus();
+      final updated = status.copyWith(
+        isUpdatingStatus: true,
+        statusUpdateMessage: 'Status OK',
+        statusUpdateError: 'Status Err',
+        isUpdatingDetails: true,
+        detailsUpdateMessage: 'Details OK',
+        detailsUpdateError: 'Details Err',
+        isDeletingService: true,
+        deleteServiceMessage: 'Delete OK',
+        deleteServiceError: 'Delete Err',
+      );
+
+      expect(updated.isUpdatingStatus, true);
+      expect(updated.statusUpdateMessage, 'Status OK');
+      expect(updated.statusUpdateError, 'Status Err');
+      expect(updated.isUpdatingDetails, true);
+      expect(updated.detailsUpdateMessage, 'Details OK');
+      expect(updated.detailsUpdateError, 'Details Err');
+      expect(updated.isDeletingService, true);
+      expect(updated.deleteServiceMessage, 'Delete OK');
+      expect(updated.deleteServiceError, 'Delete Err');
+    });
+
+    test('copyWith preserves boolean fields when not provided', () {
+      const status = ServiceActionStatus(
+        isUpdatingStatus: true,
+        isUpdatingDetails: true,
+        isDeletingService: true,
+      );
+      final updated = status.copyWith(statusUpdateMessage: 'msg');
+
+      expect(updated.isUpdatingStatus, true);
+      expect(updated.isUpdatingDetails, true);
+      expect(updated.isDeletingService, true);
+    });
+
+    test('props includes all fields', () {
+      const status = ServiceActionStatus();
+      expect(status.props.length, 9);
+    });
+  });
 }

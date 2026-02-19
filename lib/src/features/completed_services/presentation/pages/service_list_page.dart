@@ -88,13 +88,9 @@ class ServiceListPage extends StatelessWidget {
     if (service.branchName != null && service.branchName!.isNotEmpty) {
       parts.add(service.branchName!);
     }
-    if (service.serviceNames.isNotEmpty) {
+    if (service.services.isNotEmpty) {
       parts.add(
-        '${service.serviceNames.length} servicio${service.serviceNames.length > 1 ? 's' : ''}',
-      );
-    } else if (service.serviceIds.isNotEmpty) {
-      parts.add(
-        '${service.serviceIds.length} servicio${service.serviceIds.length > 1 ? 's' : ''}',
+        '${service.services.length} servicio${service.services.length > 1 ? 's' : ''}',
       );
     }
     final subtitle = parts.join(' · ');
@@ -190,7 +186,7 @@ class ServiceListPage extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => BlocProvider.value(
           value: context.read<SearchMotorcycleBloc>(),
-          child: ServiceDetailPage(service: service),
+          child: ServiceDetailPage(service: service, canRate: false),
         ),
       ),
     );

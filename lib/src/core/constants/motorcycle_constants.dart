@@ -34,6 +34,8 @@ class MotorcycleConstants {
 
   // Search bar
   static const String searchPlaceholder = 'Buscar talleres o tiendas';
+  static const String searchNoResults = 'No se encontraron sedes';
+  static const String searchClearTooltip = 'Limpiar búsqueda';
 
   // Filter chips
   static const String filterAll = 'Todos';
@@ -236,4 +238,24 @@ class MotorcycleConstants {
       'Registrar un servicio para esta motocicleta';
   static const String registerBlockedSubtitle =
       'Gestiona los servicios pendientes antes de registrar uno nuevo';
+
+  // Service Rating section (FINALIZADO)
+  static const String rateServicesTitle = 'Calificar Servicios';
+  static const String rateItemButton = 'Calificar';
+  static const String alreadyRatedLabel = 'Calificado';
+
+  // Service Editing (workshop / representative)
+  static const String editServiceTitle = 'Editar Servicio';
+  static const String editServiceSave = 'Guardar Cambios';
+  static const String editQuotedPriceLabel = 'Cotización';
+  static const String editQuotedPriceHint = 'Ej: 185000';
+  static const String editFinalPriceLabel = 'Precio Final';
+  static const String editFinalPriceHint = 'Ej: 175000';
+  static const String editNotesLabel = 'Notas del Representante';
+  static const String editNotesHint = 'Observaciones sobre el servicio...';
+  static const String finalizePriceTitle = 'Precio Final del Servicio';
+  static const String finalizePriceMessage =
+      '¿Deseas asignar un precio final antes de finalizar?';
+  static const String finalizePriceConfirm = 'Finalizar';
+  static const String finalizePriceSkip = 'Sin precio';
 }

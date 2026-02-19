@@ -22,10 +22,20 @@ abstract class CompletedServicesRepository {
   getCompletedServicesByMotorcycle(String motorcycleId);
 
   /// Updates the status of a completed service.
+  /// If [finalPrice] is provided, it is sent with the status update.
   Future<Either<ErrorModel, String>> updateServiceStatus(
     String serviceId,
-    String newStatus,
-  );
+    String newStatus, {
+    double? finalPrice,
+  });
+
+  /// Updates the details (prices/notes) of a completed service (HU75).
+  Future<Either<ErrorModel, String>> updateServiceDetails(
+    String serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  });
 
   /// Fetches status transitions for a completed service.
   Future<Either<ErrorModel, List<StatusTransitionModel>>> getServiceTransitions(

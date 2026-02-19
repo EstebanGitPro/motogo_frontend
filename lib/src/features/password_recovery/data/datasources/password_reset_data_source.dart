@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:either_dart/either.dart';
 import 'package:http/http.dart' as http;
 import 'package:motogo_frontend/src/core/config/config.dart';
+import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/errors/http_error_handler.dart';
 
@@ -29,7 +30,7 @@ class PasswordResetDataSource {
         final responseData = json.decode(response.body);
         final message =
             responseData['message'] as String? ??
-            'Contraseña actualizada correctamente';
+            FallbackMessages.operationSuccess;
         return Right(message);
       } else {
         return Left(HttpErrorHandler.fromHttpResponse(response));

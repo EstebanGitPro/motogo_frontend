@@ -13,6 +13,8 @@ import 'package:motogo_frontend/src/features/service_ratings/data/datasources/se
     as _i2;
 import 'package:motogo_frontend/src/features/service_ratings/data/models/rate_service_request.dart'
     as _i6;
+import 'package:motogo_frontend/src/features/service_ratings/domain/entities/service_review_entity.dart'
+    as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -60,4 +62,22 @@ class MockServiceRatingDataSource extends _i1.Mock
             ),
           )
           as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>>
+  getServiceReviews(String? serviceId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getServiceReviews, [serviceId]),
+            returnValue:
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>
+                  >(this, Invocation.method(#getServiceReviews, [serviceId])),
+                ),
+          )
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>
+          >);
 }

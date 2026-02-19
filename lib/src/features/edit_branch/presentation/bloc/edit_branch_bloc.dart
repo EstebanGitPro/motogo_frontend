@@ -27,7 +27,8 @@ class EditBranchBloc extends Bloc<EditBranchEvent, EditBranchState> {
 
     result.fold(
       (error) => emit(EditBranchFailure(error: error)),
-      (updatedBranch) => emit(EditBranchSuccess(updatedBranch: updatedBranch)),
+      (result) =>
+          emit(EditBranchSuccess(updatedBranch: result.$1, message: result.$2)),
     );
   }
 

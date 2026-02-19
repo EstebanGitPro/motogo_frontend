@@ -13,9 +13,9 @@ class UpdateBranchUseCase {
 
   /// Executes the update branch operation.
   ///
-  /// Returns [Right] with the updated [BranchEntity] on success,
-  /// or [Left] with [ErrorModel] on failure.
-  Future<Either<ErrorModel, BranchEntity>> call(
+  /// Returns [Right] with a record containing the updated [BranchEntity]
+  /// and the backend success message, or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, (BranchEntity, String)>> call(
     String id,
     BranchEntity branch,
   ) async {

@@ -231,8 +231,12 @@ class _EditBranchPageState extends State<EditBranchPage>
               ScaffoldMessenger.of(context)
                 ..clearSnackBars()
                 ..showSnackBar(
-                  const SnackBar(
-                    content: Text(BranchConstants.branchUpdatedSuccess),
+                  SnackBar(
+                    content: Text(
+                      state.message.isNotEmpty
+                          ? state.message
+                          : BranchConstants.branchUpdatedSuccess,
+                    ),
                     backgroundColor: Colors.green,
                     behavior: SnackBarBehavior.floating,
                   ),

@@ -588,9 +588,11 @@ void main() {
       final loaded = SearchMotorcycleLoaded(testEntity);
       final updated = loaded.copyWith(
         action: const ServiceActionStatus(
-          isUpdatingStatus: true,
-          statusUpdateMessage: 'Updated',
-          statusUpdateError: 'Failed',
+          statusUpdate: AsyncActionState(
+            isLoading: true,
+            message: 'Updated',
+            error: 'Failed',
+          ),
         ),
       );
 
@@ -612,9 +614,11 @@ void main() {
       final loaded = SearchMotorcycleLoaded(testEntity);
       final updated = loaded.copyWith(
         action: const ServiceActionStatus(
-          isDeletingService: true,
-          deleteServiceMessage: 'Deleted',
-          deleteServiceError: 'Error deleting',
+          deleteAction: AsyncActionState(
+            isLoading: true,
+            message: 'Deleted',
+            error: 'Error deleting',
+          ),
         ),
       );
 
@@ -1112,15 +1116,21 @@ void main() {
     test('copyWith returns updated instance with all fields', () {
       const status = ServiceActionStatus();
       final updated = status.copyWith(
-        isUpdatingStatus: true,
-        statusUpdateMessage: 'Status OK',
-        statusUpdateError: 'Status Err',
-        isUpdatingDetails: true,
-        detailsUpdateMessage: 'Details OK',
-        detailsUpdateError: 'Details Err',
-        isDeletingService: true,
-        deleteServiceMessage: 'Delete OK',
-        deleteServiceError: 'Delete Err',
+        statusUpdate: const AsyncActionState(
+          isLoading: true,
+          message: 'Status OK',
+          error: 'Status Err',
+        ),
+        detailsUpdate: const AsyncActionState(
+          isLoading: true,
+          message: 'Details OK',
+          error: 'Details Err',
+        ),
+        deleteAction: const AsyncActionState(
+          isLoading: true,
+          message: 'Delete OK',
+          error: 'Delete Err',
+        ),
       );
 
       expect(updated.isUpdatingStatus, true);
@@ -1134,22 +1144,24 @@ void main() {
       expect(updated.deleteServiceError, 'Delete Err');
     });
 
-    test('copyWith preserves boolean fields when not provided', () {
+    test('copyWith preserves sub-states when not provided', () {
       const status = ServiceActionStatus(
-        isUpdatingStatus: true,
-        isUpdatingDetails: true,
-        isDeletingService: true,
+        statusUpdate: AsyncActionState(isLoading: true),
+        detailsUpdate: AsyncActionState(isLoading: true),
+        deleteAction: AsyncActionState(isLoading: true),
       );
-      final updated = status.copyWith(statusUpdateMessage: 'msg');
+      final updated = status.copyWith(
+        statusUpdate: const AsyncActionState(isLoading: true, message: 'msg'),
+      );
 
       expect(updated.isUpdatingStatus, true);
       expect(updated.isUpdatingDetails, true);
       expect(updated.isDeletingService, true);
     });
 
-    test('props includes all fields', () {
+    test('props includes all sub-states', () {
       const status = ServiceActionStatus();
-      expect(status.props.length, 9);
+      expect(status.props.length, 3);
     });
   });
 }

@@ -288,7 +288,11 @@ class SearchMotorcycleBloc
 
     emit(
       currentState.copyWith(
-        action: currentState.action.copyWith(isUpdatingStatus: true),
+        action: currentState.action.copyWith(
+          statusUpdate: currentState.action.statusUpdate.copyWith(
+            isLoading: true,
+          ),
+        ),
       ),
     );
 
@@ -302,8 +306,9 @@ class SearchMotorcycleBloc
       (error) => emit(
         currentState.copyWith(
           action: currentState.action.copyWith(
-            isUpdatingStatus: false,
-            statusUpdateError: error.message,
+            statusUpdate: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
           ),
         ),
       ),
@@ -311,8 +316,7 @@ class SearchMotorcycleBloc
         emit(
           currentState.copyWith(
             action: currentState.action.copyWith(
-              isUpdatingStatus: false,
-              statusUpdateMessage: message,
+              statusUpdate: const AsyncActionState().copyWith(message: message),
             ),
           ),
         );
@@ -331,7 +335,11 @@ class SearchMotorcycleBloc
 
     emit(
       currentState.copyWith(
-        action: currentState.action.copyWith(isUpdatingDetails: true),
+        action: currentState.action.copyWith(
+          detailsUpdate: currentState.action.detailsUpdate.copyWith(
+            isLoading: true,
+          ),
+        ),
       ),
     );
 
@@ -346,8 +354,9 @@ class SearchMotorcycleBloc
       (error) => emit(
         currentState.copyWith(
           action: currentState.action.copyWith(
-            isUpdatingDetails: false,
-            detailsUpdateError: error.message,
+            detailsUpdate: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
           ),
         ),
       ),
@@ -355,8 +364,9 @@ class SearchMotorcycleBloc
         emit(
           currentState.copyWith(
             action: currentState.action.copyWith(
-              isUpdatingDetails: false,
-              detailsUpdateMessage: message,
+              detailsUpdate: const AsyncActionState().copyWith(
+                message: message,
+              ),
             ),
           ),
         );
@@ -399,7 +409,11 @@ class SearchMotorcycleBloc
 
     emit(
       currentState.copyWith(
-        action: currentState.action.copyWith(isDeletingService: true),
+        action: currentState.action.copyWith(
+          deleteAction: currentState.action.deleteAction.copyWith(
+            isLoading: true,
+          ),
+        ),
       ),
     );
 
@@ -409,8 +423,9 @@ class SearchMotorcycleBloc
       (error) => emit(
         currentState.copyWith(
           action: currentState.action.copyWith(
-            isDeletingService: false,
-            deleteServiceError: error.message,
+            deleteAction: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
           ),
         ),
       ),
@@ -418,8 +433,7 @@ class SearchMotorcycleBloc
         emit(
           currentState.copyWith(
             action: currentState.action.copyWith(
-              isDeletingService: false,
-              deleteServiceMessage: message,
+              deleteAction: const AsyncActionState().copyWith(message: message),
             ),
           ),
         );

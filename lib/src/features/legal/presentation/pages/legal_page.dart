@@ -25,9 +25,9 @@ class LegalPage extends StatelessWidget {
               body: LegalConstants.aboutBody,
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               LegalConstants.sectionTermsAndConditions,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             ...LegalConstants.tcSections.map(

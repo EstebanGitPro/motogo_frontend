@@ -210,9 +210,9 @@ class MotorcycleConstants {
   static const String selectBranchHint = 'Elige una sede';
   static const String selectServicesLabel = 'Servicios Realizados';
   static const String selectServicesHint = 'Selecciona los servicios';
-  static const String registerQuotedPriceLabel = 'Cotización';
+  static const String registerQuotedPriceLabel = quotedPriceLabel;
   static const String registerQuotedPriceHint = 'Ej: 185000';
-  static const String registerFinalPriceLabel = 'Precio Final';
+  static const String registerFinalPriceLabel = finalPriceLabel;
   static const String registerFinalPriceHint = 'Ej: 175000';
   static const String registerNotesLabel = 'Notas del Representante';
   static const String registerNotesHint =
@@ -247,9 +247,9 @@ class MotorcycleConstants {
   // Service Editing (workshop / representative)
   static const String editServiceTitle = 'Editar Servicio';
   static const String editServiceSave = 'Guardar Cambios';
-  static const String editQuotedPriceLabel = 'Cotización';
+  static const String editQuotedPriceLabel = quotedPriceLabel;
   static const String editQuotedPriceHint = 'Ej: 185000';
-  static const String editFinalPriceLabel = 'Precio Final';
+  static const String editFinalPriceLabel = finalPriceLabel;
   static const String editFinalPriceHint = 'Ej: 175000';
   static const String editNotesLabel = 'Notas del Representante';
   static const String editNotesHint = 'Observaciones sobre el servicio...';

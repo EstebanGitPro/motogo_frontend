@@ -22,6 +22,7 @@ import 'package:motogo_frontend/src/features/user_home/presentation/bloc/user_ho
 import 'package:motogo_frontend/src/features/user_home/presentation/widgets/branch_card.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/widgets/filter_bottom_sheet.dart';
 import 'package:motogo_frontend/src/features/user_home/presentation/widgets/navigation_bottom_sheet.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/widgets/search_result_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// User Home Page - Main screen for MOTORCYCLIST users.
@@ -60,6 +61,10 @@ class _UserHomeViewState extends State<_UserHomeView> {
   bool _hasInitiallyCentered = false;
   bool _hasShownDisclaimer = false;
 
+  // Search state
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+
   // In-app navigation state
   bool _isNavigating = false;
   bool _isLoadingRoute = false;
@@ -88,6 +93,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
     _radiusDebounceTimer?.cancel();
     _tapListener?.cancel();
     _navigationLocationSub?.cancel();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -95,14 +101,35 @@ class _UserHomeViewState extends State<_UserHomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          MotorcycleConstants.searchPlaceholder,
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: MotorcycleConstants.searchPlaceholder,
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                onChanged: (query) {
+                  context.read<UserHomeBloc>().add(SearchBranches(query));
+                },
+              )
+            : GestureDetector(
+                onTap: () => setState(() => _isSearching = true),
+                child: Text(
+                  MotorcycleConstants.searchPlaceholder,
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 1,
@@ -112,7 +139,23 @@ class _UserHomeViewState extends State<_UserHomeView> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        actions: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
+        actions: [
+          if (_isSearching)
+            IconButton(
+              icon: const Icon(Icons.close),
+              tooltip: MotorcycleConstants.searchClearTooltip,
+              onPressed: () {
+                _searchController.clear();
+                context.read<UserHomeBloc>().add(const SearchBranches(''));
+                setState(() => _isSearching = false);
+              },
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => setState(() => _isSearching = true),
+            ),
+        ],
       ),
       drawer: const UserHomeDrawer(),
       body: BlocConsumer<UserHomeBloc, UserHomeState>(
@@ -144,6 +187,9 @@ class _UserHomeViewState extends State<_UserHomeView> {
               ..._buildSelectedBranchCard(context, state),
               ..._buildNavigationSheet(),
               _buildFabColumn(context),
+              // Search results overlay
+              if (state is UserHomeLoaded && state.searchQuery.isNotEmpty)
+                _buildSearchOverlay(context, state),
             ],
           );
         },
@@ -264,6 +310,97 @@ class _UserHomeViewState extends State<_UserHomeView> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSearchOverlay(BuildContext context, UserHomeLoaded state) {
+    final results = state.searchResults;
+
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: GestureDetector(
+        onTap: () {
+          _searchController.clear();
+          context.read<UserHomeBloc>().add(const SearchBranches(''));
+          setState(() => _isSearching = false);
+        },
+        behavior: HitTestBehavior.translucent,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            margin: const EdgeInsets.only(top: 8, left: 16, right: 16),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.45,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(30),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: results.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 40,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          MotorcycleConstants.searchNoResults,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      itemCount: results.length,
+                      itemBuilder: (_, index) => SearchResultCard(
+                        branch: results[index],
+                        onTap: () =>
+                            _onSearchResultTap(context, results[index]),
+                      ),
+                    ),
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onSearchResultTap(BuildContext context, BranchMarkerEntity branch) {
+    // Clear search
+    _searchController.clear();
+    context.read<UserHomeBloc>().add(const SearchBranches(''));
+    setState(() => _isSearching = false);
+
+    // Select branch and center map
+    context.read<UserHomeBloc>().add(SelectBranch(branch.id));
+    _mapController?.flyTo(
+      CameraOptions(
+        center: Point(coordinates: Position(branch.longitude, branch.latitude)),
+        zoom: 16.0,
+      ),
+      MapAnimationOptions(duration: 1000),
     );
   }
 

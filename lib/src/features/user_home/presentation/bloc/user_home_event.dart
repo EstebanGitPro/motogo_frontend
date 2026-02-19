@@ -119,3 +119,13 @@ class ApplyAdvancedFilters extends UserHomeEvent {
   @override
   List<Object?> get props => [brand, displacementRange];
 }
+
+/// Event to search branches by name, address, or type.
+class SearchBranches extends UserHomeEvent {
+  final String query;
+
+  const SearchBranches(this.query);
+
+  @override
+  List<Object?> get props => [query];
+}

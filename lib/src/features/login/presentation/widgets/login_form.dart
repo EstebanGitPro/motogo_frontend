@@ -154,8 +154,9 @@ class _LoginFormState extends State<LoginForm> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text('¿No tienes una cuenta?'),
                       TextButton(

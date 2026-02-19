@@ -10,6 +10,7 @@ import 'package:motogo_frontend/src/features/completed_services/domain/usecases/
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_details_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
@@ -30,6 +31,7 @@ import 'search_motorcycle_bloc_test.mocks.dart';
   UpdateServiceStatusUseCase,
   GetServiceTransitionsUseCase,
   DeleteCompletedServiceUseCase,
+  UpdateServiceDetailsUseCase,
 ])
 void main() {
   late SearchMotorcycleBloc bloc;
@@ -41,6 +43,7 @@ void main() {
   late MockUpdateServiceStatusUseCase mockUpdateServiceStatusUseCase;
   late MockGetServiceTransitionsUseCase mockGetServiceTransitionsUseCase;
   late MockDeleteCompletedServiceUseCase mockDeleteCompletedServiceUseCase;
+  late MockUpdateServiceDetailsUseCase mockUpdateServiceDetailsUseCase;
 
   setUpAll(() {
     provideDummy<Either<ErrorModel, MotorcycleDetailEntity>>(
@@ -78,6 +81,7 @@ void main() {
     mockUpdateServiceStatusUseCase = MockUpdateServiceStatusUseCase();
     mockGetServiceTransitionsUseCase = MockGetServiceTransitionsUseCase();
     mockDeleteCompletedServiceUseCase = MockDeleteCompletedServiceUseCase();
+    mockUpdateServiceDetailsUseCase = MockUpdateServiceDetailsUseCase();
     // Default mock: representative has no branches (prevents auto-fetch)
     when(
       mockGetBranchesUseCase.call(),
@@ -91,6 +95,7 @@ void main() {
       updateServiceStatusUseCase: mockUpdateServiceStatusUseCase,
       getServiceTransitionsUseCase: mockGetServiceTransitionsUseCase,
       deleteCompletedServiceUseCase: mockDeleteCompletedServiceUseCase,
+      updateServiceDetailsUseCase: mockUpdateServiceDetailsUseCase,
     );
   });
 
@@ -533,7 +538,34 @@ void main() {
         motorcycleId: 'moto-1',
         newStatus: 'EN_PROCESO',
       );
-      expect(event.props, ['svc-1', 'moto-1', 'EN_PROCESO']);
+      expect(event.props, ['svc-1', 'moto-1', 'EN_PROCESO', null]);
+    });
+
+    test('UpdateServiceStatus props with finalPrice', () {
+      const event = UpdateServiceStatus(
+        serviceId: 'svc-1',
+        motorcycleId: 'moto-1',
+        newStatus: 'FINALIZADO',
+        finalPrice: 150000,
+      );
+      expect(event.props, ['svc-1', 'moto-1', 'FINALIZADO', 150000.0]);
+    });
+
+    test('UpdateServiceDetails props should contain all fields', () {
+      const event = UpdateServiceDetails(
+        serviceId: 'svc-1',
+        motorcycleId: 'moto-1',
+        quotedPrice: 200000,
+        finalPrice: 180000,
+        representativeNotes: 'Notas del representante',
+      );
+      expect(event.props, [
+        'svc-1',
+        'moto-1',
+        200000.0,
+        180000.0,
+        'Notas del representante',
+      ]);
     });
 
     test('FetchServiceTransitions props should contain serviceId', () {
@@ -598,7 +630,13 @@ void main() {
     blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
       'emits updated state on success',
       build: () {
-        when(mockUpdateServiceStatusUseCase.call(any, any)).thenAnswer(
+        when(
+          mockUpdateServiceStatusUseCase.call(
+            any,
+            any,
+            finalPrice: anyNamed('finalPrice'),
+          ),
+        ).thenAnswer(
           (_) async => const Right('Estado actualizado exitosamente'),
         );
         // _fetchHistoryForMotorcycle calls getBranchesUseCase
@@ -632,7 +670,11 @@ void main() {
       ],
       verify: (_) {
         verify(
-          mockUpdateServiceStatusUseCase.call('svc-1', 'EN_PROCESO'),
+          mockUpdateServiceStatusUseCase.call(
+            'svc-1',
+            'EN_PROCESO',
+            finalPrice: null,
+          ),
         ).called(1);
       },
     );
@@ -640,7 +682,13 @@ void main() {
     blocTest<SearchMotorcycleBloc, SearchMotorcycleState>(
       'emits error state on failure',
       build: () {
-        when(mockUpdateServiceStatusUseCase.call(any, any)).thenAnswer(
+        when(
+          mockUpdateServiceStatusUseCase.call(
+            any,
+            any,
+            finalPrice: anyNamed('finalPrice'),
+          ),
+        ).thenAnswer(
           (_) async => Left(
             ErrorModel(errorCode: 'ERR', message: 'Transición no permitida'),
           ),

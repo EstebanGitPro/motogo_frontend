@@ -78,11 +78,14 @@ class ServiceHistoryStatus extends Equatable {
   List<Object?> get props => [services, loading, error, transitions];
 }
 
-/// Groups status-update and delete action fields.
+/// Groups status-update, details-update, and delete action fields.
 class ServiceActionStatus extends Equatable {
   final bool isUpdatingStatus;
   final String? statusUpdateMessage;
   final String? statusUpdateError;
+  final bool isUpdatingDetails;
+  final String? detailsUpdateMessage;
+  final String? detailsUpdateError;
   final bool isDeletingService;
   final String? deleteServiceMessage;
   final String? deleteServiceError;
@@ -91,6 +94,9 @@ class ServiceActionStatus extends Equatable {
     this.isUpdatingStatus = false,
     this.statusUpdateMessage,
     this.statusUpdateError,
+    this.isUpdatingDetails = false,
+    this.detailsUpdateMessage,
+    this.detailsUpdateError,
     this.isDeletingService = false,
     this.deleteServiceMessage,
     this.deleteServiceError,
@@ -100,6 +106,9 @@ class ServiceActionStatus extends Equatable {
     bool? isUpdatingStatus,
     String? statusUpdateMessage,
     String? statusUpdateError,
+    bool? isUpdatingDetails,
+    String? detailsUpdateMessage,
+    String? detailsUpdateError,
     bool? isDeletingService,
     String? deleteServiceMessage,
     String? deleteServiceError,
@@ -108,6 +117,9 @@ class ServiceActionStatus extends Equatable {
       isUpdatingStatus: isUpdatingStatus ?? this.isUpdatingStatus,
       statusUpdateMessage: statusUpdateMessage,
       statusUpdateError: statusUpdateError,
+      isUpdatingDetails: isUpdatingDetails ?? this.isUpdatingDetails,
+      detailsUpdateMessage: detailsUpdateMessage,
+      detailsUpdateError: detailsUpdateError,
       isDeletingService: isDeletingService ?? this.isDeletingService,
       deleteServiceMessage: deleteServiceMessage,
       deleteServiceError: deleteServiceError,
@@ -119,6 +131,9 @@ class ServiceActionStatus extends Equatable {
     isUpdatingStatus,
     statusUpdateMessage,
     statusUpdateError,
+    isUpdatingDetails,
+    detailsUpdateMessage,
+    detailsUpdateError,
     isDeletingService,
     deleteServiceMessage,
     deleteServiceError,
@@ -156,6 +171,9 @@ class SearchMotorcycleLoaded extends SearchMotorcycleState {
   bool get isUpdatingStatus => action.isUpdatingStatus;
   String? get statusUpdateMessage => action.statusUpdateMessage;
   String? get statusUpdateError => action.statusUpdateError;
+  bool get isUpdatingDetails => action.isUpdatingDetails;
+  String? get detailsUpdateMessage => action.detailsUpdateMessage;
+  String? get detailsUpdateError => action.detailsUpdateError;
   bool get isDeletingService => action.isDeletingService;
   String? get deleteServiceMessage => action.deleteServiceMessage;
   String? get deleteServiceError => action.deleteServiceError;

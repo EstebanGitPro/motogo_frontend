@@ -85,15 +85,43 @@ class UpdateServiceStatus extends SearchMotorcycleEvent {
   final String serviceId;
   final String motorcycleId;
   final String newStatus;
+  final double? finalPrice;
 
   const UpdateServiceStatus({
     required this.serviceId,
     required this.motorcycleId,
     required this.newStatus,
+    this.finalPrice,
   });
 
   @override
-  List<Object?> get props => [serviceId, motorcycleId, newStatus];
+  List<Object?> get props => [serviceId, motorcycleId, newStatus, finalPrice];
+}
+
+/// Event to update the details of a completed service (HU75).
+class UpdateServiceDetails extends SearchMotorcycleEvent {
+  final String serviceId;
+  final String motorcycleId;
+  final double? quotedPrice;
+  final double? finalPrice;
+  final String? representativeNotes;
+
+  const UpdateServiceDetails({
+    required this.serviceId,
+    required this.motorcycleId,
+    this.quotedPrice,
+    this.finalPrice,
+    this.representativeNotes,
+  });
+
+  @override
+  List<Object?> get props => [
+    serviceId,
+    motorcycleId,
+    quotedPrice,
+    finalPrice,
+    representativeNotes,
+  ];
 }
 
 /// Event to fetch the transition history of a completed service.

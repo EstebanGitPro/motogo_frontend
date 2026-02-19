@@ -5,6 +5,7 @@ import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
+import 'package:motogo_frontend/src/features/motorcycle_history/presentation/pages/client_service_detail_page.dart';
 import 'package:motogo_frontend/src/features/register_motorcycle/domain/entities/motorcycle_entity.dart';
 
 /// Page displaying the service history for a motorcycle.
@@ -183,7 +184,10 @@ class MotorcycleHistoryPage extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       itemCount: services.length,
       itemBuilder: (context, index) {
-        return _ServiceHistoryCard(service: services[index]);
+        return _ServiceHistoryCard(
+          service: services[index],
+          motorcycleId: motorcycle.id!,
+        );
       },
     );
   }
@@ -191,8 +195,12 @@ class MotorcycleHistoryPage extends StatelessWidget {
 
 class _ServiceHistoryCard extends StatelessWidget {
   final CompletedServiceEntity service;
+  final String motorcycleId;
 
-  const _ServiceHistoryCard({required this.service});
+  const _ServiceHistoryCard({
+    required this.service,
+    required this.motorcycleId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -200,133 +208,152 @@ class _ServiceHistoryCard extends StatelessWidget {
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: service name + status chip
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    service.serviceNames.isNotEmpty
-                        ? service.serviceNames.join(', ')
-                        : 'Servicio',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _buildStatusChip(),
-              ],
-            ),
-
-            // Branch name (sede)
-            if (service.branchName != null &&
-                service.branchName!.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(Icons.store, size: 15, color: Colors.blue[400]),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      service.branchName!,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.blue[700],
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 12),
-
-            // Date
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 15, color: Colors.grey[500]),
-                const SizedBox(width: 6),
-                Text(
-                  DateFormat('dd MMM yyyy', 'es').format(service.requestDate),
-                  style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Price section
-            _buildPriceSection(),
-
-            // Representative notes
-            if (service.representativeNotes != null &&
-                service.representativeNotes!.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _navigateToDetail(context),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header: service name + status chip
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.notes, size: 18, color: Colors.blue[400]),
-                  const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          MotorcycleConstants.representativeNotesLabel,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          service.representativeNotes!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black87,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      service.services.isNotEmpty
+                          ? service.services
+                                .map((s) => s.serviceName ?? 'Servicio')
+                                .join(', ')
+                          : 'Servicio',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  _buildStatusChip(),
                 ],
               ),
-            ],
 
-            // Diagnostic reference
-            if (service.diagnosticId != null) ...[
-              const SizedBox(height: 10),
+              // Branch name (sede)
+              if (service.branchName != null &&
+                  service.branchName!.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.store, size: 15, color: Colors.blue[400]),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        service.branchName!,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.blue[700],
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+              const SizedBox(height: 12),
+
+              // Date
               Row(
                 children: [
-                  Icon(Icons.link, size: 14, color: Colors.grey[400]),
-                  const SizedBox(width: 4),
+                  Icon(Icons.calendar_today, size: 15, color: Colors.grey[500]),
+                  const SizedBox(width: 6),
                   Text(
-                    '${MotorcycleConstants.diagnosticRefLabel}: ${service.diagnosticId!.substring(0, service.diagnosticId!.length.clamp(0, 12))}...',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[500],
-                      fontStyle: FontStyle.italic,
-                    ),
+                    DateFormat('dd MMM yyyy', 'es').format(service.requestDate),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+
+              // Price section
+              _buildPriceSection(),
+
+              // Representative notes
+              if (service.representativeNotes != null &&
+                  service.representativeNotes!.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Divider(height: 1),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.notes, size: 18, color: Colors.blue[400]),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            MotorcycleConstants.representativeNotesLabel,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            service.representativeNotes!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black87,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+
+              // Diagnostic reference
+              if (service.diagnosticId != null) ...[
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Icon(Icons.link, size: 14, color: Colors.grey[400]),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${MotorcycleConstants.diagnosticRefLabel}: ${service.diagnosticId!.substring(0, service.diagnosticId!.length.clamp(0, 12))}...',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  Future<void> _navigateToDetail(BuildContext context) async {
+    final rated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ClientServiceDetailPage(service: service),
+      ),
+    );
+    if (rated == true && context.mounted) {
+      context.read<MotorcycleHistoryBloc>().add(
+        LoadMotorcycleHistory(motorcycleId),
+      );
+    }
   }
 
   Widget _buildStatusChip() {

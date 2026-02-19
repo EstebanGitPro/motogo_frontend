@@ -12,7 +12,9 @@ class RegisterFranchiseUseCase {
   /// Registers a franchise with the provided entity data.
   ///
   /// Validates that at least one branch is selected before proceeding.
-  Future<Either<ErrorModel, FranchiseEntity>> call(
+  /// Returns a Record with the created [FranchiseEntity] and the backend
+  /// success message.
+  Future<Either<ErrorModel, (FranchiseEntity, String)>> call(
     FranchiseEntity franchise,
   ) async {
     // Validate at least one branch is selected

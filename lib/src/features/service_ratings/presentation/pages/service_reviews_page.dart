@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/features/service_ratings/domain/entities/service_review_entity.dart';
+import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_reviews_bloc.dart';
+import 'package:intl/intl.dart';
 
-/// Page displaying service reviews with hardcoded mock data.
+/// Page displaying service reviews fetched from the API.
 ///
-/// Shows average rating summary, rating breakdown, and individual
-/// review cards. All data is artificial for preview purposes.
+/// Shows average rating summary, rating breakdown by star,
+/// and individual review cards with reviewer info.
 class ServiceReviewsPage extends StatelessWidget {
   final String serviceId;
   final String serviceName;
@@ -24,21 +28,94 @@ class ServiceReviewsPage extends StatelessWidget {
         foregroundColor: Colors.black87,
         elevation: 1,
       ),
-      body: SingleChildScrollView(
+      body: BlocBuilder<ServiceReviewsBloc, ServiceReviewsState>(
+        builder: (context, state) {
+          if (state is ServiceReviewsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is ServiceReviewsError) {
+            return _buildErrorState(context, state.message);
+          }
+          if (state is ServiceReviewsLoaded) {
+            return _buildContent(state.summary);
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildRatingSummary(),
+            Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            _buildReviewsList(),
-            const SizedBox(height: 24),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => context.read<ServiceReviewsBloc>().add(
+                FetchServiceReviews(serviceId: serviceId),
+              ),
+              child: const Text('Reintentar'),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildRatingSummary() {
+  Widget _buildContent(ServiceReviewSummaryEntity summary) {
+    if (summary.totalReviews == 0) {
+      return _buildEmptyState();
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildRatingSummary(summary),
+          const SizedBox(height: 16),
+          _buildReviewsList(summary.reviews),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            'Aún no hay reseñas',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[500],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Sé el primero en calificar este servicio',
+            style: TextStyle(fontSize: 13, color: Colors.grey[400]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRatingSummary(ServiceReviewSummaryEntity summary) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
@@ -61,9 +138,9 @@ class ServiceReviewsPage extends StatelessWidget {
               // Left: big average number + stars
               Column(
                 children: [
-                  const Text(
-                    '4.7',
-                    style: TextStyle(
+                  Text(
+                    summary.averageRating.toStringAsFixed(1),
+                    style: const TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -71,27 +148,25 @@ class ServiceReviewsPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  _buildStarRow(4.7, size: 18),
+                  _buildStarRow(summary.averageRating, size: 18),
                 ],
               ),
               const SizedBox(width: 24),
               // Right: breakdown bars
               Expanded(
                 child: Column(
-                  children: [
-                    _buildRatingBar(5, 18, 28),
-                    _buildRatingBar(4, 7, 28),
-                    _buildRatingBar(3, 2, 28),
-                    _buildRatingBar(2, 1, 28),
-                    _buildRatingBar(1, 0, 28),
-                  ],
+                  children: List.generate(5, (i) {
+                    final star = 5 - i;
+                    final count = summary.breakdown[star] ?? 0;
+                    return _buildRatingBar(star, count, summary.totalReviews);
+                  }),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            '28 reseñas',
+            '${summary.totalReviews} reseña${summary.totalReviews != 1 ? 's' : ''}',
             style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ],
@@ -161,9 +236,7 @@ class ServiceReviewsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewsList() {
-    final reviews = _getMockReviews();
-
+  Widget _buildReviewsList(List<ServiceReviewItemEntity> reviews) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -172,7 +245,9 @@ class ServiceReviewsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewCard(_MockReview review) {
+  Widget _buildReviewCard(ServiceReviewItemEntity review) {
+    final timeAgo = _formatTimeAgo(review.ratedAt);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -211,7 +286,7 @@ class ServiceReviewsPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      review.name,
+                      review.reviewerName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
@@ -219,7 +294,7 @@ class ServiceReviewsPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      review.timeAgo,
+                      timeAgo,
                       style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                     ),
                   ],
@@ -230,97 +305,53 @@ class ServiceReviewsPage extends StatelessWidget {
           const SizedBox(height: 8),
           // Stars
           _buildStarRow(review.rating.toDouble(), size: 16),
-          const SizedBox(height: 8),
-          // Comment text
-          Text(
-            review.comment,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Motorcycle info
-          Row(
-            children: [
-              Icon(Icons.two_wheeler, size: 16, color: Colors.grey[500]),
-              const SizedBox(width: 4),
-              Text(
-                review.motorcycle,
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          // Comment text (if available)
+          if (review.comment != null && review.comment!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              review.comment!,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
               ),
-            ],
-          ),
+            ),
+          ],
+          // Motorcycle info (if available)
+          if (review.motorcycleModel != null &&
+              review.motorcycleModel!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(Icons.two_wheeler, size: 16, color: Colors.grey[500]),
+                const SizedBox(width: 4),
+                Text(
+                  review.motorcycleModel!,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  List<_MockReview> _getMockReviews() {
-    return const [
-      _MockReview(
-        name: 'Carlos M.',
-        initials: 'CM',
-        timeAgo: 'Hace 2 días',
-        rating: 5,
-        comment: 'Excelente servicio, muy rápido y profesional',
-        motorcycle: 'Honda CB 160F',
-      ),
-      _MockReview(
-        name: 'Ana P.',
-        initials: 'AP',
-        timeAgo: 'Hace 5 días',
-        rating: 4,
-        comment:
-            'Buen servicio en general, aunque el tiempo de espera fue un poco más de lo estimado. El mecánico fue amable.',
-        motorcycle: 'Yamaha FZ-S',
-      ),
-      _MockReview(
-        name: 'David R.',
-        initials: 'DR',
-        timeAgo: 'Hace 1 semana',
-        rating: 5,
-        comment:
-            'Recomiendo totalmente este taller. Precios justos y un trato excelente. Mi moto quedó como nueva.',
-        motorcycle: 'Suzuki Gixxer 250',
-      ),
-      _MockReview(
-        name: 'María L.',
-        initials: 'ML',
-        timeAgo: 'Hace 2 semanas',
-        rating: 5,
-        comment:
-            'Muy profesionales, me explicaron todo el proceso y me dieron garantía del trabajo.',
-        motorcycle: 'AKT NKD 125',
-      ),
-      _MockReview(
-        name: 'Jorge H.',
-        initials: 'JH',
-        timeAgo: 'Hace 3 semanas',
-        rating: 4,
-        comment: 'Buen trabajo, el precio fue razonable. Volvería sin duda.',
-        motorcycle: 'Bajaj Pulsar NS200',
-      ),
-    ];
+  /// Formats a DateTime into a relative time string in Spanish.
+  String _formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+
+    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
+    if (diff.inHours < 24) return 'Hace ${diff.inHours} h';
+    if (diff.inDays < 7) {
+      return 'Hace ${diff.inDays} día${diff.inDays != 1 ? 's' : ''}';
+    }
+    if (diff.inDays < 30) {
+      final weeks = (diff.inDays / 7).floor();
+      return 'Hace $weeks semana${weeks != 1 ? 's' : ''}';
+    }
+
+    return DateFormat('d MMM yyyy', 'es').format(dateTime);
   }
-}
-
-/// Internal mock data class for preview reviews.
-class _MockReview {
-  final String name;
-  final String initials;
-  final String timeAgo;
-  final int rating;
-  final String comment;
-  final String motorcycle;
-
-  const _MockReview({
-    required this.name,
-    required this.initials,
-    required this.timeAgo,
-    required this.rating,
-    required this.comment,
-    required this.motorcycle,
-  });
 }

@@ -152,5 +152,85 @@ void main() {
         expect(result.left, isA<ErrorModel>());
       });
     });
+
+    group('getServiceReviews', () {
+      const serviceId = 'svc-789';
+
+      test('should return ServiceReviewSummaryEntity on success', () async {
+        final responseData = {
+          'success': true,
+          'data': {
+            'service_id': serviceId,
+            'service_name': 'Cambio de aceite',
+            'average_rating': 4.5,
+            'total_reviews': 10,
+            'breakdown': {'5': 5, '4': 3, '3': 1, '2': 1, '1': 0},
+            'reviews': [
+              {
+                'reviewer_name': 'Carlos Martinez',
+                'rating': 5,
+                'comment': 'Excelente',
+                'rated_at': '2025-01-15T10:00:00Z',
+                'motorcycle_model': 'Yamaha MT-07',
+              },
+            ],
+          },
+        };
+
+        when(
+          mockDioClient.get('/services/$serviceId/reviews'),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.getServiceReviews(serviceId);
+
+        expect(result.isRight, isTrue);
+        expect(result.right.serviceId, serviceId);
+        expect(result.right.averageRating, 4.5);
+        expect(result.right.reviews.length, 1);
+        verify(mockDioClient.get('/services/$serviceId/reviews')).called(1);
+      });
+
+      test('should return ErrorModel when success is false', () async {
+        final responseData = {
+          'success': false,
+          'code': 'ERR_001',
+          'message': 'Servicio no encontrado',
+        };
+
+        when(
+          mockDioClient.get('/services/$serviceId/reviews'),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.getServiceReviews(serviceId);
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return ErrorModel on DioException', () async {
+        when(mockDioClient.get('/services/$serviceId/reviews')).thenThrow(
+          DioException(
+            type: DioExceptionType.connectionTimeout,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        final result = await dataSource.getServiceReviews(serviceId);
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return ErrorModel on generic exception', () async {
+        when(
+          mockDioClient.get('/services/$serviceId/reviews'),
+        ).thenThrow(Exception('Network error'));
+
+        final result = await dataSource.getServiceReviews(serviceId);
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+    });
   });
 }

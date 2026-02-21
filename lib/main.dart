@@ -17,6 +17,7 @@ import 'package:motogo_frontend/src/features/register_person/presentation/bloc/r
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_representative_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_user_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
+import 'package:motogo_frontend/src/features/splash/presentation/pages/splash_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -69,7 +70,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        '/': (context) => const UserTypeSelectionPage(),
+        '/': (context) => const SplashPage(),
+        '/user-type-selection': (context) => const UserTypeSelectionPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/admin-home': (context) => const AdminHomePage(),

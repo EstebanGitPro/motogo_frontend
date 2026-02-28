@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/utils/thousands_separator_formatter.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/status_transition_entity.dart';
 import 'package:motogo_frontend/src/features/completed_services/presentation/helpers/service_status_helpers.dart';
@@ -322,10 +326,10 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
 
   void _showEditBottomSheet() {
     final quotedCtrl = TextEditingController(
-      text: widget.service.quotedPrice?.toStringAsFixed(0) ?? '',
+      text: _formatInitialPrice(widget.service.quotedPrice),
     );
     final finalCtrl = TextEditingController(
-      text: widget.service.finalPrice?.toStringAsFixed(0) ?? '',
+      text: _formatInitialPrice(widget.service.finalPrice),
     );
     final notesCtrl = TextEditingController(
       text: widget.service.representativeNotes ?? '',
@@ -366,10 +370,15 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             TextField(
               controller: quotedCtrl,
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
               decoration: InputDecoration(
                 labelText: MotorcycleConstants.editQuotedPriceLabel,
                 hintText: MotorcycleConstants.editQuotedPriceHint,
                 prefixIcon: const Icon(Icons.request_quote),
+                prefixText: '\$ ',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -380,10 +389,15 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             TextField(
               controller: finalCtrl,
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
               decoration: InputDecoration(
                 labelText: MotorcycleConstants.editFinalPriceLabel,
                 hintText: MotorcycleConstants.editFinalPriceHint,
                 prefixIcon: const Icon(Icons.payments),
+                prefixText: '\$ ',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -409,8 +423,12 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
-                  final quoted = double.tryParse(quotedCtrl.text.trim());
-                  final finalP = double.tryParse(finalCtrl.text.trim());
+                  final quoted = double.tryParse(
+                    quotedCtrl.text.replaceAll('.', '').trim(),
+                  );
+                  final finalP = double.tryParse(
+                    finalCtrl.text.replaceAll('.', '').trim(),
+                  );
                   final notes = notesCtrl.text.trim();
 
                   context.read<SearchMotorcycleBloc>().add(
@@ -444,9 +462,25 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
 
   // ─── Final Price Dialog ────────────────────────────────────────────
 
+  /// Formats a numeric price for display with thousand separators.
+  String _formatInitialPrice(double? price) {
+    if (price == null) return '';
+    final digits = price.toStringAsFixed(0);
+    final buffer = StringBuffer();
+    final length = digits.length;
+    for (var i = 0; i < length; i++) {
+      buffer.write(digits[i]);
+      final remaining = length - 1 - i;
+      if (remaining > 0 && remaining % 3 == 0) {
+        buffer.write('.');
+      }
+    }
+    return buffer.toString();
+  }
+
   void _showFinalPriceDialog() {
     final priceCtrl = TextEditingController(
-      text: widget.service.finalPrice?.toStringAsFixed(0) ?? '',
+      text: _formatInitialPrice(widget.service.finalPrice),
     );
 
     showDialog(
@@ -461,10 +495,15 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             TextField(
               controller: priceCtrl,
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
               decoration: InputDecoration(
                 labelText: MotorcycleConstants.editFinalPriceLabel,
                 hintText: MotorcycleConstants.editFinalPriceHint,
                 prefixIcon: const Icon(Icons.payments),
+                prefixText: '\$ ',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -483,7 +522,9 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
           ElevatedButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              final price = double.tryParse(priceCtrl.text.trim());
+              final price = double.tryParse(
+                priceCtrl.text.replaceAll('.', '').trim(),
+              );
               _updateStatus('FINALIZADO', finalPrice: price);
             },
             style: ElevatedButton.styleFrom(
@@ -502,13 +543,11 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(MotorcycleConstants.cancelServiceButton),
-        content: const Text(
-          '¿Estás seguro de que deseas cancelar este servicio? Esta acción no se puede deshacer.',
-        ),
+        content: const Text(MotorcycleConstants.cancelServiceConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('No'),
+            child: const Text(CommonConstants.no),
           ),
           TextButton(
             onPressed: () {
@@ -516,7 +555,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
               _updateStatus('CANCELADO');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sí, cancelar'),
+            child: const Text(ServiceConstants.confirmCancel),
           ),
         ],
       ),
@@ -532,7 +571,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('No'),
+            child: const Text(CommonConstants.no),
           ),
           TextButton(
             onPressed: () {
@@ -545,7 +584,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
               );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sí, eliminar'),
+            child: const Text(ServiceConstants.confirmDelete),
           ),
         ],
       ),
@@ -621,7 +660,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             : const Icon(Icons.delete_outline),
         label: Text(
           isDeleting
-              ? 'Eliminando...'
+              ? ServiceConstants.deleting
               : MotorcycleConstants.deleteServiceButton,
         ),
         style: OutlinedButton.styleFrom(

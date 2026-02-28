@@ -85,7 +85,7 @@ class TermsAndConditionsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Plataforma de servicios para motociclistas',
+            LegalConstants.platformDescription,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey[600],
               fontStyle: FontStyle.italic,
@@ -152,7 +152,7 @@ class TermsAndConditionsPage extends StatelessWidget {
               Icon(Icons.info_outline, color: Colors.amber[700], size: 20),
               const SizedBox(width: 8),
               Text(
-                'Declaración de datos sensibles',
+                LegalConstants.sensitiveDataDeclaration,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.amber[800],
@@ -193,7 +193,7 @@ class TermsAndConditionsPage extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Ver Políticas de Privacidad y Condiciones de Uso (MinTIC)',
+                LegalConstants.viewPrivacyPolicy,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.blue[700],
@@ -220,7 +220,7 @@ class TermsAndConditionsPage extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Contacto: ${LegalConstants.contactEmail}',
+            '${LegalConstants.contactPrefix}${LegalConstants.contactEmail}',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Colors.grey[500],
               fontSize: 11,
@@ -253,7 +253,7 @@ class TermsAndConditionsPage extends StatelessWidget {
             onPressed: () => Navigator.pop(context, true),
             icon: const Icon(Icons.check_circle_outline, size: 20),
             label: const Text(
-              'He leído y acepto',
+              LegalConstants.readAndAccept,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             style: ElevatedButton.styleFrom(

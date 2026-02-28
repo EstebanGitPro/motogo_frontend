@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
 import 'package:motogo_frontend/src/core/widgets/shared_drawer_menu_items.dart';
 import 'package:motogo_frontend/src/features/my_motorcycles/presentation/pages/my_motorcycles_page.dart';
@@ -13,10 +14,12 @@ class UserHomeDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userName = UserSessionManager.instance.currentUser?.fullName ?? '';
     return AppDrawer(
-      header: const AppDrawerHeader(
+      header: AppDrawerHeader(
         icon: Icons.account_circle,
         title: MotorcycleConstants.drawerTitle,
+        subtitle: userName.isNotEmpty ? userName : null,
       ),
       menuItems: [
         ListTile(

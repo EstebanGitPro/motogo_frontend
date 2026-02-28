@@ -413,7 +413,7 @@ class _UserHomeViewState extends State<_UserHomeView> {
 
   Widget _buildMap(UserHomeState state) {
     if (!Secrets.isMapboxConfigured) {
-      return _buildMapPlaceholder('Token de Mapbox no configurado');
+      return _buildMapPlaceholder(CommonConstants.mapboxTokenMissing);
     }
 
     // Default: Bogotá, Colombia

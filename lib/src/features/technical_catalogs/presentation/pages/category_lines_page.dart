@@ -37,7 +37,7 @@ class _CategoryLinesView extends StatelessWidget {
           title = state.categoryName;
           showBackButton = true;
         } else if (state is CategoryLinesLoadedLines) {
-          title = 'Líneas de ${state.categoryName}';
+          title = '${AdminConstants.linesOfPrefix}${state.categoryName}';
           showBackButton = true;
         }
 

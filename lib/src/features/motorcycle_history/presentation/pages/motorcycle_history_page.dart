@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
 import 'package:motogo_frontend/src/features/motorcycle_history/presentation/pages/client_service_detail_page.dart';
@@ -87,7 +88,8 @@ class MotorcycleHistoryPage extends StatelessWidget {
 
   String _buildSubtitle() {
     final parts = <String>[];
-    if (motorcycle.year != null) parts.add('Año: ${motorcycle.year}');
+    if (motorcycle.year != null)
+      parts.add('${MotorcycleConstants.yearPrefix}${motorcycle.year}');
     if (motorcycle.currentMileage != null) {
       parts.add('${motorcycle.currentMileage} km');
     }
@@ -224,9 +226,13 @@ class _ServiceHistoryCard extends StatelessWidget {
                     child: Text(
                       service.services.isNotEmpty
                           ? service.services
-                                .map((s) => s.serviceName ?? 'Servicio')
+                                .map(
+                                  (s) =>
+                                      s.serviceName ??
+                                      ServiceConstants.serviceFallbackName,
+                                )
                                 .join(', ')
-                          : 'Servicio',
+                          : ServiceConstants.serviceFallbackName,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

@@ -36,7 +36,7 @@ class _BrandLinesView extends StatelessWidget {
           title = state.brandName;
           showBackButton = true;
         } else if (state is BrandLinesLoadedLines) {
-          title = 'Líneas de ${state.brandName}';
+          title = '${AdminConstants.linesOfPrefix}${state.brandName}';
           showBackButton = true;
         }
 

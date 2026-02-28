@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_rating_constants.dart';
 import 'package:motogo_frontend/src/features/service_ratings/domain/entities/service_review_entity.dart';
 import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_reviews_bloc.dart';
-import 'package:intl/intl.dart';
 
 /// Page displaying service reviews fetched from the API.
 ///
@@ -64,7 +66,7 @@ class ServiceReviewsPage extends StatelessWidget {
               onPressed: () => context.read<ServiceReviewsBloc>().add(
                 FetchServiceReviews(serviceId: serviceId),
               ),
-              child: const Text('Reintentar'),
+              child: const Text(CommonConstants.retry),
             ),
           ],
         ),
@@ -98,7 +100,7 @@ class ServiceReviewsPage extends StatelessWidget {
           Icon(Icons.rate_review_outlined, size: 64, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
-            'Aún no hay reseñas',
+            ServiceRatingConstants.noReviewsTitle,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -107,7 +109,7 @@ class ServiceReviewsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Sé el primero en calificar este servicio',
+            ServiceRatingConstants.noReviewsSubtitle,
             style: TextStyle(fontSize: 13, color: Colors.grey[400]),
           ),
         ],
@@ -342,14 +344,18 @@ class ServiceReviewsPage extends StatelessWidget {
     final now = DateTime.now();
     final diff = now.difference(dateTime);
 
-    if (diff.inMinutes < 60) return 'Hace ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'Hace ${diff.inHours} h';
+    if (diff.inMinutes < 60) {
+      return '${ServiceRatingConstants.timeAgoMinutesPrefix}${diff.inMinutes}${ServiceRatingConstants.timeAgoMinutesSuffix}';
+    }
+    if (diff.inHours < 24) {
+      return '${ServiceRatingConstants.timeAgoMinutesPrefix}${diff.inHours}${ServiceRatingConstants.timeAgoHoursSuffix}';
+    }
     if (diff.inDays < 7) {
-      return 'Hace ${diff.inDays} día${diff.inDays != 1 ? 's' : ''}';
+      return '${ServiceRatingConstants.timeAgoMinutesPrefix}${diff.inDays}${diff.inDays != 1 ? ServiceRatingConstants.timeAgoDaysPlural : ServiceRatingConstants.timeAgoDaysSingular}';
     }
     if (diff.inDays < 30) {
       final weeks = (diff.inDays / 7).floor();
-      return 'Hace $weeks semana${weeks != 1 ? 's' : ''}';
+      return '${ServiceRatingConstants.timeAgoMinutesPrefix}$weeks${weeks != 1 ? ServiceRatingConstants.timeAgoWeeksPlural : ServiceRatingConstants.timeAgoWeeksSingular}';
     }
 
     return DateFormat('d MMM yyyy', 'es').format(dateTime);

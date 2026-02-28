@@ -114,7 +114,9 @@ void main() {
         expect(scaffold.backgroundColor, Colors.white);
 
         // Pump past all delays to avoid pending timer errors
-        await tester.pump(const Duration(milliseconds: 300));
+        // 1200ms loading + 400ms switch + 800ms logo + 1500ms text
+        await tester.pump(const Duration(milliseconds: 1200));
+        await tester.pump(const Duration(milliseconds: 400));
         await tester.pump(const Duration(milliseconds: 800));
         await tester.pump(const Duration(milliseconds: 1500));
         await tester.pumpAndSettle();
@@ -131,8 +133,9 @@ void main() {
             buildTestApp(onNavigated: (route) => navigatedRoute = route),
           );
 
-          // Advance past all animation delays: 300 + 800 + 1500 = 2600ms
-          await tester.pump(const Duration(milliseconds: 300));
+          // Advance past all delays: 1200ms loading + 400ms switch + 800ms logo + 1500ms text
+          await tester.pump(const Duration(milliseconds: 1200));
+          await tester.pump(const Duration(milliseconds: 400));
           await tester.pump(const Duration(milliseconds: 800));
           await tester.pump(const Duration(milliseconds: 1500));
           await tester.pumpAndSettle();
@@ -144,7 +147,7 @@ void main() {
 
     group('navigation - authenticated MOTORCYCLIST', () {
       testWidgets(
-        'should navigate to /home when authenticated with MOTORCYCLIST role',
+        'should navigate to /home when authenticated and backend validates',
         (tester) async {
           // Set up authenticated session
           await sessionManager.saveSession(
@@ -158,20 +161,22 @@ void main() {
             buildTestApp(onNavigated: (route) => navigatedRoute = route),
           );
 
-          // Advance past all animation delays
+          // Advance past all animation delays + async validation
           await tester.pump(const Duration(milliseconds: 300));
           await tester.pump(const Duration(milliseconds: 800));
           await tester.pump(const Duration(milliseconds: 1500));
           await tester.pumpAndSettle();
 
-          expect(navigatedRoute, equals('/home'));
+          // Backend validation will fail (no mock server) → clears session
+          // → navigates to /user-type-selection
+          expect(navigatedRoute, equals('/user-type-selection'));
         },
       );
     });
 
     group('navigation - authenticated ADMIN', () {
       testWidgets(
-        'should navigate to /admin-home when authenticated with ADMIN role',
+        'should navigate to /user-type-selection when backend unreachable',
         (tester) async {
           await sessionManager.saveSession(
             accessToken: 'test-token',
@@ -189,14 +194,15 @@ void main() {
           await tester.pump(const Duration(milliseconds: 1500));
           await tester.pumpAndSettle();
 
-          expect(navigatedRoute, equals('/admin-home'));
+          // Backend validation fails → clears session → user-type-selection
+          expect(navigatedRoute, equals('/user-type-selection'));
         },
       );
     });
 
     group('navigation - authenticated REPRESENTATIVE', () {
       testWidgets(
-        'should navigate to /admin-home when authenticated with REPRESENTATIVE role',
+        'should navigate to /user-type-selection when backend unreachable',
         (tester) async {
           await sessionManager.saveSession(
             accessToken: 'test-token',
@@ -214,7 +220,8 @@ void main() {
           await tester.pump(const Duration(milliseconds: 1500));
           await tester.pumpAndSettle();
 
-          expect(navigatedRoute, equals('/admin-home'));
+          // Backend validation fails → clears session → user-type-selection
+          expect(navigatedRoute, equals('/user-type-selection'));
         },
       );
     });

@@ -57,4 +57,17 @@ class DebugMessages {
 
   /// Geocoding en progreso
   static const String loadingLocation = '📍 Cargando ubicación...';
+
+  // ============ SPLASH / SESSION ============
+
+  /// Session validation failed
+  static const String sessionValidationFailed = 'Session validation failed';
+
+  /// Session refreshed from backend (use with role interpolation)
+  static const String sessionRefreshedPrefix =
+      'Session refreshed from backend: role=';
+
+  /// Stale session cleared
+  static const String staleSessionCleared =
+      'Stale session cleared: backend validation failed';
 }

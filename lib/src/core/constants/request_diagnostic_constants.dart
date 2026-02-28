@@ -52,4 +52,15 @@ class RequestDiagnosticConstants {
   static const String msgProblemPlaceholder =
       '[Aquí aparecerá la descripción del problema]';
   static const String msgNotApplicable = 'N/A';
+
+  // Evidence photo labels
+  static const String uploadingPhoto = 'Subiendo foto...';
+  static const String loadingEvidence = 'Cargando evidencias...';
+  static const String selectMotorcycleFirst =
+      'Selecciona una moto primero para agregar fotos';
+  static const String selectPhotoAngle = 'Selecciona el ángulo de la foto';
+  static const String angleFrontDescription = 'Vista de frente de la moto';
+  static const String angleSideDescription = 'Vista de lado (izq o der)';
+  static const String angleRearDescription = 'Vista de atrás de la moto';
+  static const String photoLabelPrefix = 'Foto ';
 }

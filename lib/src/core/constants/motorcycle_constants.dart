@@ -96,6 +96,9 @@ class MotorcycleConstants {
   static const String noMotorcyclesFound = 'No tienes motocicletas registradas';
   static const String noMotorcyclesSubtitle =
       'Registra tu primera moto para comenzar';
+  static const String emptyStateSubtitle =
+      'Registra tu primera moto para recibir diagnósticos y cotizaciones personalizadas.';
+  static const String yearPrefix = 'Año: ';
 
   // Confirmation dialogs
   static const String confirmLogoutTitle = 'Cerrar Sesión';
@@ -127,6 +130,7 @@ class MotorcycleConstants {
       'No hay diagnósticos registrados';
   static const String diagnosticPendingSolution = 'Pendiente de solución';
   static const String diagnosticEvidenceLabel = 'Evidencia fotográfica';
+  static const String diagnosticBranchLabel = 'Taller';
 
   // Motorcycle Evidence Gallery (workshop view)
   static const String motorcycleEvidenceTitle = 'Galería de evidencias';
@@ -200,6 +204,8 @@ class MotorcycleConstants {
   static const String deleteServiceButton = 'Eliminar Servicio';
   static const String deleteServiceConfirmation =
       '¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.';
+  static const String cancelServiceConfirmation =
+      '¿Estás seguro de que deseas cancelar este servicio? Esta acción no se puede deshacer.';
   static const String transitionHistoryTitle = 'Historial de Cambios';
   static const String statusPending = 'Pendiente';
 

@@ -268,6 +268,16 @@ Para efectos de estos Términos, el Responsable tiene domicilio en Pereira, Risa
       'Deseo recibir comunicaciones comerciales '
       'sobre promociones y novedades';
 
+  // Terms page UI strings
+  static const String platformDescription =
+      'Plataforma de servicios para motociclistas';
+  static const String sensitiveDataDeclaration =
+      'Declaración de datos sensibles';
+  static const String viewPrivacyPolicy =
+      'Ver Políticas de Privacidad y Condiciones de Uso (MinTIC)';
+  static const String readAndAccept = 'He leído y acepto';
+  static const String contactPrefix = 'Contacto: ';
+
   // ── Sensitive data consent declaration ──────────────────────────────────
   static const String sensitiveDataConsent =
       'He sido informado de que mi número de cédula, placa de vehículo, '

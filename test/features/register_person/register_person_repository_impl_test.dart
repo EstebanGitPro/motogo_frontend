@@ -8,7 +8,6 @@ import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/features/register_person/data/datasources/register_person_data_source.dart';
 import 'package:motogo_frontend/src/features/register_person/data/models/person_model.dart';
 import 'package:motogo_frontend/src/features/register_person/data/repositories/register_repository_impl.dart';
-import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_entity.dart';
 import 'package:motogo_frontend/src/features/register_person/domain/entities/register_person_params.dart';
 import 'package:motogo_frontend/src/features/register_person/exceptions/register_person_exceptions.dart';
 

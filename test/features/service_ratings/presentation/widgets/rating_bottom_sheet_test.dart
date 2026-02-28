@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart';
 import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_rating_bloc.dart';
 import 'package:motogo_frontend/src/features/service_ratings/presentation/widgets/rating_bottom_sheet.dart';

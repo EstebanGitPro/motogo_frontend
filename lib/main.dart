@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
@@ -18,9 +19,11 @@ import 'package:motogo_frontend/src/features/register_person/presentation/pages/
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/register_user_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 import 'package:motogo_frontend/src/features/splash/presentation/pages/splash_page.dart';
+import 'package:motogo_frontend/src/features/user_home/presentation/pages/user_home_page.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await EasyLocalization.ensureInitialized();
   await Firebase.initializeApp();
 
@@ -74,6 +77,7 @@ class MyApp extends StatelessWidget {
         '/user-type-selection': (context) => const UserTypeSelectionPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
+        '/user-home': (context) => const UserHomePage(),
         '/admin-home': (context) => const AdminHomePage(),
         '/register/user': (context) => const RegisterUserPage(),
         '/register/representative': (context) =>

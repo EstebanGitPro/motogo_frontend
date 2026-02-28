@@ -61,6 +61,18 @@ class AuthInterceptor extends Interceptor {
         return handler.resolve(retryResponse);
       } catch (retryError) {
         AppLogger.error(DebugMessages.retryFailed, retryError);
+
+        // If retry also fails with 401, the session is truly expired
+        // (e.g. role claims missing, Keycloak session invalidated).
+        // Clear session and redirect to login instead of showing
+        // a confusing backend error to the user.
+        final is401Retry =
+            retryError is DioException &&
+            retryError.response?.statusCode == 401;
+        if (is401Retry) {
+          AppLogger.auth(DebugMessages.redirectingToLogin);
+          await _handleSessionExpired();
+        }
         return handler.next(err);
       }
     } else {

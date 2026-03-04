@@ -27,21 +27,23 @@ class RefreshTokenDataSourceImpl implements RefreshTokenDataSource {
   // to avoid infinite refresh loops
   late final Dio _dio;
 
-  RefreshTokenDataSourceImpl() {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: Config.baseUrl,
-        connectTimeout: const Duration(seconds: 15),
-        receiveTimeout: const Duration(seconds: 15),
-        headers: {'Content-Type': 'application/json'},
-        extra: kIsWeb ? {'withCredentials': true} : {},
-      ),
-    );
+  RefreshTokenDataSourceImpl({Dio? dio}) {
+    _dio =
+        dio ??
+        Dio(
+          BaseOptions(
+            baseUrl: Config.baseUrl,
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            headers: {'Content-Type': 'application/json'},
+            extra: kIsWeb ? {'withCredentials': true} : {},
+          ),
+        );
 
     // Configure BrowserHttpClientAdapter for Web cookie support.
     // The mg_refresh_token cookie is restricted to /motogo/api/v1/auth path,
     // so it only travels on refresh/logout requests.
-    if (kIsWeb) {
+    if (kIsWeb && dio == null) {
       web_adapter.configureWebCredentials(_dio);
     }
   }

@@ -91,3 +91,6 @@ coverage/
 # macOS duplicate files
 *\ 2.*
 *\ 2
+
+# SonarQube
+.scannerwork/

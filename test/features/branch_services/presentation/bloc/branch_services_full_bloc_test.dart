@@ -222,14 +222,10 @@ void main() {
         },
         skip: 2,
         expect: () => [
-          // Optimistic: branchServices still 0 (was empty, remove is no-op)
-          isA<BranchServicesLoaded>().having(
-            (s) => s.branchServices.length,
-            'branchServices',
-            0,
-          ),
-          // API success
+          // Optimistic remove is a no-op (list was empty) so BLoC deduplicates.
+          // Only the API success state is emitted.
           isA<BranchServicesLoaded>()
+              .having((s) => s.branchServices.length, 'branchServices', 0)
               .having((s) => s.message, 'message', 'Servicio desasociado')
               .having((s) => s.isSuccess, 'isSuccess', true),
         ],

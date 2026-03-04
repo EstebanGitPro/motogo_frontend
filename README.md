@@ -189,26 +189,35 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### Step 4: Configure Environment Variables
+### Step 4: Configure Environment (Optional)
+
+> **Note:** The app works out of the box with default configuration.
+> Mapbox token and backend URL (`http://localhost:8085/motogo/api/v1`) are embedded as defaults.
+
+To override any default, copy `.env.example` and adjust:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your actual values:
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `BASE_URL` | `http://localhost:8085/motogo/api/v1` | Backend API URL |
+| `MAPBOX_ACCESS_TOKEN` | Embedded (project token) | Map rendering & geocoding |
 
-| Variable | Purpose | Where to Get It |
-|----------|---------|-----------------|
-| `MAPBOX_ACCESS_TOKEN` | Map rendering & geocoding | [Mapbox Dashboard](https://account.mapbox.com/) |
+Or pass values directly at runtime:
+
+```bash
+flutter run --dart-define=BASE_URL=https://your-server.com/motogo/api/v1
+```
 
 ### Step 5: Firebase Configuration
 
-Ensure the Firebase configuration files are in place:
+The Firebase configuration file is already included in the repository:
 
-- **Android**: `android/app/google-services.json`
-- **iOS**: `ios/Runner/GoogleService-Info.plist`
+- **Android**: `android/app/google-services.json` ✅ (included)
 
-> Download from [Firebase Console](https://console.firebase.google.com/) → Project Settings → Your Apps.
+> **⚠️ Nota de proyecto de grado:** Las claves de Firebase incluidas son claves de cliente (no secretos de servidor). Están diseñadas para distribuirse dentro de la aplicación. La seguridad se gestiona mediante Firebase Security Rules en el servidor. En un entorno de producción real, estas claves se gestionarían mediante variables de entorno y restricciones por dominio/SHA.
 
 ### Step 6: Install Husky Pre-commit Hooks
 
@@ -219,11 +228,14 @@ npm install
 ### Step 7: Run the Application
 
 ```bash
-# Using the dev script (recommended — loads .env automatically)
+# Quick start (uses embedded defaults — recommended)
+flutter run
+
+# Using the dev script (loads overrides from .env)
 ./scripts/run_dev.sh
 
-# Or manually
-flutter run --dart-define=MAPBOX_ACCESS_TOKEN=your_token_here
+# Or manually with custom backend
+flutter run --dart-define=BASE_URL=https://your-server.com/motogo/api/v1
 ```
 
 ### ✅ Verification
@@ -234,7 +246,7 @@ flutter run --dart-define=MAPBOX_ACCESS_TOKEN=your_token_here
 | Map loads | User home screen shows Mapbox map |
 | Backend connected | Login screen can communicate with API |
 
-> **Note:** The app requires the [MotoGo Backend](https://github.com/EstebanGitPro/motogo_backend_f) running for full functionality.
+> **Note:** The app requires the [MotoGo Backend](https://github.com/EstebanGitPro/motogo_backend_f) running on `localhost:8085` for full functionality.
 
 ---
 

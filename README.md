@@ -6,62 +6,62 @@
 [![Version](https://img.shields.io/badge/version-0.14.0-blue)](CHANGELOG.md)
 [![SonarCloud](https://img.shields.io/badge/SonarCloud-Analyzed-F3702A?logo=sonarcloud)](https://sonarcloud.io/project/overview?id=EstebanGitPro_motogo_frontend)
 
-> Mobile application for **MotoGo** — helping motorcyclists find trusted workshops, compare services tailored to their registered vehicles, and request quotes or diagnostics before visiting.
+> Aplicación móvil de **MotoGo** — ayuda a los motociclistas a encontrar talleres confiables, comparar servicios adaptados a sus vehículos registrados y solicitar cotizaciones o diagnósticos antes de visitarlos.
 
 ---
 
-## 📖 Table of Contents
+## 📖 Tabla de Contenido
 
-- [Vision](#-vision)
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [Architecture](#-architecture)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Available Commands](#-available-commands)
+- [Visión](#-visión)
+- [Características Principales](#-características-principales)
+- [Stack Tecnológico](#-stack-tecnológico)
+- [Arquitectura](#-arquitectura)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Primeros Pasos](#-primeros-pasos)
+- [Comandos Disponibles](#-comandos-disponibles)
 - [Testing](#-testing)
 - [Build & Release](#-build--release)
-- [Contributing](#-contributing)
-- [Credits](#-credits)
-- [License](#-license)
+- [Contribución](#-contribución)
+- [Créditos](#-créditos)
+- [Licencia](#-licencia)
 
 ---
 
-## 🎯 Vision
+## 🎯 Visión
 
-For motorcyclists who don't have a reliable way to find trusted workshops offering technical services and consumables that match their needs, **MotoGo** is a mobile application that saves users both time and money when searching for motorcycle services.
+Para los motociclistas que no cuentan con un mecanismo que permita encontrar establecimientos confiables que brinden servicios técnicos y/o venta de consumibles que se ajuste a sus necesidades, **MotoGo** es una aplicación móvil que permite a los usuarios ahorrar tanto su tiempo como su dinero en la búsqueda de los servicios para su motocicleta.
 
-Unlike Yelp, Google Maps, or Yellow Pages, MotoGo provides:
+A diferencia de **Yelp**, **4WorldLover**, **Google Maps** y **Páginas Amarillas**, nuestro producto permite:
 
-- ✅ Access to a **service catalog filtered by registered vehicles** in the user's profile
-- ✅ **Nearby service information** with map-based discovery
-- ✅ Ability to **request quotes or approximate diagnostics** before traveling to the location
-
----
-
-## ✨ Key Features
-
-| Module | Features |
-|--------|----------|
-| **Authentication** | Login, registration, password recovery, email verification |
-| **User Profile** | Edit profile, change password, account deletion |
-| **Motorcycles** | Registration, editing, profile images, evidence gallery, deletion |
-| **Branch Discovery** | Map-based nearby search, branch detail view, schedule information |
-| **Branch Management** | Register/edit branches, manage franchise, branch services, schedules |
-| **Service Catalog** | Browse services filtered by vehicle, technical catalogs |
-| **Diagnostics** | Request diagnostic, WhatsApp integration, permission handling |
-| **Service History** | Completed services, motorcycle service history |
-| **Ratings** | Service reviews and ratings |
-| **Admin** | Admin dashboard, admin service management |
+- ✅ Acceder al **catálogo de servicios** dependiendo de los vehículos que cada usuario tiene registrados en su perfil
+- ✅ Acceso a la información de los **servicios más cercanos** al usuario con descubrimiento basado en mapa
+- ✅ La posibilidad de **solicitar una cotización o un diagnóstico aproximado** antes de dirigirse al lugar
 
 ---
 
-## 🛠 Technology Stack
+## ✨ Características Principales
 
-| Category | Technology |
-|----------|-----------|
+| Módulo | Funcionalidades |
+|--------|-----------------|
+| **Autenticación** | Login, registro, recuperación de contraseña, verificación de correo |
+| **Perfil de Usuario** | Edición de perfil, cambio de contraseña, eliminación de cuenta |
+| **Motocicletas** | Registro, edición, imágenes de perfil, galería de evidencias, eliminación |
+| **Descubrimiento de Sucursales** | Búsqueda cercana basada en mapa, detalle de sucursal, información de horarios |
+| **Gestión de Sucursales** | Registro/edición de sucursales, gestión de franquicia, servicios, horarios |
+| **Catálogo de Servicios** | Consulta de servicios filtrados por vehículo, catálogos técnicos |
+| **Diagnósticos** | Solicitud de diagnóstico, integración con WhatsApp, manejo de permisos |
+| **Historial de Servicios** | Servicios completados, historial de servicios por motocicleta |
+| **Calificaciones** | Reseñas y calificaciones de servicios |
+| **Administración** | Dashboard administrativo, gestión administrativa de servicios |
+
+---
+
+## 🛠 Stack Tecnológico
+
+| Categoría | Tecnología |
+|-----------|------------|
 | **Framework** | Flutter 3.8.1 |
-| **Language** | Dart 3.8.1 |
+| **Lenguaje** | Dart 3.8.1 |
 | **State Management** | [BLoC](https://bloclibrary.dev/) (flutter_bloc) |
 | **Dependency Injection** | [Kiwi](https://pub.dev/packages/kiwi) + kiwi_generator |
 | **HTTP Client** | [Dio](https://pub.dev/packages/dio) |
@@ -73,13 +73,13 @@ Unlike Yelp, Google Maps, or Yellow Pages, MotoGo provides:
 | **Localization** | easy_localization |
 | **Testing** | flutter_test, mockito, bloc_test |
 | **Code Quality** | SonarCloud, flutter_lints, Husky pre-commit hooks |
-| **Architecture** | Clean Architecture (3-layer) |
+| **Architecture** | Clean Architecture (3 capas) |
 
 ---
 
-## 🏗 Architecture
+## 🏗 Arquitectura
 
-MotoGo Frontend follows a **Feature-First Clean Architecture** pattern with 3 layers per feature:
+MotoGo Frontend sigue un patrón de **Clean Architecture Feature-First** con 3 capas por feature:
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -94,207 +94,207 @@ MotoGo Frontend follows a **Feature-First Clean Architecture** pattern with 3 la
 └─────────────────────────────────────────────────────┘
 ```
 
-**Key principles:**
+**Principios clave:**
 
-- Each **feature** is self-contained with its own `data/`, `domain/`, and `presentation/` layers
-- **BLoC** handles all state management with clear events and states
-- **Kiwi** provides compile-time dependency injection
-- Domain layer defines repository interfaces; Data layer implements them
-- **Core** module provides shared utilities, widgets, networking, and constants
+- Cada **feature** es autocontenido con sus propias capas `data/`, `domain/` y `presentation/`
+- **BLoC** maneja toda la gestión de estado con eventos y estados claros
+- **Kiwi** proporciona dependency injection en tiempo de compilación
+- La capa Domain define interfaces de repositorio; la capa Data las implementa
+- El módulo **Core** provee utilidades compartidas, widgets, networking y constantes
 
 ---
 
-## 📁 Project Structure
+## 📁 Estructura del Proyecto
 
 ```
 motogo_frontend/
 ├── lib/
-│   ├── main.dart                      # Application entrypoint
+│   ├── main.dart                      # Punto de entrada de la aplicación
 │   └── src/
-│       ├── core/                      # Shared infrastructure
-│       │   ├── catalogs/              # Shared catalog logic
-│       │   ├── config/                # App configuration
-│       │   ├── constants/             # Feature-based constants
-│       │   ├── errors/                # Error handling & failures
-│       │   ├── geocoding/             # Geocoding service
-│       │   ├── injector/              # Kiwi DI setup
-│       │   ├── mixins/                # Shared mixins
-│       │   ├── models/                # Core models
+│       ├── core/                      # Infraestructura compartida
+│       │   ├── catalogs/              # Lógica de catálogos compartida
+│       │   ├── config/                # Configuración de la app
+│       │   ├── constants/             # Constantes basadas en features
+│       │   ├── errors/                # Manejo de errores y failures
+│       │   ├── geocoding/             # Servicio de geocodificación
+│       │   ├── injector/              # Configuración de Kiwi DI
+│       │   ├── mixins/                # Mixins compartidos
+│       │   ├── models/                # Modelos del core
 │       │   ├── network/               # HTTP client, interceptors
-│       │   ├── routes/                # App routing
-│       │   ├── services/              # Shared services
-│       │   ├── user/                  # User session management
-│       │   ├── utils/                 # Utility functions
-│       │   ├── validators/            # Input validators
-│       │   └── widgets/               # Reusable widgets
-│       └── features/                  # Feature modules (36 features)
-│           ├── login/                 # Authentication
-│           ├── register_person/       # User registration
-│           ├── user_home/             # User home (map discovery)
-│           ├── my_motorcycles/        # Motorcycle management
-│           ├── my_branches/           # Branch listing
-│           ├── register_branch/       # Branch registration
-│           ├── diagnostic/            # Diagnostic flow
-│           ├── service_ratings/       # Service reviews
-│           ├── admin_home/            # Admin dashboard
-│           └── ...                    # 27 more feature modules
-├── test/                              # Unit & widget tests (mirror structure)
+│       │   ├── routes/                # Enrutamiento de la app
+│       │   ├── services/              # Servicios compartidos
+│       │   ├── user/                  # Gestión de sesión de usuario
+│       │   ├── utils/                 # Funciones utilitarias
+│       │   ├── validators/            # Validadores de entrada
+│       │   └── widgets/               # Widgets reutilizables
+│       └── features/                  # Módulos de features (36 features)
+│           ├── login/                 # Autenticación
+│           ├── register_person/       # Registro de usuario
+│           ├── user_home/             # Home del usuario (descubrimiento en mapa)
+│           ├── my_motorcycles/        # Gestión de motocicletas
+│           ├── my_branches/           # Listado de sucursales
+│           ├── register_branch/       # Registro de sucursal
+│           ├── diagnostic/            # Flujo de diagnóstico
+│           ├── service_ratings/       # Reseñas de servicios
+│           ├── admin_home/            # Dashboard administrativo
+│           └── ...                    # 27 módulos de features más
+├── test/                              # Tests unitarios y de widgets (estructura espejo)
 ├── assets/
-│   ├── lang/                          # i18n translation files
-│   └── icons/                         # App icons
+│   ├── lang/                          # Archivos de traducción i18n
+│   └── icons/                         # Íconos de la app
 ├── scripts/
-│   ├── run_dev.sh                     # Run with env variables
-│   ├── build_release.sh               # Build APK/AAB with secrets
-│   └── emu-pixel.sh                   # Launch Pixel emulator
-├── android/                           # Android platform config
-├── ios/                               # iOS platform config
-├── .env.example                       # Environment variable template
-├── analysis_options.yaml              # Dart linter rules
-├── pubspec.yaml                       # Dependencies
-└── sonar-project.properties           # SonarCloud config
+│   ├── run_dev.sh                     # Ejecutar con variables de entorno
+│   ├── build_release.sh               # Construir APK/AAB con secrets
+│   └── emu-pixel.sh                   # Lanzar emulador Pixel
+├── android/                           # Configuración de plataforma Android
+├── ios/                               # Configuración de plataforma iOS
+├── .env.example                       # Plantilla de variables de entorno
+├── analysis_options.yaml              # Reglas del linter de Dart
+├── pubspec.yaml                       # Dependencias
+└── sonar-project.properties           # Configuración de SonarCloud
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Primeros Pasos
 
-**Estimated time:** 10–15 minutes
+**Tiempo estimado:** 10–15 minutos
 
-### Prerequisites
+### Prerrequisitos
 
-| Tool | Version | Purpose |
-|------|---------|---------|
+| Herramienta | Versión | Propósito |
+|-------------|---------|-----------|
 | **Flutter** | ≥ 3.8.1 | Framework |
-| **Dart** | ≥ 3.8.1 | Language (bundled with Flutter) |
-| **Android Studio** or **VS Code** | Latest | IDE with Flutter plugin |
-| **Xcode** | Latest (macOS only) | iOS development |
-| **Android Emulator** or physical device | — | Testing |
+| **Dart** | ≥ 3.8.1 | Lenguaje (incluido con Flutter) |
+| **Android Studio** o **VS Code** | Última | IDE con plugin de Flutter |
+| **Xcode** | Última (solo macOS) | Desarrollo iOS |
+| **Emulador Android** o dispositivo físico | — | Testing |
 
-### Step 1: Clone the Repository
+### Paso 1: Clonar el Repositorio
 
 ```bash
 git clone https://github.com/EstebanGitPro/motogo_frontend.git
 cd motogo_frontend
 ```
 
-### Step 2: Install Flutter Dependencies
+### Paso 2: Instalar Dependencias de Flutter
 
 ```bash
 flutter pub get
 ```
 
-### Step 3: Generate Code (Kiwi DI)
+### Paso 3: Generar Código (Kiwi DI)
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-### Step 4: Configure Environment (Optional)
+### Paso 4: Configurar Entorno (Opcional)
 
-> **Note:** The app works out of the box with default configuration.
-> Mapbox token and backend URL (`http://localhost:8085/motogo/api/v1`) are embedded as defaults.
+> **Nota:** La app funciona de inmediato con la configuración por defecto.
+> El token de Mapbox y la URL del backend (`http://localhost:8085/motogo/api/v1`) están embebidos como valores por defecto.
 
-To override any default, copy `.env.example` and adjust:
+Para sobrescribir algún valor por defecto, copiar `.env.example` y ajustar:
 
 ```bash
 cp .env.example .env
 ```
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `BASE_URL` | `http://localhost:8085/motogo/api/v1` | Backend API URL |
-| `MAPBOX_ACCESS_TOKEN` | Embedded (project token) | Map rendering & geocoding |
+| Variable | Valor por Defecto | Propósito |
+|----------|-------------------|-----------|
+| `BASE_URL` | `http://localhost:8085/motogo/api/v1` | URL del API backend |
+| `MAPBOX_ACCESS_TOKEN` | Embebido (token del proyecto) | Renderizado de mapas y geocodificación |
 
-Or pass values directly at runtime:
+O pasar valores directamente en tiempo de ejecución:
 
 ```bash
 flutter run --dart-define=BASE_URL=https://your-server.com/motogo/api/v1
 ```
 
-### Step 5: Firebase Configuration
+### Paso 5: Configuración de Firebase
 
-The Firebase configuration file is already included in the repository:
+El archivo de configuración de Firebase ya está incluido en el repositorio:
 
-- **Android**: `android/app/google-services.json` ✅ (included)
+- **Android**: `android/app/google-services.json` ✅ (incluido)
 
 > **⚠️ Nota de proyecto de grado:** Las claves de Firebase incluidas son claves de cliente (no secretos de servidor). Están diseñadas para distribuirse dentro de la aplicación. La seguridad se gestiona mediante Firebase Security Rules en el servidor. En un entorno de producción real, estas claves se gestionarían mediante variables de entorno y restricciones por dominio/SHA.
 
-### Step 6: Install Husky Pre-commit Hooks
+### Paso 6: Instalar Husky Pre-commit Hooks
 
 ```bash
 npm install
 ```
 
-### Step 7: Run the Application
+### Paso 7: Ejecutar la Aplicación
 
 ```bash
-# Quick start (uses embedded defaults — recommended)
+# Inicio rápido (usa valores por defecto embebidos — recomendado)
 flutter run
 
-# Using the dev script (loads overrides from .env)
+# Usando el script de desarrollo (carga overrides desde .env)
 ./scripts/run_dev.sh
 
-# Or manually with custom backend
+# O manualmente con backend personalizado
 flutter run --dart-define=BASE_URL=https://your-server.com/motogo/api/v1
 ```
 
-### ✅ Verification
+### ✅ Verificación
 
-| Check | How to Verify |
-|-------|---------------|
-| App launches | Splash screen appears with MotoGo logo |
-| Map loads | User home screen shows Mapbox map |
-| Backend connected | Login screen can communicate with API |
+| Chequeo | Cómo Verificar |
+|---------|----------------|
+| La app inicia | Aparece la pantalla de splash con el logo de MotoGo |
+| El mapa carga | La pantalla home del usuario muestra el mapa de Mapbox |
+| Backend conectado | La pantalla de login puede comunicarse con el API |
 
-> **Note:** The app requires the [MotoGo Backend](https://github.com/EstebanGitPro/motogo_backend_f) running on `localhost:8085` for full functionality.
+> **Nota:** La app requiere el [MotoGo Backend](https://github.com/EstebanGitPro/motogo_backend_f) ejecutándose en `localhost:8085` para funcionalidad completa.
 
 ---
 
-## 📋 Available Commands
+## 📋 Comandos Disponibles
 
-| Command | Description |
+| Comando | Descripción |
 |---------|-------------|
-| `flutter pub get` | Install dependencies |
-| `flutter run` | Run in debug mode |
-| `flutter test` | Run all tests |
-| `flutter test --coverage` | Run tests with coverage report |
-| `flutter analyze` | Run static analysis (linter) |
-| `dart run build_runner build` | Generate code (Kiwi DI) |
-| `dart run build_runner watch` | Watch mode for code generation |
-| `./scripts/run_dev.sh` | Run with environment variables loaded |
-| `./scripts/build_release.sh apk` | Build release APK |
-| `./scripts/build_release.sh appbundle` | Build release AAB (Play Store) |
-| `./scripts/emu-pixel.sh` | Launch Pixel emulator |
+| `flutter pub get` | Instalar dependencias |
+| `flutter run` | Ejecutar en modo debug |
+| `flutter test` | Ejecutar todos los tests |
+| `flutter test --coverage` | Ejecutar tests con reporte de cobertura |
+| `flutter analyze` | Ejecutar análisis estático (linter) |
+| `dart run build_runner build` | Generar código (Kiwi DI) |
+| `dart run build_runner watch` | Modo watch para generación de código |
+| `./scripts/run_dev.sh` | Ejecutar con variables de entorno cargadas |
+| `./scripts/build_release.sh apk` | Construir APK de release |
+| `./scripts/build_release.sh appbundle` | Construir AAB de release (Play Store) |
+| `./scripts/emu-pixel.sh` | Lanzar emulador Pixel |
 
 ---
 
 ## 🧪 Testing
 
-### Run All Tests
+### Ejecutar Todos los Tests
 
 ```bash
 flutter test
 ```
 
-### Coverage Report
+### Reporte de Cobertura
 
 ```bash
 flutter test --coverage
 # Output: coverage/lcov.info
 
-# Generate HTML report (requires lcov)
+# Generar reporte HTML (requiere lcov)
 genhtml coverage/lcov.info -o coverage/html
 open coverage/html/index.html
 ```
 
-### Testing Patterns
+### Patrones de Testing
 
-| Layer | Framework | Pattern |
-|-------|-----------|---------|
-| **BLoC** | `bloc_test` | Test events → states transitions |
-| **Use Cases** | `mockito` | Mock repository, test business logic |
-| **Repositories** | `mockito` | Mock data source, test data mapping |
-| **Models** | `flutter_test` | Test JSON serialization, `copyWith`, equality |
+| Capa | Framework | Patrón |
+|------|-----------|--------|
+| **BLoC** | `bloc_test` | Testear transiciones events → states |
+| **Use Cases** | `mockito` | Mockear repositorio, testear lógica de negocio |
+| **Repositories** | `mockito` | Mockear data source, testear mapeo de datos |
+| **Models** | `flutter_test` | Testear serialización JSON, `copyWith`, equality |
 
 ---
 
@@ -322,30 +322,30 @@ flutter build apk --debug
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contribución
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our development workflow, coding standards, and pull request process.
-
----
-
-## 🏆 Credits
-
-See [CREDITS.md](CREDITS.md) for third-party attributions.
+Por favor lee [CONTRIBUTING.md](CONTRIBUTING.md) para detalles sobre nuestro flujo de desarrollo, estándares de código y proceso de pull requests.
 
 ---
 
-## 🛡️ Security
+## 🏆 Créditos
 
-To report a vulnerability, please read our [Security Policy](SECURITY.md).
+Ver [CREDITS.md](CREDITS.md) para atribuciones de terceros.
 
 ---
 
-## 📄 License
+## 🛡️ Seguridad
 
-This project is licensed under the [MIT License](LICENSE).
+Para reportar una vulnerabilidad, por favor lee nuestra [Política de Seguridad](SECURITY.md).
+
+---
+
+## 📄 Licencia
+
+Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
 
 ---
 
 <p align="center">
-  <sub>Built with ❤️ by the MotoGo team</sub>
+  <sub>Hecho con ❤️ por el equipo de MotoGo</sub>
 </p>

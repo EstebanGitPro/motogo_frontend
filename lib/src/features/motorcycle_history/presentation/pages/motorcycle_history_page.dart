@@ -88,8 +88,9 @@ class MotorcycleHistoryPage extends StatelessWidget {
 
   String _buildSubtitle() {
     final parts = <String>[];
-    if (motorcycle.year != null)
+    if (motorcycle.year != null) {
       parts.add('${MotorcycleConstants.yearPrefix}${motorcycle.year}');
+    }
     if (motorcycle.currentMileage != null) {
       parts.add('${motorcycle.currentMileage} km');
     }

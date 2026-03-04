@@ -114,9 +114,6 @@ void main() {
         expect(scaffold.backgroundColor, Colors.white);
 
         // Pump past all delays to avoid pending timer errors
-        // 1200ms loading + 400ms switch + 800ms logo + 1500ms text
-        await tester.pump(const Duration(milliseconds: 1200));
-        await tester.pump(const Duration(milliseconds: 400));
         await tester.pump(const Duration(milliseconds: 800));
         await tester.pump(const Duration(milliseconds: 1500));
         await tester.pumpAndSettle();
@@ -133,9 +130,7 @@ void main() {
             buildTestApp(onNavigated: (route) => navigatedRoute = route),
           );
 
-          // Advance past all delays: 1200ms loading + 400ms switch + 800ms logo + 1500ms text
-          await tester.pump(const Duration(milliseconds: 1200));
-          await tester.pump(const Duration(milliseconds: 400));
+          // Advance past all animation delays: 800 + 1500 = 2300ms
           await tester.pump(const Duration(milliseconds: 800));
           await tester.pump(const Duration(milliseconds: 1500));
           await tester.pumpAndSettle();

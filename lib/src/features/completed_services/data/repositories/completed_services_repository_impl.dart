@@ -36,9 +36,29 @@ class CompletedServicesRepositoryImpl implements CompletedServicesRepository {
   @override
   Future<Either<ErrorModel, String>> updateServiceStatus(
     String serviceId,
-    String newStatus,
-  ) {
-    return _dataSource.updateServiceStatus(serviceId, newStatus);
+    String newStatus, {
+    double? finalPrice,
+  }) {
+    return _dataSource.updateServiceStatus(
+      serviceId,
+      newStatus,
+      finalPrice: finalPrice,
+    );
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> updateServiceDetails(
+    String serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  }) {
+    return _dataSource.updateServiceDetails(
+      serviceId,
+      quotedPrice: quotedPrice,
+      finalPrice: finalPrice,
+      representativeNotes: representativeNotes,
+    );
   }
 
   @override

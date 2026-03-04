@@ -106,14 +106,57 @@ class MockCompletedServicesDataSource extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> updateServiceStatus(
     String? serviceId,
-    String? newStatus,
-  ) =>
+    String? newStatus, {
+    double? finalPrice,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#updateServiceStatus, [serviceId, newStatus]),
+            Invocation.method(
+              #updateServiceStatus,
+              [serviceId, newStatus],
+              {#finalPrice: finalPrice},
+            ),
             returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
               _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
                 this,
-                Invocation.method(#updateServiceStatus, [serviceId, newStatus]),
+                Invocation.method(
+                  #updateServiceStatus,
+                  [serviceId, newStatus],
+                  {#finalPrice: finalPrice},
+                ),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, String>> updateServiceDetails(
+    String? serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #updateServiceDetails,
+              [serviceId],
+              {
+                #quotedPrice: quotedPrice,
+                #finalPrice: finalPrice,
+                #representativeNotes: representativeNotes,
+              },
+            ),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(
+                  #updateServiceDetails,
+                  [serviceId],
+                  {
+                    #quotedPrice: quotedPrice,
+                    #finalPrice: finalPrice,
+                    #representativeNotes: representativeNotes,
+                  },
+                ),
               ),
             ),
           )

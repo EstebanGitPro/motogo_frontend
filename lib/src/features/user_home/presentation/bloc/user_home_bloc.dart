@@ -30,6 +30,7 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
     on<ChangeBrandFilter>(_onChangeBrandFilter);
     on<ChangeDisplacementRangeFilter>(_onChangeDisplacementRangeFilter);
     on<ApplyAdvancedFilters>(_onApplyAdvancedFilters);
+    on<SearchBranches>(_onSearchBranches);
   }
 
   Future<void> _onInitializeMap(
@@ -254,6 +255,13 @@ class UserHomeBloc extends Bloc<UserHomeEvent, UserHomeState> {
           displacementRange: event.displacementRange,
         ),
       );
+    }
+  }
+
+  void _onSearchBranches(SearchBranches event, Emitter<UserHomeState> emit) {
+    final currentState = state;
+    if (currentState is UserHomeLoaded) {
+      emit(currentState.copyWith(searchQuery: event.query));
     }
   }
 }

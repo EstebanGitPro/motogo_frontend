@@ -80,6 +80,7 @@ void main() {
             'id': 'diag-123',
             'motorcycle_id': 'moto-456',
             'branch_id': 'branch-789',
+            'branch_name': 'Taller Norte',
             'problem_description': 'Ruido en motor',
             'possible_solution': 'Cambiar correa',
             'date': '2024-01-15',
@@ -98,6 +99,7 @@ void main() {
         expect(model.id, 'diag-123');
         expect(model.motorcycleId, 'moto-456');
         expect(model.branchId, 'branch-789');
+        expect(model.branchName, 'Taller Norte');
         expect(model.problemDescription, 'Ruido en motor');
         expect(model.possibleSolution, 'Cambiar correa');
         expect(model.date, '2024-01-15');
@@ -117,6 +119,7 @@ void main() {
         expect(model.id, 'diag-123');
         expect(model.problemDescription, 'Frenos desgastados');
         expect(model.branchId, isNull);
+        expect(model.branchName, isNull);
         expect(model.possibleSolution, isNull);
         expect(model.evidence, isEmpty);
       });
@@ -127,6 +130,7 @@ void main() {
         expect(model.id, '');
         expect(model.motorcycleId, '');
         expect(model.branchId, isNull);
+        expect(model.branchName, isNull);
         expect(model.problemDescription, '');
         expect(model.possibleSolution, isNull);
         expect(model.date, '');
@@ -140,6 +144,7 @@ void main() {
           'id': 'diag-abc',
           'motorcycle_id': 'moto-xyz',
           'branch_id': 'branch-123',
+          'branch_name': 'Taller Sur',
           'problem_description': 'Aceite con fugas',
           'possible_solution': 'Cambiar empaque',
           'date': '2024-03-10',
@@ -151,6 +156,7 @@ void main() {
         expect(model.id, 'diag-abc');
         expect(model.motorcycleId, 'moto-xyz');
         expect(model.branchId, 'branch-123');
+        expect(model.branchName, 'Taller Sur');
         expect(model.problemDescription, 'Aceite con fugas');
         expect(model.possibleSolution, 'Cambiar empaque');
       });
@@ -190,6 +196,7 @@ void main() {
           id: 'diag-123',
           motorcycleId: 'moto-456',
           branchId: 'branch-789',
+          branchName: 'Taller Norte',
           problemDescription: 'Motor ruidoso',
           possibleSolution: 'Cambiar correa',
           date: '2024-01-15',
@@ -207,6 +214,7 @@ void main() {
         expect(entity.id, 'diag-123');
         expect(entity.motorcycleId, 'moto-456');
         expect(entity.branchId, 'branch-789');
+        expect(entity.branchName, 'Taller Norte');
         expect(entity.problemDescription, 'Motor ruidoso');
         expect(entity.possibleSolution, 'Cambiar correa');
         expect(entity.date.year, 2024);

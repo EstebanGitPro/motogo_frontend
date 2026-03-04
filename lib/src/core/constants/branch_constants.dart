@@ -102,6 +102,7 @@ class BranchConstants {
   // FAB menu options
   static const String newBranchOption = 'Nueva Sede';
   static const String newFranchiseOption = 'Nueva Franquicia';
+  static const String franchiseFallbackName = 'Franquicia';
 
   /// Maps backend establishment type codes to Spanish display labels.
   ///

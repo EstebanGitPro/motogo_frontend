@@ -25,6 +25,7 @@ class UserHomeLoaded extends UserHomeState {
   final String? selectedBranchId;
   final ActiveFilters filters;
   final BranchLoadStatus loadStatus;
+  final String searchQuery;
 
   const UserHomeLoaded({
     this.mapConfig = const MapConfig(),
@@ -32,6 +33,7 @@ class UserHomeLoaded extends UserHomeState {
     this.selectedBranchId,
     this.filters = const ActiveFilters(),
     this.loadStatus = const BranchLoadStatus(),
+    this.searchQuery = '',
   });
 
   // Convenience accessors for map config.
@@ -49,6 +51,25 @@ class UserHomeLoaded extends UserHomeState {
   bool get isLoadingBranches => loadStatus.isLoading;
   String? get errorMessage => loadStatus.errorMessage;
 
+  /// Returns branches matching the current search query.
+  ///
+  /// Filters by name, address, type label, city, and service names
+  /// (case-insensitive). Returns empty list when query is blank.
+  List<BranchMarkerEntity> get searchResults {
+    if (searchQuery.isEmpty) return const [];
+    final q = searchQuery.toLowerCase();
+    return branches
+        .where(
+          (b) =>
+              b.name.toLowerCase().contains(q) ||
+              (b.address?.toLowerCase().contains(q) ?? false) ||
+              b.displayTypeLabel.toLowerCase().contains(q) ||
+              (b.cityName?.toLowerCase().contains(q) ?? false) ||
+              b.serviceNames.any((s) => s.toLowerCase().contains(q)),
+        )
+        .toList();
+  }
+
   /// Creates a copy with updated values.
   UserHomeLoaded copyWith({
     MapConfig? mapConfig,
@@ -57,6 +78,7 @@ class UserHomeLoaded extends UserHomeState {
     bool clearSelectedBranch = false,
     ActiveFilters? filters,
     BranchLoadStatus? loadStatus,
+    String? searchQuery,
   }) {
     return UserHomeLoaded(
       mapConfig: mapConfig ?? this.mapConfig,
@@ -66,6 +88,7 @@ class UserHomeLoaded extends UserHomeState {
           : (selectedBranchId ?? this.selectedBranchId),
       filters: filters ?? this.filters,
       loadStatus: loadStatus ?? this.loadStatus,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
@@ -89,6 +112,7 @@ class UserHomeLoaded extends UserHomeState {
     selectedBranchId,
     filters,
     loadStatus,
+    searchQuery,
   ];
 }
 

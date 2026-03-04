@@ -7,7 +7,6 @@ import 'package:motogo_frontend/src/features/branch_detail/domain/entities/branc
 import 'package:motogo_frontend/src/features/branch_detail/presentation/bloc/branch_detail_bloc.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
 import 'package:motogo_frontend/src/features/branch_services/presentation/widgets/service_card_widget.dart';
-import 'package:motogo_frontend/src/features/branch_detail/presentation/widgets/rating_bottom_sheet.dart';
 import 'package:motogo_frontend/src/features/branch_detail/presentation/widgets/schedule_section.dart';
 import 'package:motogo_frontend/src/features/request_diagnostic/presentation/pages/request_diagnostic_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -402,12 +401,7 @@ class _BranchDetailView extends StatelessWidget {
               ),
             )
           else
-            ...services.map(
-              (service) => ServiceCardWidget(
-                service: service,
-                onRate: () => RatingBottomSheet.show(context, service),
-              ),
-            ),
+            ...services.map((service) => ServiceCardWidget(service: service)),
         ],
       ),
     );

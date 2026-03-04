@@ -258,7 +258,7 @@ class RequestDiagnosticBloc
   ) {
     final currentState = state;
     if (currentState is RequestDiagnosticLoaded) {
-      emit(currentState.copyWith(problemDescription: event.description));
+      emit(currentState.copyWith(problemDescription: event.description.trim()));
     }
   }
 

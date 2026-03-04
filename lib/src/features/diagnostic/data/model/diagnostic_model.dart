@@ -38,6 +38,7 @@ class DiagnosticModel {
   final String id;
   final String motorcycleId;
   final String? branchId;
+  final String? branchName;
   final String problemDescription;
   final String? possibleSolution;
   final String date;
@@ -47,6 +48,7 @@ class DiagnosticModel {
     required this.id,
     required this.motorcycleId,
     this.branchId,
+    this.branchName,
     required this.problemDescription,
     this.possibleSolution,
     required this.date,
@@ -55,29 +57,25 @@ class DiagnosticModel {
 
   factory DiagnosticModel.fromJson(Map<String, dynamic> json) {
     final data = json['data'] as Map<String, dynamic>?;
-    final source = data ?? json;
-
-    return DiagnosticModel(
-      id: source['id'] as String? ?? '',
-      motorcycleId: source['motorcycle_id'] as String? ?? '',
-      branchId: source['branch_id'] as String?,
-      problemDescription: source['problem_description'] as String? ?? '',
-      possibleSolution: source['possible_solution'] as String?,
-      date: source['date'] as String? ?? '',
-      evidence: _parseEvidence(source['evidence']),
-    );
+    return DiagnosticModel._fromMap(data ?? json);
   }
 
   /// Factory for parsing a single item from a list response (no wrapper).
   factory DiagnosticModel.fromDataJson(Map<String, dynamic> json) {
+    return DiagnosticModel._fromMap(json);
+  }
+
+  /// Shared parsing logic for both [fromJson] and [fromDataJson].
+  factory DiagnosticModel._fromMap(Map<String, dynamic> source) {
     return DiagnosticModel(
-      id: json['id'] as String? ?? '',
-      motorcycleId: json['motorcycle_id'] as String? ?? '',
-      branchId: json['branch_id'] as String?,
-      problemDescription: json['problem_description'] as String? ?? '',
-      possibleSolution: json['possible_solution'] as String?,
-      date: json['date'] as String? ?? '',
-      evidence: _parseEvidence(json['evidence']),
+      id: source['id'] as String? ?? '',
+      motorcycleId: source['motorcycle_id'] as String? ?? '',
+      branchId: source['branch_id'] as String?,
+      branchName: source['branch_name'] as String?,
+      problemDescription: source['problem_description'] as String? ?? '',
+      possibleSolution: source['possible_solution'] as String?,
+      date: source['date'] as String? ?? '',
+      evidence: _parseEvidence(source['evidence']),
     );
   }
 
@@ -94,6 +92,7 @@ class DiagnosticModel {
       id: id,
       motorcycleId: motorcycleId,
       branchId: branchId,
+      branchName: branchName,
       problemDescription: problemDescription,
       possibleSolution: possibleSolution,
       date: DateTime.tryParse(date) ?? DateTime.now(),

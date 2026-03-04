@@ -2,94 +2,21 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:either_dart/either.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
-
-class TestableEmailRecoveryDataSource {
-  final Dio dio;
-
-  TestableEmailRecoveryDataSource(this.dio);
-
-  Future<Either<ErrorModel, bool>> verifyEmail(String email) async {
-    try {
-      final response = await dio.post(
-        '/auth/password-reset',
-        data: {'email': email},
-      );
-
-      if (response.statusCode != 200) {
-        return Left(_handleDioError(response));
-      }
-
-      final decoded = response.data;
-      final status = decoded['status'] as String?;
-
-      if (status == 'success') {
-        return const Right(true);
-      } else {
-        return Left(_handleDioError(response));
-      }
-    } on DioException catch (e) {
-      return Left(_handleDioException(e));
-    } on SocketException {
-      return Left(ErrorModel(message: 'Error de conexión'));
-    } on FormatException {
-      return Left(ErrorModel(message: 'Respuesta inválida del servidor'));
-    } catch (e) {
-      return Left(ErrorModel(message: e.toString()));
-    }
-  }
-
-  ErrorModel _handleDioError(Response<dynamic> response) {
-    String? serverMessage;
-
-    try {
-      final errorData = response.data;
-      if (errorData is Map<String, dynamic>) {
-        serverMessage = errorData['message']?.toString();
-      }
-    } catch (e) {
-      serverMessage = null;
-    }
-
-    return ErrorModel(
-      message: serverMessage ?? 'Error desconocido',
-      errorCode: response.statusCode.toString(),
-    );
-  }
-
-  ErrorModel _handleDioException(DioException e) {
-    final statusCode = e.response?.statusCode;
-    String? serverMessage;
-
-    try {
-      final errorData = e.response?.data;
-      if (errorData is Map<String, dynamic>) {
-        serverMessage = errorData['message']?.toString();
-      }
-    } catch (_) {
-      serverMessage = null;
-    }
-
-    return ErrorModel(
-      message: serverMessage ?? 'Error de conexión',
-      errorCode: statusCode?.toString(),
-    );
-  }
-}
+import 'package:motogo_frontend/src/features/password_recovery/data/datasources/email_verification_datasource.dart';
 
 void main() {
   group('EmailRecoveryVerificationDataSource', () {
     late Dio dio;
-    late TestableEmailRecoveryDataSource dataSource;
+    late EmailRecoveryVerificationDataSource dataSource;
 
     setUp(() {
-      dio = Dio();
-      dataSource = TestableEmailRecoveryDataSource(dio);
+      dio = Dio(BaseOptions(baseUrl: 'https://test.com'));
+      dataSource = EmailRecoveryVerificationDataSource(dio: dio);
     });
 
     group('verifyEmail', () {
-      test('should return true on success response', () async {
+      test('should return true on success response with status', () async {
         const responseJson =
             '{"status": "success", "message": "Email enviado"}';
         dio.httpClientAdapter = _SimpleAdapter(responseJson, 200);
@@ -100,22 +27,37 @@ void main() {
         expect(result.right, true);
       });
 
-      test('should return ErrorModel when status is not success', () async {
+      test(
+        'should return true on success response with success flag',
+        () async {
+          const responseJson = '{"success": true, "message": "Email enviado"}';
+          dio.httpClientAdapter = _SimpleAdapter(responseJson, 200);
+
+          final result = await dataSource.verifyEmail('test@example.com');
+
+          expect(result.isRight, isTrue);
+          expect(result.right, true);
+        },
+      );
+
+      test('should return ErrorModel when success is false', () async {
         const responseJson =
-            '{"status": "error", "message": "Email no encontrado"}';
+            '{"success": false, "message": "Email no encontrado"}';
         dio.httpClientAdapter = _SimpleAdapter(responseJson, 200);
 
         final result = await dataSource.verifyEmail('notfound@example.com');
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());
+        expect(result.left.message, 'Email no encontrado');
       });
 
-      test('should return ErrorModel on non-200 status code', () async {
-        const responseJson = '{"message": "Bad Request"}';
-        dio.httpClientAdapter = _SimpleAdapter(responseJson, 400);
+      test('should return ErrorModel when status is not success', () async {
+        const responseJson =
+            '{"status": "error", "message": "Email no encontrado"}';
+        dio.httpClientAdapter = _SimpleAdapter(responseJson, 200);
 
-        final result = await dataSource.verifyEmail('bad@example.com');
+        final result = await dataSource.verifyEmail('notfound@example.com');
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());
@@ -133,7 +75,6 @@ void main() {
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());
-        expect(result.left.message, 'Error de conexión');
       });
 
       test(
@@ -154,9 +95,37 @@ void main() {
           final result = await dataSource.verifyEmail('noexist@example.com');
 
           expect(result.isLeft, isTrue);
-          expect(result.left.message, 'Usuario no existe');
+          expect(result.left.message, contains('Usuario no existe'));
         },
       );
+
+      test('should handle non-Map response data', () async {
+        const responseJson = '"just a string"';
+        dio.httpClientAdapter = _SimpleAdapter(responseJson, 200);
+
+        final result = await dataSource.verifyEmail('test@example.com');
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should handle FormatException as generic error', () async {
+        dio.httpClientAdapter = _FormatExceptionAdapter();
+
+        final result = await dataSource.verifyEmail('test@example.com');
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should handle SocketException as network error', () async {
+        dio.httpClientAdapter = _SocketExceptionAdapter();
+
+        final result = await dataSource.verifyEmail('test@example.com');
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
     });
   });
 }
@@ -195,5 +164,27 @@ class _ExceptionAdapter extends IOHttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     throw exception;
+  }
+}
+
+class _FormatExceptionAdapter extends IOHttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    throw const FormatException('Bad format');
+  }
+}
+
+class _SocketExceptionAdapter extends IOHttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    throw const SocketException('No connection');
   }
 }

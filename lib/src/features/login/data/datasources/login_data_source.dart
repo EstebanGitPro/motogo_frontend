@@ -1,9 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/constants/error_codes.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
+import 'package:motogo_frontend/src/core/network/dio_client_stub.dart'
+    if (dart.library.html) 'package:motogo_frontend/src/core/network/dio_client_web.dart'
+    as web_adapter;
 import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 import 'package:motogo_frontend/src/core/user/data/datasources/user_session_data_source.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
@@ -30,8 +34,16 @@ class LoginDataSource {
               connectTimeout: const Duration(seconds: 30),
               receiveTimeout: const Duration(seconds: 30),
               headers: {'Content-Type': 'application/json'},
+              extra: kIsWeb ? {'withCredentials': true} : {},
             ),
-          );
+          ) {
+    // Configure BrowserHttpClientAdapter for Web cookie support.
+    // CRITICAL: Without withCredentials on the login request, the browser
+    // silently discards the Set-Cookie headers from the response.
+    if (kIsWeb && dio == null) {
+      web_adapter.configureWebCredentials(_dio);
+    }
+  }
 
   /// Realiza el login y guarda la sesión completa en UserSessionManager.
   /// Retorna un LoginResult con el usuario y el mensaje del backend.
@@ -86,6 +98,8 @@ class LoginDataSource {
       }
 
       // Obtener el perfil del usuario usando el datasource centralizado
+      // On Web, use a temporary token from the response for the profile fetch.
+      // The cookies are already stored by the browser at this point.
       final profileResult = await _userDataSource.fetchCurrentUser(accessToken);
 
       if (profileResult.isLeft) {
@@ -94,7 +108,9 @@ class LoginDataSource {
 
       final user = profileResult.right;
 
-      // Guardar la sesión completa en UserSessionManager
+      // Guardar la sesión completa en UserSessionManager.
+      // On Web, tokens are managed by HttpOnly cookies, but we still save
+      // them in the session manager for profile/user data access.
       await UserSessionManager.instance.saveSession(
         accessToken: accessToken,
         refreshToken: refreshToken,

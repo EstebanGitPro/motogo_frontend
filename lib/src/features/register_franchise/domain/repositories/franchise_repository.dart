@@ -6,8 +6,9 @@ import 'package:motogo_frontend/src/features/register_franchise/domain/entities/
 abstract class FranchiseRepository {
   /// Registers a new franchise with the given entity data.
   ///
-  /// Returns the created [FranchiseEntity] on success, or an [ErrorModel] on failure.
-  Future<Either<ErrorModel, FranchiseEntity>> registerFranchise(
+  /// Returns a Record with the created [FranchiseEntity] and the backend
+  /// success message, or an [ErrorModel] on failure.
+  Future<Either<ErrorModel, (FranchiseEntity, String)>> registerFranchise(
     FranchiseEntity franchise,
   );
 }

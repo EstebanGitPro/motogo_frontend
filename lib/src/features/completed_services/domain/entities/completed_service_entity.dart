@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_item_entity.dart';
 
 /// Entity representing a completed service record.
 ///
@@ -13,8 +14,7 @@ class CompletedServiceEntity extends Equatable {
   final double? quotedPrice;
   final double? finalPrice;
   final String? representativeNotes;
-  final List<String> serviceIds;
-  final List<String> serviceNames;
+  final List<CompletedServiceItemEntity> services;
   final String? branchName;
 
   const CompletedServiceEntity({
@@ -27,10 +27,18 @@ class CompletedServiceEntity extends Equatable {
     this.quotedPrice,
     this.finalPrice,
     this.representativeNotes,
-    this.serviceIds = const [],
-    this.serviceNames = const [],
+    this.services = const [],
     this.branchName,
   });
+
+  /// Whether the service has reached its final state.
+  bool get isFinalized => status == 'FINALIZADO';
+
+  /// Whether any items still need to be rated.
+  bool get hasUnratedItems => services.any((item) => !item.isRated);
+
+  /// Count of already-rated items.
+  int get ratedCount => services.where((item) => item.isRated).length;
 
   @override
   List<Object?> get props => [
@@ -43,8 +51,7 @@ class CompletedServiceEntity extends Equatable {
     quotedPrice,
     finalPrice,
     representativeNotes,
-    serviceIds,
-    serviceNames,
+    services,
     branchName,
   ];
 }

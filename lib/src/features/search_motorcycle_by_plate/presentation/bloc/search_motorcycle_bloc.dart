@@ -7,6 +7,7 @@ import 'package:motogo_frontend/src/features/completed_services/domain/usecases/
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_details_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart';
 import 'package:motogo_frontend/src/features/diagnostic/domain/entity/diagnostic_entity.dart';
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart';
@@ -32,6 +33,7 @@ class SearchMotorcycleBloc
   final UpdateServiceStatusUseCase _updateServiceStatusUseCase;
   final GetServiceTransitionsUseCase _getServiceTransitionsUseCase;
   final DeleteCompletedServiceUseCase _deleteCompletedServiceUseCase;
+  final UpdateServiceDetailsUseCase _updateServiceDetailsUseCase;
 
   /// Maps branchId → branchName for enriching history entities.
   Map<String, String> _branchNameMap = {};
@@ -45,6 +47,7 @@ class SearchMotorcycleBloc
     required UpdateServiceStatusUseCase updateServiceStatusUseCase,
     required GetServiceTransitionsUseCase getServiceTransitionsUseCase,
     required DeleteCompletedServiceUseCase deleteCompletedServiceUseCase,
+    required UpdateServiceDetailsUseCase updateServiceDetailsUseCase,
   }) : _searchUseCase = searchUseCase,
        _setSolutionUseCase = setSolutionUseCase,
        _registerServiceUseCase = registerServiceUseCase,
@@ -53,6 +56,7 @@ class SearchMotorcycleBloc
        _updateServiceStatusUseCase = updateServiceStatusUseCase,
        _getServiceTransitionsUseCase = getServiceTransitionsUseCase,
        _deleteCompletedServiceUseCase = deleteCompletedServiceUseCase,
+       _updateServiceDetailsUseCase = updateServiceDetailsUseCase,
        super(const SearchMotorcycleInitial()) {
     on<SearchByPlate>(_onSearchByPlate);
     on<ClearSearch>(_onClearSearch);
@@ -60,6 +64,7 @@ class SearchMotorcycleBloc
     on<RegisterCompletedService>(_onRegisterCompletedService);
     on<FetchServiceHistory>(_onFetchServiceHistory);
     on<UpdateServiceStatus>(_onUpdateServiceStatus);
+    on<UpdateServiceDetails>(_onUpdateServiceDetails);
     on<FetchServiceTransitions>(_onFetchServiceTransitions);
     on<DeleteCompletedService>(_onDeleteCompletedService);
   }
@@ -228,8 +233,7 @@ class SearchMotorcycleBloc
                   quotedPrice: e.quotedPrice,
                   finalPrice: e.finalPrice,
                   representativeNotes: e.representativeNotes,
-                  serviceIds: e.serviceIds,
-                  serviceNames: e.serviceNames,
+                  services: e.services,
                   branchName: name,
                 )
               : e;
@@ -284,21 +288,27 @@ class SearchMotorcycleBloc
 
     emit(
       currentState.copyWith(
-        action: currentState.action.copyWith(isUpdatingStatus: true),
+        action: currentState.action.copyWith(
+          statusUpdate: currentState.action.statusUpdate.copyWith(
+            isLoading: true,
+          ),
+        ),
       ),
     );
 
     final result = await _updateServiceStatusUseCase(
       event.serviceId,
       event.newStatus,
+      finalPrice: event.finalPrice,
     );
 
     result.fold(
       (error) => emit(
         currentState.copyWith(
           action: currentState.action.copyWith(
-            isUpdatingStatus: false,
-            statusUpdateError: error.message,
+            statusUpdate: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
           ),
         ),
       ),
@@ -306,12 +316,61 @@ class SearchMotorcycleBloc
         emit(
           currentState.copyWith(
             action: currentState.action.copyWith(
-              isUpdatingStatus: false,
-              statusUpdateMessage: message,
+              statusUpdate: const AsyncActionState().copyWith(message: message),
             ),
           ),
         );
         // Refresh service history to reflect the status change
+        _fetchHistoryForMotorcycle(event.motorcycleId);
+      },
+    );
+  }
+
+  Future<void> _onUpdateServiceDetails(
+    UpdateServiceDetails event,
+    Emitter<SearchMotorcycleState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! SearchMotorcycleLoaded) return;
+
+    emit(
+      currentState.copyWith(
+        action: currentState.action.copyWith(
+          detailsUpdate: currentState.action.detailsUpdate.copyWith(
+            isLoading: true,
+          ),
+        ),
+      ),
+    );
+
+    final result = await _updateServiceDetailsUseCase(
+      event.serviceId,
+      quotedPrice: event.quotedPrice,
+      finalPrice: event.finalPrice,
+      representativeNotes: event.representativeNotes,
+    );
+
+    result.fold(
+      (error) => emit(
+        currentState.copyWith(
+          action: currentState.action.copyWith(
+            detailsUpdate: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
+          ),
+        ),
+      ),
+      (message) {
+        emit(
+          currentState.copyWith(
+            action: currentState.action.copyWith(
+              detailsUpdate: const AsyncActionState().copyWith(
+                message: message,
+              ),
+            ),
+          ),
+        );
+        // Refresh service history to reflect the updated details
         _fetchHistoryForMotorcycle(event.motorcycleId);
       },
     );
@@ -350,7 +409,11 @@ class SearchMotorcycleBloc
 
     emit(
       currentState.copyWith(
-        action: currentState.action.copyWith(isDeletingService: true),
+        action: currentState.action.copyWith(
+          deleteAction: currentState.action.deleteAction.copyWith(
+            isLoading: true,
+          ),
+        ),
       ),
     );
 
@@ -360,8 +423,9 @@ class SearchMotorcycleBloc
       (error) => emit(
         currentState.copyWith(
           action: currentState.action.copyWith(
-            isDeletingService: false,
-            deleteServiceError: error.message,
+            deleteAction: const AsyncActionState().copyWith(
+              error: error.message,
+            ),
           ),
         ),
       ),
@@ -369,8 +433,7 @@ class SearchMotorcycleBloc
         emit(
           currentState.copyWith(
             action: currentState.action.copyWith(
-              isDeletingService: false,
-              deleteServiceMessage: message,
+              deleteAction: const AsyncActionState().copyWith(message: message),
             ),
           ),
         );

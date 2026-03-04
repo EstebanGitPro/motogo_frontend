@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/catalogs/domain/repositories/catalogs_repository.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_services/data/datasources/branch_services_datasource.dart';
@@ -167,7 +168,7 @@ class BranchServicesPage extends StatelessWidget {
                 LoadBranchServices(branchId),
               );
             },
-            child: const Text('Reintentar'),
+            child: const Text(CommonConstants.retry),
           ),
         ],
       ),

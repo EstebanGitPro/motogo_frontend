@@ -27,7 +27,9 @@ void main() {
   final errorModel = ErrorModel(message: 'Error', errorCode: 'ERR');
 
   setUpAll(() {
-    provideDummy<Either<ErrorModel, BranchEntity>>(Right(testBranch));
+    provideDummy<Either<ErrorModel, (BranchEntity, String)>>(
+      Right((testBranch, 'Sede actualizada exitosamente')),
+    );
   });
 
   setUp(() {
@@ -36,15 +38,17 @@ void main() {
   });
 
   group('UpdateBranchUseCase', () {
-    test('should return updated BranchEntity on success', () async {
-      when(
-        mockRepository.updateBranch('branch-1', testBranch),
-      ).thenAnswer((_) async => Right(testBranch));
+    test('should return updated BranchEntity and message on success', () async {
+      when(mockRepository.updateBranch('branch-1', testBranch)).thenAnswer(
+        (_) async => Right((testBranch, 'Sede actualizada exitosamente')),
+      );
 
       final result = await useCase.call('branch-1', testBranch);
 
       expect(result.isRight, isTrue);
-      expect(result.right.name, 'MotoGo Centro');
+      final (branch, message) = result.right;
+      expect(branch.name, 'MotoGo Centro');
+      expect(message, 'Sede actualizada exitosamente');
       verify(mockRepository.updateBranch('branch-1', testBranch)).called(1);
     });
 

@@ -17,4 +17,5 @@ export $(grep -v '^#' .env | xargs)
 
 # Run flutter with dart-define flags
 flutter run \
-    --dart-define=MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN}
+    --dart-define=MAPBOX_ACCESS_TOKEN=${MAPBOX_ACCESS_TOKEN} \
+    --dart-define=BASE_URL=${BASE_URL:-http://localhost:8085/motogo/api/v1}

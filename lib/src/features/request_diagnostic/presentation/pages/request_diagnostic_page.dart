@@ -90,8 +90,8 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
   }
 
   void _handleLoadedState(BuildContext context, RequestDiagnosticLoaded state) {
-    _handleErrorMessage(context, state.errorMessage);
-    _handlePermissionMessage(context, state.permissionMessage);
+    _handleErrorMessage(context, state.messages.errorMessage);
+    _handlePermissionMessage(context, state.messages.permissionMessage);
     _handleSuccessMessage(context, state);
 
     // Load evidence when motorcycle is selected and not yet loaded
@@ -132,7 +132,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
     BuildContext context,
     RequestDiagnosticLoaded state,
   ) {
-    final message = state.successMessage?.trim();
+    final message = state.messages.successMessage?.trim();
     if (message != null && message.isNotEmpty) {
       if (_lastSuccessMessage != message) {
         _lastSuccessMessage = message;
@@ -310,8 +310,8 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
                   const SizedBox(width: 8),
                   Text(
                     state.hasLoadedEvidence
-                        ? 'Subiendo foto...'
-                        : 'Cargando evidencias...',
+                        ? RequestDiagnosticConstants.uploadingPhoto
+                        : RequestDiagnosticConstants.loadingEvidence,
                   ),
                 ],
               ),
@@ -320,7 +320,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                'Selecciona una moto primero para agregar fotos',
+                RequestDiagnosticConstants.selectMotorcycleFirst,
                 style: TextStyle(color: Colors.grey),
               ),
             )
@@ -449,7 +449,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
             const Padding(
               padding: EdgeInsets.all(16),
               child: Text(
-                'Selecciona el ángulo de la foto',
+                RequestDiagnosticConstants.selectPhotoAngle,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
@@ -484,11 +484,11 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
   String _getAngleDescription(EvidenceAngle angle) {
     switch (angle) {
       case EvidenceAngle.frontal:
-        return 'Vista de frente de la moto';
+        return RequestDiagnosticConstants.angleFrontDescription;
       case EvidenceAngle.lateral:
-        return 'Vista de lado (izq o der)';
+        return RequestDiagnosticConstants.angleSideDescription;
       case EvidenceAngle.rear:
-        return 'Vista de atrás de la moto';
+        return RequestDiagnosticConstants.angleRearDescription;
     }
   }
 
@@ -506,7 +506,7 @@ class _RequestDiagnosticViewState extends State<_RequestDiagnosticView> {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                'Foto ${angle.label}',
+                '${RequestDiagnosticConstants.photoLabelPrefix}${angle.label}',
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

@@ -12,9 +12,9 @@ import 'package:motogo_frontend/src/features/register_branch/domain/entities/bra
 abstract class EditBranchDataSource {
   /// Updates an existing branch.
   ///
-  /// Returns [Right] with the updated [BranchEntity] on success,
-  /// or [Left] with [ErrorModel] on failure.
-  Future<Either<ErrorModel, BranchEntity>> updateBranch(
+  /// Returns [Right] with a record containing the updated [BranchEntity]
+  /// and the backend success message, or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, (BranchEntity, String)>> updateBranch(
     String id,
     BranchModel branch,
   );
@@ -26,7 +26,7 @@ class EditBranchDataSourceImpl implements EditBranchDataSource {
   EditBranchDataSourceImpl(this._dioClient);
 
   @override
-  Future<Either<ErrorModel, BranchEntity>> updateBranch(
+  Future<Either<ErrorModel, (BranchEntity, String)>> updateBranch(
     String id,
     BranchModel branch,
   ) async {
@@ -43,17 +43,19 @@ class EditBranchDataSourceImpl implements EditBranchDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
+        final message = responseData['message'] as String? ?? '';
+
         // Extract updated branch data
         final data = responseData['data'] as Map<String, dynamic>?;
         if (data != null) {
           final updatedBranch = BranchModel.fromJson(data);
-          return Right(updatedBranch.toEntity());
+          return Right((updatedBranch.toEntity(), message));
         }
 
         // Fallback: return original branch if no data in response
-        return Right(branch.toEntity());
+        return Right((branch.toEntity(), message));
       }
-      return Right(branch.toEntity());
+      return Right((branch.toEntity(), ''));
     } on DioException catch (e) {
       return DioErrorHandler.handleDioException(e);
     } catch (e) {

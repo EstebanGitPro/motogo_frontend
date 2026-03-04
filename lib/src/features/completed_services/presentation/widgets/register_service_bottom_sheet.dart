@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/utils/thousands_separator_formatter.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/branch_services/data/datasources/branch_services_datasource.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
@@ -40,6 +41,12 @@ class _RegisterServiceBottomSheetState
   final _quotedPriceController = TextEditingController();
   final _finalPriceController = TextEditingController();
   final _notesController = TextEditingController();
+  final _sheetController = DraggableScrollableController();
+
+  // Keys for auto-scrolling to focused fields
+  final _quotedPriceKey = GlobalKey();
+  final _finalPriceKey = GlobalKey();
+  final _notesKey = GlobalKey();
 
   // Branch selection
   List<BranchEntity> _branches = [];
@@ -62,7 +69,33 @@ class _RegisterServiceBottomSheetState
     _quotedPriceController.dispose();
     _finalPriceController.dispose();
     _notesController.dispose();
+    _sheetController.dispose();
     super.dispose();
+  }
+
+  /// Scrolls to make the widget with [key] visible after a short delay
+  /// (to let the keyboard finish animating), and expands the sheet.
+  Future<void> _onFieldTapped(GlobalKey key) async {
+    // Expand sheet to maximum
+    if (_sheetController.isAttached) {
+      _sheetController.animateTo(
+        0.95,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+    // Wait for keyboard animation to finish
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      // ignore: use_build_context_synchronously
+      ctx,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
   }
 
   Future<void> _loadBranches() async {
@@ -165,7 +198,10 @@ class _RegisterServiceBottomSheetState
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     return DraggableScrollableSheet(
+      controller: _sheetController,
       initialChildSize: 0.85,
       maxChildSize: 0.95,
       minChildSize: 0.5,
@@ -232,7 +268,12 @@ class _RegisterServiceBottomSheetState
                         _buildNotesField(),
                         const SizedBox(height: 24),
                         _buildSubmitButton(),
-                        const SizedBox(height: 16),
+                        // Extra padding so the keyboard doesn't cover fields
+                        SizedBox(
+                          height: keyboardHeight > 0
+                              ? keyboardHeight * 0.5
+                              : 16,
+                        ),
                       ],
                     ),
                   ),
@@ -420,6 +461,7 @@ class _RegisterServiceBottomSheetState
 
   Widget _buildPriceFields() {
     return Row(
+      key: _quotedPriceKey,
       children: [
         Expanded(
           child: TextFormField(
@@ -427,8 +469,9 @@ class _RegisterServiceBottomSheetState
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
-              _ThousandsSeparatorFormatter(),
+              ThousandsSeparatorFormatter(),
             ],
+            onTap: () => _onFieldTapped(_quotedPriceKey),
             decoration: InputDecoration(
               labelText: MotorcycleConstants.registerQuotedPriceLabel,
               hintText: MotorcycleConstants.registerQuotedPriceHint,
@@ -441,13 +484,15 @@ class _RegisterServiceBottomSheetState
         ),
         const SizedBox(width: 12),
         Expanded(
+          key: _finalPriceKey,
           child: TextFormField(
             controller: _finalPriceController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
-              _ThousandsSeparatorFormatter(),
+              ThousandsSeparatorFormatter(),
             ],
+            onTap: () => _onFieldTapped(_finalPriceKey),
             decoration: InputDecoration(
               labelText: MotorcycleConstants.registerFinalPriceLabel,
               hintText: MotorcycleConstants.registerFinalPriceHint,
@@ -464,9 +509,11 @@ class _RegisterServiceBottomSheetState
 
   Widget _buildNotesField() {
     return TextFormField(
+      key: _notesKey,
       controller: _notesController,
       maxLines: 4,
       maxLength: 500,
+      onTap: () => _onFieldTapped(_notesKey),
       decoration: InputDecoration(
         labelText: MotorcycleConstants.registerNotesLabel,
         hintText: MotorcycleConstants.registerNotesHint,
@@ -493,38 +540,6 @@ class _RegisterServiceBottomSheetState
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-    );
-  }
-}
-
-/// Formatter that adds dots as thousand separators.
-///
-/// Example: 185000 → 185.000, 1500000 → 1.500.000
-class _ThousandsSeparatorFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    // Only digits at this point (FilteringTextInputFormatter.digitsOnly runs first)
-    final digits = newValue.text;
-    if (digits.isEmpty) return newValue;
-
-    // Format with dots
-    final buffer = StringBuffer();
-    final length = digits.length;
-    for (var i = 0; i < length; i++) {
-      buffer.write(digits[i]);
-      final remaining = length - 1 - i;
-      if (remaining > 0 && remaining % 3 == 0) {
-        buffer.write('.');
-      }
-    }
-
-    final formatted = buffer.toString();
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

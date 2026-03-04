@@ -1,6 +1,8 @@
 class Config {
-  static const String baseUrl =
-      'https://d54tmr5b-8085.use2.devtunnels.ms/motogo/api/v1';
+  static const String baseUrl = String.fromEnvironment(
+    'BASE_URL',
+    defaultValue: 'http://localhost:8085/motogo/api/v1',
+  );
 
   /// URL de navegación de Google Maps con destino específico
   static String googleMapsDirectionsUrl(double lat, double lng) =>

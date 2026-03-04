@@ -24,22 +24,39 @@ class LegalPage extends StatelessWidget {
               title: LegalConstants.sectionAbout,
               body: LegalConstants.aboutBody,
             ),
-            _buildSection(
-              title: LegalConstants.sectionTermsAndConditions,
-              body: LegalConstants.termsBody,
+            const SizedBox(height: 8),
+            const Text(
+              LegalConstants.sectionTermsAndConditions,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            _buildSection(
-              title: LegalConstants.sectionPrivacyPolicy,
-              body: LegalConstants.privacyBody,
+            const SizedBox(height: 8),
+            ...LegalConstants.tcSections.map(
+              (section) => Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ExpansionTile(
+                  title: Text(
+                    section['title']!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  children: [
+                    Text(
+                      section['content']!,
+                      style: const TextStyle(fontSize: 13, height: 1.5),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            _buildSection(
-              title: LegalConstants.sectionDataTreatment,
-              body: LegalConstants.dataBody,
-            ),
-            _buildSection(
-              title: LegalConstants.sectionSecurity,
-              body: LegalConstants.securityBody,
-            ),
+            const SizedBox(height: 8),
             _buildSection(
               title: LegalConstants.sectionLicenses,
               body: LegalConstants.licensesBody,

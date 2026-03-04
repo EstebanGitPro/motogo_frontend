@@ -17,7 +17,8 @@ class Secrets {
   /// Get your token from https://account.mapbox.com/access-tokens/
   static const String mapboxAccessToken = String.fromEnvironment(
     'MAPBOX_ACCESS_TOKEN',
-    defaultValue: '',
+    defaultValue:
+        'pk.eyJ1Ijoic3RpZmxlcjA4IiwiYSI6ImNta2U3b3dveDA0ODAzZG9mN3EzbHQzdm4ifQ.uhavqtuqgUt6dwKv0uyNCg',
   );
 
   /// Returns true if Mapbox is configured with a valid token.

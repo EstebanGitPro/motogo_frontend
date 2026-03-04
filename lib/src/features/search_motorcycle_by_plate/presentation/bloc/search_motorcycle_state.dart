@@ -78,51 +78,65 @@ class ServiceHistoryStatus extends Equatable {
   List<Object?> get props => [services, loading, error, transitions];
 }
 
-/// Groups status-update and delete action fields.
-class ServiceActionStatus extends Equatable {
-  final bool isUpdatingStatus;
-  final String? statusUpdateMessage;
-  final String? statusUpdateError;
-  final bool isDeletingService;
-  final String? deleteServiceMessage;
-  final String? deleteServiceError;
+/// Groups a single async-action triplet: loading flag, success message, error.
+class AsyncActionState extends Equatable {
+  final bool isLoading;
+  final String? message;
+  final String? error;
 
-  const ServiceActionStatus({
-    this.isUpdatingStatus = false,
-    this.statusUpdateMessage,
-    this.statusUpdateError,
-    this.isDeletingService = false,
-    this.deleteServiceMessage,
-    this.deleteServiceError,
-  });
+  const AsyncActionState({this.isLoading = false, this.message, this.error});
 
-  ServiceActionStatus copyWith({
-    bool? isUpdatingStatus,
-    String? statusUpdateMessage,
-    String? statusUpdateError,
-    bool? isDeletingService,
-    String? deleteServiceMessage,
-    String? deleteServiceError,
-  }) {
-    return ServiceActionStatus(
-      isUpdatingStatus: isUpdatingStatus ?? this.isUpdatingStatus,
-      statusUpdateMessage: statusUpdateMessage,
-      statusUpdateError: statusUpdateError,
-      isDeletingService: isDeletingService ?? this.isDeletingService,
-      deleteServiceMessage: deleteServiceMessage,
-      deleteServiceError: deleteServiceError,
+  AsyncActionState copyWith({bool? isLoading, String? message, String? error}) {
+    return AsyncActionState(
+      isLoading: isLoading ?? this.isLoading,
+      message: message,
+      error: error,
     );
   }
 
   @override
-  List<Object?> get props => [
-    isUpdatingStatus,
-    statusUpdateMessage,
-    statusUpdateError,
-    isDeletingService,
-    deleteServiceMessage,
-    deleteServiceError,
-  ];
+  List<Object?> get props => [isLoading, message, error];
+}
+
+/// Groups status-update, details-update, and delete action fields.
+class ServiceActionStatus extends Equatable {
+  final AsyncActionState statusUpdate;
+  final AsyncActionState detailsUpdate;
+  final AsyncActionState deleteAction;
+
+  const ServiceActionStatus({
+    this.statusUpdate = const AsyncActionState(),
+    this.detailsUpdate = const AsyncActionState(),
+    this.deleteAction = const AsyncActionState(),
+  });
+
+  // ─── Convenience getters (backward compatibility) ─────────────────
+  bool get isUpdatingStatus => statusUpdate.isLoading;
+  String? get statusUpdateMessage => statusUpdate.message;
+  String? get statusUpdateError => statusUpdate.error;
+
+  bool get isUpdatingDetails => detailsUpdate.isLoading;
+  String? get detailsUpdateMessage => detailsUpdate.message;
+  String? get detailsUpdateError => detailsUpdate.error;
+
+  bool get isDeletingService => deleteAction.isLoading;
+  String? get deleteServiceMessage => deleteAction.message;
+  String? get deleteServiceError => deleteAction.error;
+
+  ServiceActionStatus copyWith({
+    AsyncActionState? statusUpdate,
+    AsyncActionState? detailsUpdate,
+    AsyncActionState? deleteAction,
+  }) {
+    return ServiceActionStatus(
+      statusUpdate: statusUpdate ?? this.statusUpdate,
+      detailsUpdate: detailsUpdate ?? this.detailsUpdate,
+      deleteAction: deleteAction ?? this.deleteAction,
+    );
+  }
+
+  @override
+  List<Object?> get props => [statusUpdate, detailsUpdate, deleteAction];
 }
 
 /// Success state - motorcycle found.
@@ -156,6 +170,9 @@ class SearchMotorcycleLoaded extends SearchMotorcycleState {
   bool get isUpdatingStatus => action.isUpdatingStatus;
   String? get statusUpdateMessage => action.statusUpdateMessage;
   String? get statusUpdateError => action.statusUpdateError;
+  bool get isUpdatingDetails => action.isUpdatingDetails;
+  String? get detailsUpdateMessage => action.detailsUpdateMessage;
+  String? get detailsUpdateError => action.detailsUpdateError;
   bool get isDeletingService => action.isDeletingService;
   String? get deleteServiceMessage => action.deleteServiceMessage;
   String? get deleteServiceError => action.deleteServiceError;

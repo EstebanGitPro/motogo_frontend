@@ -10,7 +10,11 @@ import 'package:motogo_frontend/src/features/register_franchise/data/models/fran
 ///
 /// Uses DioClient with automatic token refresh.
 abstract class RegisterFranchiseDataSource {
-  Future<Either<ErrorModel, FranchiseModel>> registerFranchise(
+  /// Registers a new franchise.
+  ///
+  /// Returns a Record with the created [FranchiseModel] and the backend
+  /// success message, or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, (FranchiseModel, String)>> registerFranchise(
     FranchiseModel franchise,
   );
 }
@@ -21,7 +25,7 @@ class RegisterFranchiseDataSourceImpl implements RegisterFranchiseDataSource {
   RegisterFranchiseDataSourceImpl(this._dioClient);
 
   @override
-  Future<Either<ErrorModel, FranchiseModel>> registerFranchise(
+  Future<Either<ErrorModel, (FranchiseModel, String)>> registerFranchise(
     FranchiseModel franchise,
   ) async {
     try {
@@ -37,21 +41,26 @@ class RegisterFranchiseDataSourceImpl implements RegisterFranchiseDataSource {
           return Left(DioErrorHandler.fromBackendError(responseData));
         }
 
+        final message =
+            responseData['message'] as String? ??
+            FallbackMessages.operationSuccess;
+
         // Extract data from backend response
         final data = responseData['data'] as Map<String, dynamic>?;
         if (data != null) {
-          return Right(FranchiseModel.fromJson(data));
+          return Right((FranchiseModel.fromJson(data), message));
         }
 
         // Return with generated ID if no data in response
-        return Right(
+        return Right((
           FranchiseModel(
             id: 'generated',
             name: franchise.name,
             description: franchise.description,
             branchIds: franchise.branchIds,
           ),
-        );
+          message,
+        ));
       }
       return Left(
         ErrorModel(

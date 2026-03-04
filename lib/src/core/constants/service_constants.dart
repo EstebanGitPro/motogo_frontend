@@ -61,6 +61,20 @@ class ServiceConstants {
   static const String serviceActivated = 'Servicio activado';
   static const String serviceDeactivated = 'Servicio desactivado';
 
+  // Confirmation dialogs
+  static const String confirmCancel = 'Sí, cancelar';
+  static const String confirmDelete = 'Sí, eliminar';
+  static const String deleting = 'Eliminando...';
+  static const String serviceFallbackName = 'Servicio';
+
+  // Category options for service editing
+  static const List<String> categoryOptions = [
+    filterMaintenance,
+    filterRepair,
+    filterDiagnostics,
+    filterAesthetics,
+  ];
+
   /// Returns all service types as a list for filter chips
   static List<String> get allServiceTypes => [
     filterAll,

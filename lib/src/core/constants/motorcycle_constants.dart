@@ -34,6 +34,8 @@ class MotorcycleConstants {
 
   // Search bar
   static const String searchPlaceholder = 'Buscar talleres o tiendas';
+  static const String searchNoResults = 'No se encontraron sedes';
+  static const String searchClearTooltip = 'Limpiar búsqueda';
 
   // Filter chips
   static const String filterAll = 'Todos';
@@ -94,6 +96,9 @@ class MotorcycleConstants {
   static const String noMotorcyclesFound = 'No tienes motocicletas registradas';
   static const String noMotorcyclesSubtitle =
       'Registra tu primera moto para comenzar';
+  static const String emptyStateSubtitle =
+      'Registra tu primera moto para recibir diagnósticos y cotizaciones personalizadas.';
+  static const String yearPrefix = 'Año: ';
 
   // Confirmation dialogs
   static const String confirmLogoutTitle = 'Cerrar Sesión';
@@ -125,6 +130,7 @@ class MotorcycleConstants {
       'No hay diagnósticos registrados';
   static const String diagnosticPendingSolution = 'Pendiente de solución';
   static const String diagnosticEvidenceLabel = 'Evidencia fotográfica';
+  static const String diagnosticBranchLabel = 'Taller';
 
   // Motorcycle Evidence Gallery (workshop view)
   static const String motorcycleEvidenceTitle = 'Galería de evidencias';
@@ -198,6 +204,8 @@ class MotorcycleConstants {
   static const String deleteServiceButton = 'Eliminar Servicio';
   static const String deleteServiceConfirmation =
       '¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.';
+  static const String cancelServiceConfirmation =
+      '¿Estás seguro de que deseas cancelar este servicio? Esta acción no se puede deshacer.';
   static const String transitionHistoryTitle = 'Historial de Cambios';
   static const String statusPending = 'Pendiente';
 
@@ -208,9 +216,9 @@ class MotorcycleConstants {
   static const String selectBranchHint = 'Elige una sede';
   static const String selectServicesLabel = 'Servicios Realizados';
   static const String selectServicesHint = 'Selecciona los servicios';
-  static const String registerQuotedPriceLabel = 'Cotización';
+  static const String registerQuotedPriceLabel = quotedPriceLabel;
   static const String registerQuotedPriceHint = 'Ej: 185000';
-  static const String registerFinalPriceLabel = 'Precio Final';
+  static const String registerFinalPriceLabel = finalPriceLabel;
   static const String registerFinalPriceHint = 'Ej: 175000';
   static const String registerNotesLabel = 'Notas del Representante';
   static const String registerNotesHint =
@@ -236,4 +244,24 @@ class MotorcycleConstants {
       'Registrar un servicio para esta motocicleta';
   static const String registerBlockedSubtitle =
       'Gestiona los servicios pendientes antes de registrar uno nuevo';
+
+  // Service Rating section (FINALIZADO)
+  static const String rateServicesTitle = 'Calificar Servicios';
+  static const String rateItemButton = 'Calificar';
+  static const String alreadyRatedLabel = 'Calificado';
+
+  // Service Editing (workshop / representative)
+  static const String editServiceTitle = 'Editar Servicio';
+  static const String editServiceSave = 'Guardar Cambios';
+  static const String editQuotedPriceLabel = quotedPriceLabel;
+  static const String editQuotedPriceHint = 'Ej: 185000';
+  static const String editFinalPriceLabel = finalPriceLabel;
+  static const String editFinalPriceHint = 'Ej: 175000';
+  static const String editNotesLabel = 'Notas del Representante';
+  static const String editNotesHint = 'Observaciones sobre el servicio...';
+  static const String finalizePriceTitle = 'Precio Final del Servicio';
+  static const String finalizePriceMessage =
+      '¿Deseas asignar un precio final antes de finalizar?';
+  static const String finalizePriceConfirm = 'Finalizar';
+  static const String finalizePriceSkip = 'Sin precio';
 }

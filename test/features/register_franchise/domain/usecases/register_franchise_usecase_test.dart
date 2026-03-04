@@ -27,8 +27,12 @@ void main() {
     branchIds: ['branch-1', 'branch-2'],
   );
 
+  const tMessage = 'Franquicia creada exitosamente';
+
   setUpAll(() {
-    provideDummy<Either<ErrorModel, FranchiseEntity>>(const Right(tFranchise));
+    provideDummy<Either<ErrorModel, (FranchiseEntity, String)>>(
+      const Right((tFranchise, tMessage)),
+    );
   });
 
   setUp(() {
@@ -50,12 +54,14 @@ void main() {
     test('should delegate to repository when branchIds is not empty', () async {
       when(
         mockRepository.registerFranchise(any),
-      ).thenAnswer((_) async => const Right(tResult));
+      ).thenAnswer((_) async => const Right((tResult, tMessage)));
 
       final result = await useCase.call(tFranchise);
 
       expect(result.isRight, isTrue);
-      expect(result.right.id, 'franchise-abc');
+      final (entity, message) = result.right;
+      expect(entity.id, 'franchise-abc');
+      expect(message, tMessage);
       verify(mockRepository.registerFranchise(tFranchise)).called(1);
     });
 

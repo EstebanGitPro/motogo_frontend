@@ -1,8 +1,10 @@
+import 'package:motogo_frontend/src/features/completed_services/data/model/completed_service_item_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 
 /// Model representing a completed service from the API response.
 ///
-/// Maps JSON from `GET /branches/{branch_id}/completed-services`.
+/// Maps JSON from `GET /branches/{branch_id}/completed-services`
+/// and `GET /motorcycles/{motorcycle_id}/completed-services`.
 class CompletedServiceModel {
   final String id;
   final String branchId;
@@ -14,8 +16,7 @@ class CompletedServiceModel {
   final double? quotedPrice;
   final double? finalPrice;
   final String? representativeNotes;
-  final List<String> serviceIds;
-  final List<String> serviceNames;
+  final List<CompletedServiceItemModel> services;
 
   const CompletedServiceModel({
     required this.id,
@@ -28,22 +29,15 @@ class CompletedServiceModel {
     this.quotedPrice,
     this.finalPrice,
     this.representativeNotes,
-    this.serviceIds = const [],
-    this.serviceNames = const [],
+    this.services = const [],
   });
 
   factory CompletedServiceModel.fromJson(Map<String, dynamic> json) {
-    // Parse services list to extract service_id values
     final servicesRaw = json['services'] as List<dynamic>? ?? [];
-    final serviceIds = servicesRaw
-        .map((s) => (s as Map<String, dynamic>)['service_id'] as String?)
-        .where((id) => id != null)
-        .cast<String>()
-        .toList();
-    final serviceNames = servicesRaw
-        .map((s) => (s as Map<String, dynamic>)['service_name'] as String?)
-        .where((name) => name != null)
-        .cast<String>()
+    final serviceItems = servicesRaw
+        .map(
+          (s) => CompletedServiceItemModel.fromJson(s as Map<String, dynamic>),
+        )
         .toList();
 
     return CompletedServiceModel(
@@ -57,8 +51,7 @@ class CompletedServiceModel {
       quotedPrice: (json['quoted_price'] as num?)?.toDouble(),
       finalPrice: (json['final_price'] as num?)?.toDouble(),
       representativeNotes: json['representative_notes'] as String?,
-      serviceIds: serviceIds,
-      serviceNames: serviceNames,
+      services: serviceItems,
     );
   }
 
@@ -74,8 +67,7 @@ class CompletedServiceModel {
       quotedPrice: quotedPrice,
       finalPrice: finalPrice,
       representativeNotes: representativeNotes,
-      serviceIds: serviceIds,
-      serviceNames: serviceNames,
+      services: services.map((s) => s.toEntity()).toList(),
     );
   }
 }

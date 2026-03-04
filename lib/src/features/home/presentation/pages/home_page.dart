@@ -4,6 +4,7 @@ import 'package:motogo_frontend/src/core/constants/branch_constants.dart';
 import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
 import 'package:motogo_frontend/src/core/widgets/shared_drawer_menu_items.dart';
 import 'package:motogo_frontend/src/features/edit_branch/presentation/pages/branch_detail_page.dart';
@@ -180,7 +181,9 @@ class _HomeViewState extends State<_HomeView> {
     final branch = state.filteredBranches[index];
     String? franchiseName;
     if (branch.franchiseId != null) {
-      franchiseName = state.franchiseNames[branch.franchiseId] ?? 'Franquicia';
+      franchiseName =
+          state.franchiseNames[branch.franchiseId] ??
+          BranchConstants.franchiseFallbackName;
     }
     return BranchCard(
       branch: branch,
@@ -303,10 +306,12 @@ class _HomeViewState extends State<_HomeView> {
   }
 
   Widget _buildDrawer(BuildContext context) {
+    final userName = UserSessionManager.instance.currentUser?.fullName ?? '';
     return AppDrawer(
-      header: const AppDrawerHeader(
+      header: AppDrawerHeader(
         icon: Icons.account_circle,
-        title: 'Menú Principal',
+        title: MotorcycleConstants.drawerTitle,
+        subtitle: userName.isNotEmpty ? userName : null,
       ),
       menuItems: [
         ListTile(
@@ -361,7 +366,7 @@ class _HomeViewState extends State<_HomeView> {
             ),
             const SizedBox(height: 24),
             const Text(
-              '¡Bienvenido!',
+              BranchConstants.welcomeTitle,
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -370,7 +375,7 @@ class _HomeViewState extends State<_HomeView> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Aún no tienes sedes registradas.\nCrea tu primera sede para empezar.',
+              BranchConstants.noBranchesMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

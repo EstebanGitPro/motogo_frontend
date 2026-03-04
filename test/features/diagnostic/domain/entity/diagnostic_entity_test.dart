@@ -92,6 +92,7 @@ void main() {
         expect(entity.id, 'diag-123');
         expect(entity.motorcycleId, 'moto-456');
         expect(entity.branchId, isNull);
+        expect(entity.branchName, isNull);
         expect(entity.problemDescription, 'Ruido extraño');
         expect(entity.possibleSolution, isNull);
         expect(entity.date, testDate);
@@ -104,6 +105,7 @@ void main() {
           id: 'diag-123',
           motorcycleId: 'moto-456',
           branchId: 'branch-789',
+          branchName: 'Taller Norte',
           problemDescription: 'Ruido extraño',
           possibleSolution: 'Cambiar correa',
           date: testDate,
@@ -117,6 +119,7 @@ void main() {
         );
 
         expect(entity.branchId, 'branch-789');
+        expect(entity.branchName, 'Taller Norte');
         expect(entity.possibleSolution, 'Cambiar correa');
         expect(entity.evidence.length, 1);
       });
@@ -163,16 +166,18 @@ void main() {
           id: 'diag-123',
           motorcycleId: 'moto-456',
           branchId: 'branch-789',
+          branchName: 'Taller Norte',
           problemDescription: 'Issue',
           possibleSolution: 'Fix',
           date: testDate,
           evidence: const [],
         );
 
-        expect(entity.props.length, 7);
+        expect(entity.props.length, 8);
         expect(entity.props, contains('diag-123'));
         expect(entity.props, contains('moto-456'));
         expect(entity.props, contains('branch-789'));
+        expect(entity.props, contains('Taller Norte'));
         expect(entity.props, contains('Issue'));
         expect(entity.props, contains('Fix'));
         expect(entity.props, contains(testDate));

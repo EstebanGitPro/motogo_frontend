@@ -51,19 +51,20 @@ class MockBranchRepository extends _i1.Mock implements _i2.BranchRepository {
           as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
 
   @override
-  _i3.Future<_i4.Either<_i5.ErrorModel, _i6.BranchEntity>> updateBranch(
-    String? id,
-    _i6.BranchEntity? branch,
-  ) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, (_i6.BranchEntity, String)>>
+  updateBranch(String? id, _i6.BranchEntity? branch) =>
       (super.noSuchMethod(
             Invocation.method(#updateBranch, [id, branch]),
             returnValue:
-                _i3.Future<_i4.Either<_i5.ErrorModel, _i6.BranchEntity>>.value(
-                  _i7.dummyValue<_i4.Either<_i5.ErrorModel, _i6.BranchEntity>>(
-                    this,
-                    Invocation.method(#updateBranch, [id, branch]),
-                  ),
+                _i3.Future<
+                  _i4.Either<_i5.ErrorModel, (_i6.BranchEntity, String)>
+                >.value(
+                  _i7.dummyValue<
+                    _i4.Either<_i5.ErrorModel, (_i6.BranchEntity, String)>
+                  >(this, Invocation.method(#updateBranch, [id, branch])),
                 ),
           )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.BranchEntity>>);
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, (_i6.BranchEntity, String)>
+          >);
 }

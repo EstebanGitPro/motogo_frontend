@@ -75,7 +75,7 @@ class _RegisterServiceBottomSheetState
 
   /// Scrolls to make the widget with [key] visible after a short delay
   /// (to let the keyboard finish animating), and expands the sheet.
-  void _onFieldTapped(GlobalKey key) {
+  Future<void> _onFieldTapped(GlobalKey key) async {
     // Expand sheet to maximum
     if (_sheetController.isAttached) {
       _sheetController.animateTo(
@@ -84,19 +84,18 @@ class _RegisterServiceBottomSheetState
         curve: Curves.easeOut,
       );
     }
-    // Scroll to the field after keyboard animation
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (!mounted) return;
-      final ctx = key.currentContext;
-      if (ctx != null) {
-        Scrollable.ensureVisible(
-          ctx,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
-        );
-      }
-    });
+    // Wait for keyboard animation to finish
+    await Future.delayed(const Duration(milliseconds: 400));
+    if (!mounted) return;
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      // ignore: use_build_context_synchronously
+      ctx,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+    );
   }
 
   Future<void> _loadBranches() async {

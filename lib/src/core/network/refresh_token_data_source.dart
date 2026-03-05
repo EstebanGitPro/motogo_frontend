@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
+import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/constants/error_codes.dart';
 import 'package:motogo_frontend/src/core/errors/error_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/network/token_response.dart';
+
+import 'dio_client_stub.dart'
+    if (dart.library.html) 'dio_client_web.dart'
+    as web_adapter;
 
 /// DataSource for refreshing access tokens.
 ///
@@ -20,23 +25,40 @@ abstract class RefreshTokenDataSource {
 class RefreshTokenDataSourceImpl implements RefreshTokenDataSource {
   // Use a separate Dio instance without auth interceptor
   // to avoid infinite refresh loops
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: Config.baseUrl,
-      connectTimeout: const Duration(seconds: 15),
-      receiveTimeout: const Duration(seconds: 15),
-      headers: {'Content-Type': 'application/json'},
-    ),
-  );
+  late final Dio _dio;
+
+  RefreshTokenDataSourceImpl({Dio? dio}) {
+    _dio =
+        dio ??
+        Dio(
+          BaseOptions(
+            baseUrl: Config.baseUrl,
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            headers: {'Content-Type': 'application/json'},
+            extra: kIsWeb ? {'withCredentials': true} : {},
+          ),
+        );
+
+    // Configure BrowserHttpClientAdapter for Web cookie support.
+    // The mg_refresh_token cookie is restricted to /motogo/api/v1/auth path,
+    // so it only travels on refresh/logout requests.
+    if (kIsWeb && dio == null) {
+      web_adapter.configureWebCredentials(_dio);
+    }
+  }
 
   @override
   Future<Either<ErrorModel, TokenResponse>> refreshToken(
     String refreshToken,
   ) async {
     try {
+      // On Web, the refresh token travels as an HttpOnly cookie.
+      // The backend reads it from the cookie if body is empty.
+      // On mobile, send the refresh token in the request body.
       final response = await _dio.post(
         '/auth/refresh',
-        data: {'refresh_token': refreshToken},
+        data: kIsWeb ? null : {'refresh_token': refreshToken},
       );
 
       if (response.statusCode == 200) {

@@ -10,7 +10,15 @@ class UpdateServiceStatusUseCase {
 
   UpdateServiceStatusUseCase(this._repository);
 
-  Future<Either<ErrorModel, String>> call(String serviceId, String newStatus) {
-    return _repository.updateServiceStatus(serviceId, newStatus);
+  Future<Either<ErrorModel, String>> call(
+    String serviceId,
+    String newStatus, {
+    double? finalPrice,
+  }) {
+    return _repository.updateServiceStatus(
+      serviceId,
+      newStatus,
+      finalPrice: finalPrice,
+    );
   }
 }

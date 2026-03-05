@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/utils/thousands_separator_formatter.dart';
+import 'package:motogo_frontend/src/core/constants/common_constants.dart';
 import 'package:motogo_frontend/src/core/constants/motorcycle_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/status_transition_entity.dart';
 import 'package:motogo_frontend/src/features/completed_services/presentation/helpers/service_status_helpers.dart';
+import 'package:motogo_frontend/src/features/completed_services/presentation/widgets/service_detail_widgets.dart';
 import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presentation/bloc/search_motorcycle_bloc.dart';
 
 /// Full-page detail view for a completed service.
@@ -13,7 +18,15 @@ import 'package:motogo_frontend/src/features/search_motorcycle_by_plate/presenta
 class ServiceDetailPage extends StatefulWidget {
   final CompletedServiceEntity service;
 
-  const ServiceDetailPage({super.key, required this.service});
+  /// When `true`, shows the rating section for FINALIZADO services.
+  /// Should only be `true` on the client (motorcyclist) side.
+  final bool canRate;
+
+  const ServiceDetailPage({
+    super.key,
+    required this.service,
+    this.canRate = false,
+  });
 
   @override
   State<ServiceDetailPage> createState() => _ServiceDetailPageState();
@@ -43,6 +56,11 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
       message: state.deleteServiceMessage,
       error: state.deleteServiceError,
       popOnSuccess: true,
+    );
+    _showFeedback(
+      context,
+      message: state.detailsUpdateMessage,
+      error: state.detailsUpdateError,
     );
   }
 
@@ -76,7 +94,9 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
           return prev.statusUpdateMessage != curr.statusUpdateMessage ||
               prev.statusUpdateError != curr.statusUpdateError ||
               prev.deleteServiceMessage != curr.deleteServiceMessage ||
-              prev.deleteServiceError != curr.deleteServiceError;
+              prev.deleteServiceError != curr.deleteServiceError ||
+              prev.detailsUpdateMessage != curr.detailsUpdateMessage ||
+              prev.detailsUpdateError != curr.detailsUpdateError;
         }
         return false;
       },
@@ -100,9 +120,15 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildStatusHeader(),
+                ServiceStatusHeader(
+                  status: widget.service.status,
+                  requestDate: widget.service.requestDate,
+                ),
                 const SizedBox(height: 24),
-                _buildInfoSection(),
+                ServiceInfoSection(
+                  service: widget.service,
+                  onEdit: _showEditBottomSheet,
+                ),
                 const SizedBox(height: 24),
                 _buildActionButtons(isUpdating),
                 const SizedBox(height: 16),
@@ -120,212 +146,23 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
     );
   }
 
-  // ─── Status Header ─────────────────────────────────────────────────
-
-  Widget _buildStatusHeader() {
-    final statusLabel = getStatusLabel(widget.service.status);
-    final statusColor = getStatusColor(widget.service.status);
-    final dateStr = formatServiceDate(widget.service.requestDate);
-
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Estado Actual',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 7,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    statusLabel,
-                    style: TextStyle(
-                      color: statusColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  'Fecha Solicitud',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  dateStr,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ─── Info Section ──────────────────────────────────────────────────
-
-  Widget _buildInfoSection() {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Branch name
-            if (widget.service.branchName != null &&
-                widget.service.branchName!.isNotEmpty) ...[
-              _buildDetailRow(
-                Icons.store,
-                MotorcycleConstants.branchLabel,
-                widget.service.branchName!,
-              ),
-              const SizedBox(height: 14),
-            ],
-            // Final price
-            if (widget.service.finalPrice != null) ...[
-              _buildDetailRow(
-                Icons.payments,
-                MotorcycleConstants.finalPriceLabel,
-                '\$${formatServicePrice(widget.service.finalPrice!)}',
-                valueColor: Colors.green[700],
-              ),
-              const SizedBox(height: 14),
-            ],
-            // Quoted price
-            if (widget.service.quotedPrice != null) ...[
-              _buildDetailRow(
-                Icons.request_quote,
-                MotorcycleConstants.quotedPriceLabel,
-                '\$${formatServicePrice(widget.service.quotedPrice!)}',
-              ),
-              const SizedBox(height: 14),
-            ],
-            // Diagnostic ref
-            if (widget.service.diagnosticId != null) ...[
-              _buildDetailRow(
-                Icons.assignment,
-                MotorcycleConstants.diagnosticRefLabel,
-                widget.service.diagnosticId!.substring(0, 8),
-                valueColor: Colors.orange[700],
-              ),
-              const SizedBox(height: 14),
-            ],
-            // Services performed
-            if (widget.service.serviceNames.isNotEmpty) ...[
-              const Divider(),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Icon(Icons.build_outlined, size: 18, color: Colors.blue[700]),
-                  const SizedBox(width: 8),
-                  Text(
-                    MotorcycleConstants.servicesPerformedLabel,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.blue[700],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              ...widget.service.serviceNames.map(
-                (name) => Padding(
-                  padding: const EdgeInsets.only(left: 26, bottom: 6),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 16,
-                        color: Colors.green[600],
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(name, style: const TextStyle(fontSize: 14)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            // Notes
-            if (widget.service.representativeNotes != null &&
-                widget.service.representativeNotes!.trim().isNotEmpty) ...[
-              const Divider(),
-              const SizedBox(height: 10),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue[50],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      MotorcycleConstants.representativeNotesLabel,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue[700],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      widget.service.representativeNotes!,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
   // ─── Action Buttons ────────────────────────────────────────────────
 
   Widget _buildActionButtons(bool isUpdating) {
     final status = widget.service.status.toUpperCase();
 
-    // Terminal states — no actions
-    if (status == 'FINALIZADO' || status == 'CANCELADO') {
+    // Finalized → show rating section (client side only)
+    if (status == 'FINALIZADO') {
+      return widget.canRate
+          ? ServiceRatingSection(
+              completedServiceId: widget.service.id,
+              items: widget.service.services,
+            )
+          : const SizedBox.shrink();
+    }
+
+    // Cancelled → no actions
+    if (status == 'CANCELADO') {
       return const SizedBox.shrink();
     }
 
@@ -343,12 +180,27 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
           _buildCancelButton(isUpdating),
         ],
         if (status == 'EN_PROCESO') ...[
-          _buildPrimaryActionButton(
-            isUpdating: isUpdating,
-            targetStatus: 'FINALIZADO',
-            icon: Icons.check_circle,
-            label: MotorcycleConstants.finalizeServiceButton,
-            color: Colors.green,
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: isUpdating ? null : _showFinalPriceDialog,
+              icon: isUpdating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check_circle),
+              label: const Text(MotorcycleConstants.finalizeServiceButton),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           _buildCancelButton(isUpdating),
@@ -459,12 +311,229 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
 
   // ─── Actions ───────────────────────────────────────────────────────
 
-  void _updateStatus(String newStatus) {
+  void _updateStatus(String newStatus, {double? finalPrice}) {
     context.read<SearchMotorcycleBloc>().add(
       UpdateServiceStatus(
         serviceId: widget.service.id,
         motorcycleId: widget.service.motorcycleId,
         newStatus: newStatus,
+        finalPrice: finalPrice,
+      ),
+    );
+  }
+
+  // ─── Edit Bottom Sheet ─────────────────────────────────────────────
+
+  void _showEditBottomSheet() {
+    final quotedCtrl = TextEditingController(
+      text: _formatInitialPrice(widget.service.quotedPrice),
+    );
+    final finalCtrl = TextEditingController(
+      text: _formatInitialPrice(widget.service.finalPrice),
+    );
+    final notesCtrl = TextEditingController(
+      text: widget.service.representativeNotes ?? '',
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              MotorcycleConstants.editServiceTitle,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+            // Quoted price
+            TextField(
+              controller: quotedCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
+              decoration: InputDecoration(
+                labelText: MotorcycleConstants.editQuotedPriceLabel,
+                hintText: MotorcycleConstants.editQuotedPriceHint,
+                prefixIcon: const Icon(Icons.request_quote),
+                prefixText: '\$ ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            // Final price
+            TextField(
+              controller: finalCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
+              decoration: InputDecoration(
+                labelText: MotorcycleConstants.editFinalPriceLabel,
+                hintText: MotorcycleConstants.editFinalPriceHint,
+                prefixIcon: const Icon(Icons.payments),
+                prefixText: '\$ ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            // Notes
+            TextField(
+              controller: notesCtrl,
+              maxLines: 3,
+              decoration: InputDecoration(
+                labelText: MotorcycleConstants.editNotesLabel,
+                hintText: MotorcycleConstants.editNotesHint,
+                prefixIcon: const Icon(Icons.notes),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Save button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  final quoted = double.tryParse(
+                    quotedCtrl.text.replaceAll('.', '').trim(),
+                  );
+                  final finalP = double.tryParse(
+                    finalCtrl.text.replaceAll('.', '').trim(),
+                  );
+                  final notes = notesCtrl.text.trim();
+
+                  context.read<SearchMotorcycleBloc>().add(
+                    UpdateServiceDetails(
+                      serviceId: widget.service.id,
+                      motorcycleId: widget.service.motorcycleId,
+                      quotedPrice: quoted,
+                      finalPrice: finalP,
+                      representativeNotes: notes.isEmpty ? null : notes,
+                    ),
+                  );
+                  Navigator.of(ctx).pop();
+                },
+                icon: const Icon(Icons.save),
+                label: const Text(MotorcycleConstants.editServiceSave),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[700],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── Final Price Dialog ────────────────────────────────────────────
+
+  /// Formats a numeric price for display with thousand separators.
+  String _formatInitialPrice(double? price) {
+    if (price == null) return '';
+    final digits = price.toStringAsFixed(0);
+    final buffer = StringBuffer();
+    final length = digits.length;
+    for (var i = 0; i < length; i++) {
+      buffer.write(digits[i]);
+      final remaining = length - 1 - i;
+      if (remaining > 0 && remaining % 3 == 0) {
+        buffer.write('.');
+      }
+    }
+    return buffer.toString();
+  }
+
+  void _showFinalPriceDialog() {
+    final priceCtrl = TextEditingController(
+      text: _formatInitialPrice(widget.service.finalPrice),
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(MotorcycleConstants.finalizePriceTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(MotorcycleConstants.finalizePriceMessage),
+            const SizedBox(height: 16),
+            TextField(
+              controller: priceCtrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                ThousandsSeparatorFormatter(),
+              ],
+              decoration: InputDecoration(
+                labelText: MotorcycleConstants.editFinalPriceLabel,
+                hintText: MotorcycleConstants.editFinalPriceHint,
+                prefixIcon: const Icon(Icons.payments),
+                prefixText: '\$ ',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _updateStatus('FINALIZADO');
+            },
+            child: const Text(MotorcycleConstants.finalizePriceSkip),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              final price = double.tryParse(
+                priceCtrl.text.replaceAll('.', '').trim(),
+              );
+              _updateStatus('FINALIZADO', finalPrice: price);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text(MotorcycleConstants.finalizePriceConfirm),
+          ),
+        ],
       ),
     );
   }
@@ -474,13 +543,11 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text(MotorcycleConstants.cancelServiceButton),
-        content: const Text(
-          '¿Estás seguro de que deseas cancelar este servicio? Esta acción no se puede deshacer.',
-        ),
+        content: const Text(MotorcycleConstants.cancelServiceConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('No'),
+            child: const Text(CommonConstants.no),
           ),
           TextButton(
             onPressed: () {
@@ -488,7 +555,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
               _updateStatus('CANCELADO');
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sí, cancelar'),
+            child: const Text(ServiceConstants.confirmCancel),
           ),
         ],
       ),
@@ -504,7 +571,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('No'),
+            child: const Text(CommonConstants.no),
           ),
           TextButton(
             onPressed: () {
@@ -517,7 +584,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
               );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sí, eliminar'),
+            child: const Text(ServiceConstants.confirmDelete),
           ),
         ],
       ),
@@ -593,7 +660,7 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
             : const Icon(Icons.delete_outline),
         label: Text(
           isDeleting
-              ? 'Eliminando...'
+              ? ServiceConstants.deleting
               : MotorcycleConstants.deleteServiceButton,
         ),
         style: OutlinedButton.styleFrom(
@@ -605,35 +672,6 @@ class _ServiceDetailPageState extends State<ServiceDetailPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    IconData icon,
-    String label,
-    String value, {
-    Color? valueColor,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.grey[600]),
-        const SizedBox(width: 8),
-        Text(
-          '$label:',
-          style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: valueColor,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

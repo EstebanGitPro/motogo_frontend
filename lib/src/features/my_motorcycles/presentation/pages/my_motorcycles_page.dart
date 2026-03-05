@@ -125,7 +125,7 @@ class _MyMotorcyclesView extends StatelessWidget {
             Icon(Icons.two_wheeler, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 24),
             Text(
-              '¡Aún no tienes motos registradas!',
+              MotorcycleConstants.noMotorcyclesFound,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -135,7 +135,7 @@ class _MyMotorcyclesView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Registra tu primera moto para recibir diagnósticos y cotizaciones personalizadas.',
+              MotorcycleConstants.emptyStateSubtitle,
               style: TextStyle(fontSize: 14, color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
@@ -280,7 +280,7 @@ class _MotorcycleCard extends StatelessWidget {
     final details = <String>[];
 
     if (motorcycle.year != null) {
-      details.add('Año: ${motorcycle.year}');
+      details.add('${MotorcycleConstants.yearPrefix}${motorcycle.year}');
     }
 
     if (motorcycle.currentMileage != null) {

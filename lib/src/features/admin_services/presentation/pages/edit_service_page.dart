@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
+import 'package:motogo_frontend/src/core/constants/service_constants.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/entities/admin_service_entity.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
@@ -24,12 +25,7 @@ class _EditServicePageState extends State<EditServicePage> {
   bool _hasChanges = false;
 
   // Available service types (matches backend enum)
-  final List<String> _serviceTypes = [
-    'Mantenimiento',
-    'Reparación',
-    'Diagnóstico',
-    'Estética',
-  ];
+  final List<String> _serviceTypes = ServiceConstants.categoryOptions;
 
   @override
   void initState() {

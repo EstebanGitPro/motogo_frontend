@@ -40,6 +40,7 @@ void main() {
         // Arrange
         final responseData = {
           'success': true,
+          'message': 'Franquicia creada exitosamente',
           'data': {
             'id': 'franchise-123',
             'name': 'MotoShop Bogotá',
@@ -57,8 +58,10 @@ void main() {
 
         // Assert
         expect(result.isRight, isTrue);
-        expect(result.right, isA<FranchiseModel>());
-        expect(result.right.id, 'franchise-123');
+        final (model, message) = result.right;
+        expect(model, isA<FranchiseModel>());
+        expect(model.id, 'franchise-123');
+        expect(message, 'Franquicia creada exitosamente');
         verify(
           mockDioClient.post('/franchises', data: anyNamed('data')),
         ).called(1);
@@ -77,8 +80,9 @@ void main() {
 
         // Assert
         expect(result.isRight, isTrue);
-        expect(result.right.id, 'generated');
-        expect(result.right.name, testFranchise.name);
+        final (model, _) = result.right;
+        expect(model.id, 'generated');
+        expect(model.name, testFranchise.name);
       });
 
       test('should return ErrorModel when success is false', () async {

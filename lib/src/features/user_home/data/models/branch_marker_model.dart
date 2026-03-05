@@ -20,6 +20,7 @@ class BranchMarkerModel extends BranchMarkerEntity {
     super.departmentName,
     super.brands,
     super.displacementRanges,
+    super.serviceNames,
   });
 
   /// Creates a model from JSON response.
@@ -62,6 +63,7 @@ class BranchMarkerModel extends BranchMarkerEntity {
       displacementRanges: JsonHelpers.parseStringList(
         json['displacement_ranges'],
       ),
+      serviceNames: JsonHelpers.parseStringList(json['service_names']),
     );
   }
 
@@ -96,6 +98,7 @@ class BranchMarkerModel extends BranchMarkerEntity {
       departmentName: departmentName,
       brands: brands,
       displacementRanges: displacementRanges,
+      serviceNames: serviceNames,
     );
   }
 }

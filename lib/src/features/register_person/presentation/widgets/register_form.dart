@@ -1,8 +1,11 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:motogo_frontend/src/core/constants/legal_constants.dart';
 import 'package:motogo_frontend/src/core/validators/validators.dart';
 import 'package:motogo_frontend/src/features/login/presentation/bloc/login_bloc.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/bloc/register_person_bloc.dart';
+import 'package:motogo_frontend/src/features/register_person/presentation/pages/terms_and_conditions_page.dart';
 import 'package:motogo_frontend/src/features/register_person/presentation/pages/user_type_selection_page.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -46,6 +49,9 @@ class _RegisterFormState extends State<RegisterForm> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _termsAccepted = false;
+  bool _sensitiveDataAccepted = false;
+  bool _commercialCommsAccepted = false;
 
   @override
   void initState() {
@@ -97,6 +103,21 @@ class _RegisterFormState extends State<RegisterForm> {
       _passwordValidator.validate(value);
   String? _validateConfirmPassword(String? value) =>
       _confirmPasswordValidator.validate(value);
+
+  Future<void> _openTermsAndConditions() async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            TermsAndConditionsPage(primaryColor: widget.primaryColor),
+      ),
+    );
+    if (result == true && mounted) {
+      setState(() {
+        _termsAccepted = true;
+      });
+    }
+  }
 
   void _handleRegister() {
     if (_formKey.currentState!.validate()) {
@@ -227,7 +248,9 @@ class _RegisterFormState extends State<RegisterForm> {
                         const SizedBox(height: 24),
                         widget.extraContent!,
                       ],
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
+                      _buildLegalCheckboxes(),
+                      const SizedBox(height: 24),
                       _buildSubmitSection(isMobile),
                       const SizedBox(height: 32),
                       _buildLoginLink(isMobile),
@@ -482,6 +505,119 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
+  /// Builds the three legal checkboxes required for registration.
+  Widget _buildLegalCheckboxes() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ── 1. Terms & Conditions (mandatory) ──────────────────────
+        _buildCheckboxRow(
+          key: const Key('terms_checkbox'),
+          value: _termsAccepted,
+          onChanged: (value) {
+            setState(() => _termsAccepted = value ?? false);
+          },
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+              children: [
+                const TextSpan(text: 'Acepto los '),
+                TextSpan(
+                  text: 'Términos y Condiciones',
+                  style: TextStyle(
+                    color: widget.primaryColor,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = _openTermsAndConditions,
+                ),
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // ── 2. Sensitive data consent (mandatory) ──────────────────
+        _buildCheckboxRow(
+          key: const Key('sensitive_data_checkbox'),
+          value: _sensitiveDataAccepted,
+          onChanged: (value) {
+            setState(() => _sensitiveDataAccepted = value ?? false);
+          },
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+              children: [
+                const TextSpan(text: LegalConstants.checkboxSensitiveData),
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: Colors.red[400],
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // ── 3. Commercial communications (optional) ────────────────
+        _buildCheckboxRow(
+          key: const Key('commercial_comms_checkbox'),
+          value: _commercialCommsAccepted,
+          onChanged: (value) {
+            setState(() => _commercialCommsAccepted = value ?? false);
+          },
+          child: Text(
+            LegalConstants.checkboxCommercialComms,
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 32),
+          child: Text(
+            '* Obligatorio',
+            style: TextStyle(fontSize: 11, color: Colors.red[300]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Reusable row for a checkbox + label widget.
+  Widget _buildCheckboxRow({
+    required Key key,
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+    required Widget child,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            key: key,
+            value: value,
+            activeColor: widget.primaryColor,
+            onChanged: onChanged,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: child),
+      ],
+    );
+  }
+
   /// Builds the submit button with error banner.
   Widget _buildSubmitSection(bool isMobile) {
     return BlocBuilder<RegisterPersonBloc, RegisterPersonState>(
@@ -546,7 +682,9 @@ class _RegisterFormState extends State<RegisterForm> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: isLoading ? null : _handleRegister,
+        onPressed: (isLoading || !_termsAccepted || !_sensitiveDataAccepted)
+            ? null
+            : _handleRegister,
         style: ElevatedButton.styleFrom(
           backgroundColor: widget.primaryColor,
           foregroundColor: Colors.white,

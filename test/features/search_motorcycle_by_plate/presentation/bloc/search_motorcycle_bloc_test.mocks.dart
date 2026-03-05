@@ -23,6 +23,8 @@ import 'package:motogo_frontend/src/features/completed_services/domain/usecases/
     as _i16;
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/register_completed_service_usecase.dart'
     as _i9;
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_details_usecase.dart'
+    as _i19;
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart'
     as _i15;
 import 'package:motogo_frontend/src/features/my_branches/domain/usecases/get_branches_usecase.dart'
@@ -212,14 +214,23 @@ class MockUpdateServiceStatusUseCase extends _i1.Mock
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(
     String? serviceId,
-    String? newStatus,
-  ) =>
+    String? newStatus, {
+    double? finalPrice,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#call, [serviceId, newStatus]),
+            Invocation.method(
+              #call,
+              [serviceId, newStatus],
+              {#finalPrice: finalPrice},
+            ),
             returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
               _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
                 this,
-                Invocation.method(#call, [serviceId, newStatus]),
+                Invocation.method(
+                  #call,
+                  [serviceId, newStatus],
+                  {#finalPrice: finalPrice},
+                ),
               ),
             ),
           )
@@ -272,6 +283,50 @@ class MockDeleteCompletedServiceUseCase extends _i1.Mock
               _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
                 this,
                 Invocation.method(#call, [serviceId]),
+              ),
+            ),
+          )
+          as _i3.Future<_i4.Either<_i5.ErrorModel, String>>);
+}
+
+/// A class which mocks [UpdateServiceDetailsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUpdateServiceDetailsUseCase extends _i1.Mock
+    implements _i19.UpdateServiceDetailsUseCase {
+  MockUpdateServiceDetailsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i3.Future<_i4.Either<_i5.ErrorModel, String>> call(
+    String? serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #call,
+              [serviceId],
+              {
+                #quotedPrice: quotedPrice,
+                #finalPrice: finalPrice,
+                #representativeNotes: representativeNotes,
+              },
+            ),
+            returnValue: _i3.Future<_i4.Either<_i5.ErrorModel, String>>.value(
+              _i7.dummyValue<_i4.Either<_i5.ErrorModel, String>>(
+                this,
+                Invocation.method(
+                  #call,
+                  [serviceId],
+                  {
+                    #quotedPrice: quotedPrice,
+                    #finalPrice: finalPrice,
+                    #representativeNotes: representativeNotes,
+                  },
+                ),
               ),
             ),
           )

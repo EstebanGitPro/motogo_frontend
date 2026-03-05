@@ -15,9 +15,9 @@ abstract class BranchRepository {
 
   /// Updates an existing branch.
   ///
-  /// Returns [Right] with the updated [BranchEntity] on success,
-  /// or [Left] with [ErrorModel] on failure.
-  Future<Either<ErrorModel, BranchEntity>> updateBranch(
+  /// Returns [Right] with a record containing the updated [BranchEntity]
+  /// and the backend success message, or [Left] with [ErrorModel] on failure.
+  Future<Either<ErrorModel, (BranchEntity, String)>> updateBranch(
     String id,
     BranchEntity branch,
   );

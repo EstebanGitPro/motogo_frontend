@@ -162,8 +162,17 @@ import 'package:motogo_frontend/src/features/completed_services/domain/usecases/
 import 'package:motogo_frontend/src/features/motorcycle_history/domain/usecases/get_motorcycle_history_usecase.dart';
 import 'package:motogo_frontend/src/features/motorcycle_history/presentation/bloc/motorcycle_history_bloc.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_status_usecase.dart';
+import 'package:motogo_frontend/src/features/completed_services/domain/usecases/update_service_details_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/get_service_transitions_usecase.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/usecases/delete_completed_service_usecase.dart';
+// Features - Service Ratings
+import 'package:motogo_frontend/src/features/service_ratings/data/datasources/service_rating_datasource.dart';
+import 'package:motogo_frontend/src/features/service_ratings/data/repositories/service_rating_repository_impl.dart';
+import 'package:motogo_frontend/src/features/service_ratings/domain/usecases/get_service_reviews_usecase.dart';
+import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_reviews_bloc.dart';
+import 'package:motogo_frontend/src/features/service_ratings/domain/repositories/service_rating_repository.dart';
+import 'package:motogo_frontend/src/features/service_ratings/domain/usecases/rate_service_item_usecase.dart';
+import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_rating_bloc.dart';
 // Features - Service Ratings
 import 'package:motogo_frontend/src/features/service_ratings/data/datasources/rating_range_datasource.dart';
 import 'package:motogo_frontend/src/features/service_ratings/data/repositories/rating_range_repository_impl.dart';
@@ -287,6 +296,14 @@ abstract class InjectorApp {
     );
     container.registerFactory<RatingRangeRepository>(
       (c) => RatingRangeRepositoryImpl(c.resolve<RatingRangeDataSource>()),
+    );
+
+    // Service Ratings - Rating submission (uses DioClient)
+    container.registerFactory<ServiceRatingDataSource>(
+      (c) => ServiceRatingDataSourceImpl(c.resolve<DioClient>()),
+    );
+    container.registerFactory<ServiceRatingRepository>(
+      (c) => ServiceRatingRepositoryImpl(c.resolve<ServiceRatingDataSource>()),
     );
 
     // My Branches - uses DioClient
@@ -544,7 +561,26 @@ abstract class InjectorApp {
         c.resolve<CompletedServicesRepository>(),
       ),
     );
-
+    container.registerFactory<UpdateServiceDetailsUseCase>(
+      (c) =>
+          UpdateServiceDetailsUseCase(c.resolve<CompletedServicesRepository>()),
+    );
+    container.registerFactory<RateServiceItemUseCase>(
+      (c) => RateServiceItemUseCase(c.resolve<ServiceRatingRepository>()),
+    );
+    container.registerFactory<ServiceRatingBloc>(
+      (c) => ServiceRatingBloc(
+        rateServiceItemUseCase: c.resolve<RateServiceItemUseCase>(),
+      ),
+    );
+    container.registerFactory<GetServiceReviewsUseCase>(
+      (c) => GetServiceReviewsUseCase(c.resolve<ServiceRatingRepository>()),
+    );
+    container.registerFactory<ServiceReviewsBloc>(
+      (c) => ServiceReviewsBloc(
+        getServiceReviewsUseCase: c.resolve<GetServiceReviewsUseCase>(),
+      ),
+    );
     // Technical Catalogs - Brand Lines (HU40)
     container.registerFactory<BrandLinesDataSource>(
       (c) => BrandLinesDataSourceImpl(c.resolve<DioClient>()),
@@ -664,6 +700,7 @@ abstract class InjectorApp {
         getServiceTransitionsUseCase: c.resolve<GetServiceTransitionsUseCase>(),
         deleteCompletedServiceUseCase: c
             .resolve<DeleteCompletedServiceUseCase>(),
+        updateServiceDetailsUseCase: c.resolve<UpdateServiceDetailsUseCase>(),
       ),
     );
 

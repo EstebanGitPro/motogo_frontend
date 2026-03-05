@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:motogo_frontend/src/core/constants/franchise_constants.dart';
 import 'package:motogo_frontend/src/features/register_franchise/domain/usecases/register_franchise_usecase.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_event.dart';
 import 'package:motogo_frontend/src/features/register_franchise/presentation/bloc/register_franchise_state.dart';
@@ -32,11 +31,8 @@ class RegisterFranchiseBloc
           message: error.message,
         ),
       ),
-      (franchise) => emit(
-        RegisterFranchiseSuccess(
-          franchise: franchise,
-          message: FranchiseConstants.franchiseCreatedSuccess,
-        ),
+      (record) => emit(
+        RegisterFranchiseSuccess(franchise: record.$1, message: record.$2),
       ),
     );
   }

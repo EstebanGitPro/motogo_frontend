@@ -12,12 +12,15 @@ class FranchiseRepositoryImpl implements FranchiseRepository {
   FranchiseRepositoryImpl(this._dataSource);
 
   @override
-  Future<Either<ErrorModel, FranchiseEntity>> registerFranchise(
+  Future<Either<ErrorModel, (FranchiseEntity, String)>> registerFranchise(
     FranchiseEntity franchise,
   ) async {
     final model = FranchiseModel.fromEntity(franchise);
     final result = await _dataSource.registerFranchise(model);
 
-    return result.fold((error) => Left(error), (model) => Right(model));
+    return result.fold(
+      (error) => Left(error),
+      (record) => Right((record.$1 as FranchiseEntity, record.$2)),
+    );
   }
 }

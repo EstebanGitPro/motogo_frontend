@@ -145,4 +145,7 @@ class AdminConstants {
   static const String catalogLineCategories = 'Línea Categoría';
   static const String catalogLineCategoriesSubtitle = 'Categorías de líneas';
   static const String comingSoon = 'Próximamente';
+
+  // Technical catalog dynamic titles
+  static const String linesOfPrefix = 'Líneas de ';
 }

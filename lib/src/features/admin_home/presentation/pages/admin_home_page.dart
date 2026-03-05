@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:motogo_frontend/src/core/constants/admin_constants.dart';
-import 'package:motogo_frontend/src/core/widgets/gradient_header_card.dart';
 import 'package:motogo_frontend/src/core/injector/injector.dart';
+import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/core/widgets/app_drawer.dart';
+import 'package:motogo_frontend/src/core/widgets/gradient_header_card.dart';
 import 'package:motogo_frontend/src/core/widgets/logout_dialog.dart';
 import 'package:motogo_frontend/src/features/admin_home/presentation/widgets/admin_menu_card.dart';
 import 'package:motogo_frontend/src/features/admin_services/domain/usecases/admin_service_usecases.dart';
@@ -102,11 +103,14 @@ class AdminHomePage extends StatelessWidget {
   }
 
   Widget _buildDrawer(BuildContext context) {
+    final userName = UserSessionManager.instance.currentUser?.fullName ?? '';
     return AppDrawer(
-      header: const AppDrawerHeader(
+      header: AppDrawerHeader(
         icon: Icons.admin_panel_settings,
         title: AdminConstants.drawerTitle,
-        subtitle: AdminConstants.drawerSubtitle,
+        subtitle: userName.isNotEmpty
+            ? userName
+            : AdminConstants.drawerSubtitle,
       ),
       menuItems: [
         ListTile(

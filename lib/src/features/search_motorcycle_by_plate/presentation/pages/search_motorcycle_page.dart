@@ -555,6 +555,11 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
         diagnostic.possibleSolution!.isNotEmpty;
     final dateFormatted =
         '${diagnostic.date.day.toString().padLeft(2, '0')}/${diagnostic.date.month.toString().padLeft(2, '0')}/${diagnostic.date.year}';
+    final hasBranch =
+        diagnostic.branchName != null && diagnostic.branchName!.isNotEmpty;
+    final titleText = hasBranch
+        ? '${diagnostic.branchName} — $dateFormatted'
+        : dateFormatted;
 
     return Card(
       elevation: 2,
@@ -575,7 +580,7 @@ class _SearchMotorcycleViewState extends State<_SearchMotorcycleView> {
             size: 28,
           ),
           title: Text(
-            dateFormatted,
+            titleText,
             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
           children: [

@@ -28,8 +28,12 @@ void main() {
     branchIds: ['branch-1'],
   );
 
+  const tMessage = 'Franquicia creada exitosamente';
+
   setUpAll(() {
-    provideDummy<Either<ErrorModel, FranchiseModel>>(const Right(tResultModel));
+    provideDummy<Either<ErrorModel, (FranchiseModel, String)>>(
+      const Right((tResultModel, tMessage)),
+    );
   });
 
   setUp(() {
@@ -42,13 +46,15 @@ void main() {
       test('should return entity on success', () async {
         when(
           mockDataSource.registerFranchise(any),
-        ).thenAnswer((_) async => const Right(tResultModel));
+        ).thenAnswer((_) async => const Right((tResultModel, tMessage)));
 
         final result = await repository.registerFranchise(tFranchise);
 
         expect(result.isRight, isTrue);
-        expect(result.right.id, 'franchise-xyz');
-        expect(result.right.name, 'MotoRed');
+        final (entity, message) = result.right;
+        expect(entity.id, 'franchise-xyz');
+        expect(entity.name, 'MotoRed');
+        expect(message, tMessage);
         verify(mockDataSource.registerFranchise(any)).called(1);
       });
 
@@ -68,7 +74,7 @@ void main() {
         () async {
           when(
             mockDataSource.registerFranchise(any),
-          ).thenAnswer((_) async => const Right(tResultModel));
+          ).thenAnswer((_) async => const Right((tResultModel, tMessage)));
 
           await repository.registerFranchise(tFranchise);
 

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:either_dart/either.dart';
-import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
 import 'package:motogo_frontend/src/core/errors/error_model.dart';
 import 'package:motogo_frontend/src/core/geocoding/data/models/geocoding_result_model.dart';
 import 'package:motogo_frontend/src/core/network/dio_client.dart';
+import 'package:motogo_frontend/src/core/network/dio_error_handler.dart';
 
 /// DataSource for geocoding operations.
 ///
@@ -38,22 +38,24 @@ class GeocodingDataSourceImpl implements GeocodingDataSource {
         },
       );
 
-      final data = response.data;
-      if (data is Map<String, dynamic> && data['success'] == true) {
-        return Right(GeocodingResultModel.fromJson(data));
+      final responseData = response.data;
+      if (responseData is Map<String, dynamic>) {
+        final success = responseData['success'] as bool?;
+        if (success == false) {
+          return Left(DioErrorHandler.fromBackendError(responseData));
+        }
+        if (success == true) {
+          return Right(GeocodingResultModel.fromJson(responseData));
+        }
       }
 
-      return Left(ErrorModel(message: DebugMessages.geocodingFailed));
+      return Left(
+        DioErrorHandler.fromBackendError({'message': responseData?.toString()}),
+      );
     } on DioException catch (e) {
-      // Extract message from DioException response data if available
-      String errorMessage = DebugMessages.geocodingFailed;
-      if (e.response?.data is Map<String, dynamic>) {
-        final data = e.response!.data as Map<String, dynamic>;
-        errorMessage = data['message'] as String? ?? errorMessage;
-      }
-      return Left(ErrorModel(message: errorMessage));
+      return DioErrorHandler.handleDioException(e);
     } catch (e) {
-      return Left(ErrorModel(message: DebugMessages.unexpectedError));
+      return DioErrorHandler.handleException(e);
     }
   }
 }

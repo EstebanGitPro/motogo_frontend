@@ -23,6 +23,7 @@ class DiagnosticEntity extends Equatable {
   final String id;
   final String motorcycleId;
   final String? branchId;
+  final String? branchName;
   final String problemDescription;
   final String? possibleSolution;
   final DateTime date;
@@ -32,6 +33,7 @@ class DiagnosticEntity extends Equatable {
     required this.id,
     required this.motorcycleId,
     this.branchId,
+    this.branchName,
     required this.problemDescription,
     this.possibleSolution,
     required this.date,
@@ -43,6 +45,7 @@ class DiagnosticEntity extends Equatable {
     id,
     motorcycleId,
     branchId,
+    branchName,
     problemDescription,
     possibleSolution,
     date,

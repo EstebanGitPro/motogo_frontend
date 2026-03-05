@@ -76,4 +76,9 @@ class BranchDetailConstants {
 
   // Address fallback
   static const String addressNotAvailable = 'Dirección no disponible';
+
+  // Displacement range labels
+  static const String cilindrajeLow = 'Bajo (50-200cc)';
+  static const String cilindrajeMedium = 'Medio (201-400cc)';
+  static const String cilindrageHigh = 'Alto (401cc+)';
 }

@@ -55,4 +55,10 @@ class CommonConstants {
 
   // Empty states
   static const String noBrandsAvailable = 'No hay marcas disponibles';
+
+  // Mapbox
+  static const String mapboxTokenMissing = 'Token de Mapbox no configurado';
+
+  // Dialog responses
+  static const String no = 'No';
 }

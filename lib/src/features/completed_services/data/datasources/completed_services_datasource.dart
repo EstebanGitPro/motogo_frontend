@@ -33,11 +33,26 @@ abstract class CompletedServicesDataSource {
   /// Updates the status of a completed service.
   ///
   /// Calls PATCH /completed-services/{serviceId}/status.
+  /// If [finalPrice] is provided, it is included in the request body
+  /// (used when transitioning to FINALIZADO).
   /// Returns the success message from the backend.
   Future<Either<ErrorModel, String>> updateServiceStatus(
     String serviceId,
-    String newStatus,
-  );
+    String newStatus, {
+    double? finalPrice,
+  });
+
+  /// Updates the details of a completed service (HU75).
+  ///
+  /// Calls PATCH /completed-services/{serviceId}.
+  /// At least one field must be non-null.
+  /// Returns the success message from the backend.
+  Future<Either<ErrorModel, String>> updateServiceDetails(
+    String serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  });
 
   /// Fetches status transitions for a completed service.
   ///
@@ -91,14 +106,36 @@ class CompletedServicesDataSourceImpl
   @override
   Future<Either<ErrorModel, String>> updateServiceStatus(
     String serviceId,
-    String newStatus,
-  ) {
+    String newStatus, {
+    double? finalPrice,
+  }) {
+    final data = <String, dynamic>{'status': newStatus};
+    if (finalPrice != null) {
+      data['final_price'] = finalPrice;
+    }
     return handleMessageResponse(
-      () => _dioClient.patch(
-        '/completed-services/$serviceId/status',
-        data: {'status': newStatus},
-      ),
+      () =>
+          _dioClient.patch('/completed-services/$serviceId/status', data: data),
       'Estado actualizado exitosamente',
+    );
+  }
+
+  @override
+  Future<Either<ErrorModel, String>> updateServiceDetails(
+    String serviceId, {
+    double? quotedPrice,
+    double? finalPrice,
+    String? representativeNotes,
+  }) {
+    final data = <String, dynamic>{};
+    if (quotedPrice != null) data['quoted_price'] = quotedPrice;
+    if (finalPrice != null) data['final_price'] = finalPrice;
+    if (representativeNotes != null) {
+      data['representative_notes'] = representativeNotes;
+    }
+    return handleMessageResponse(
+      () => _dioClient.patch('/completed-services/$serviceId', data: data),
+      'Detalles actualizados exitosamente',
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:motogo_frontend/src/core/constants/person_constants.dart';
 import 'package:motogo_frontend/src/core/utils/translation_utils.dart';
 import 'package:motogo_frontend/src/core/widgets/responsive_scaffold_body.dart';
 import 'package:motogo_frontend/src/features/login/presentation/pages/login_page.dart';
@@ -157,7 +158,7 @@ class _VerificationPageState extends State<VerificationPage> {
         ),
         SizedBox(height: isMobile ? 16 : 20),
         Text(
-          'Revisa tu correo electrónico',
+          PersonConstants.verificationTitle,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
             fontSize: isMobile ? 18 : 20,
             fontWeight: FontWeight.w600,
@@ -169,7 +170,7 @@ class _VerificationPageState extends State<VerificationPage> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24),
           child: Text(
-            'Enviamos un enlace de verificación a:',
+            PersonConstants.verificationSentMessage,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: isMobile ? 15 : 16,
               color: Colors.grey[600],
@@ -226,8 +227,7 @@ class _VerificationPageState extends State<VerificationPage> {
           SizedBox(width: isMobile ? 12 : 16),
           Expanded(
             child: Text(
-              'El correo puede tardar unos minutos en llegar. '
-              'Revisa tu carpeta de spam si no lo ves.',
+              PersonConstants.verificationSpamNote,
               style: TextStyle(
                 fontSize: isMobile ? 13 : 14,
                 color: Colors.blue[900],
@@ -243,8 +243,8 @@ class _VerificationPageState extends State<VerificationPage> {
   /// Countdown pill with spinner and redirect text.
   Widget _buildCountdownIndicator(BuildContext context, bool isMobile) {
     final countdownText = _secondsRemaining > 0
-        ? 'Redirigiendo al login en $_secondsRemaining segundos...'
-        : 'Redirigiendo...';
+        ? '${PersonConstants.redirectingCountdownPrefix}$_secondsRemaining${PersonConstants.redirectingCountdownSuffix}'
+        : PersonConstants.redirecting;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -295,7 +295,7 @@ class _VerificationPageState extends State<VerificationPage> {
         );
       },
       child: Text(
-        'Ir al login ahora',
+        PersonConstants.goToLoginNow,
         style: TextStyle(
           fontSize: isMobile ? 14 : 16,
           color: Theme.of(context).primaryColor,

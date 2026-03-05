@@ -18,6 +18,7 @@ class BranchMarkerEntity extends Equatable {
   final String? departmentName;
   final List<String> brands;
   final List<String> displacementRanges;
+  final List<String> serviceNames;
 
   const BranchMarkerEntity({
     required this.id,
@@ -34,6 +35,7 @@ class BranchMarkerEntity extends Equatable {
     this.departmentName,
     this.brands = const [],
     this.displacementRanges = const [],
+    this.serviceNames = const [],
   });
 
   /// Returns true if this is a workshop.
@@ -78,5 +80,6 @@ class BranchMarkerEntity extends Equatable {
     departmentName,
     brands,
     displacementRanges,
+    serviceNames,
   ];
 }

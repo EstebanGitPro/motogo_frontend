@@ -37,19 +37,20 @@ class MockRegisterFranchiseDataSource extends _i1.Mock
   }
 
   @override
-  _i3.Future<_i4.Either<_i5.ErrorModel, _i6.FranchiseModel>> registerFranchise(
-    _i6.FranchiseModel? franchise,
-  ) =>
+  _i3.Future<_i4.Either<_i5.ErrorModel, (_i6.FranchiseModel, String)>>
+  registerFranchise(_i6.FranchiseModel? franchise) =>
       (super.noSuchMethod(
             Invocation.method(#registerFranchise, [franchise]),
             returnValue:
                 _i3.Future<
-                  _i4.Either<_i5.ErrorModel, _i6.FranchiseModel>
+                  _i4.Either<_i5.ErrorModel, (_i6.FranchiseModel, String)>
                 >.value(
                   _i7.dummyValue<
-                    _i4.Either<_i5.ErrorModel, _i6.FranchiseModel>
+                    _i4.Either<_i5.ErrorModel, (_i6.FranchiseModel, String)>
                   >(this, Invocation.method(#registerFranchise, [franchise])),
                 ),
           )
-          as _i3.Future<_i4.Either<_i5.ErrorModel, _i6.FranchiseModel>>);
+          as _i3.Future<
+            _i4.Either<_i5.ErrorModel, (_i6.FranchiseModel, String)>
+          >);
 }

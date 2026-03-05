@@ -16,6 +16,44 @@ class UploadedEvidence extends Equatable {
   List<Object?> get props => [id, imageUrl, angle];
 }
 
+/// Groups the transient user-feedback messages in the diagnostic form.
+class DiagnosticFormMessages extends Equatable {
+  /// Error message to display (e.g., upload failure, submission error).
+  final String? errorMessage;
+
+  /// Success message after diagnostic submission.
+  final String? successMessage;
+
+  /// Feedback message after toggling permission.
+  final String? permissionMessage;
+
+  const DiagnosticFormMessages({
+    this.errorMessage,
+    this.successMessage,
+    this.permissionMessage,
+  });
+
+  /// Empty instance — no active messages.
+  static const empty = DiagnosticFormMessages();
+
+  /// Creates a copy with specified values overridden.
+  DiagnosticFormMessages copyWith({
+    String? errorMessage,
+    String? successMessage,
+    String? permissionMessage,
+    bool clearError = false,
+  }) {
+    return DiagnosticFormMessages(
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      successMessage: successMessage,
+      permissionMessage: permissionMessage,
+    );
+  }
+
+  @override
+  List<Object?> get props => [errorMessage, successMessage, permissionMessage];
+}
+
 /// States for the RequestDiagnosticBloc.
 abstract class RequestDiagnosticState extends Equatable {
   const RequestDiagnosticState();
@@ -46,9 +84,7 @@ class RequestDiagnosticLoaded extends RequestDiagnosticState {
   final bool isPermissionGranted;
   final bool isUploadingPhoto;
   final bool isSubmitting;
-  final String? errorMessage;
-  final String? successMessage;
-  final String? permissionMessage;
+  final DiagnosticFormMessages messages;
   final bool hasLoadedEvidence;
 
   const RequestDiagnosticLoaded({
@@ -62,9 +98,7 @@ class RequestDiagnosticLoaded extends RequestDiagnosticState {
     this.isPermissionGranted = false,
     this.isUploadingPhoto = false,
     this.isSubmitting = false,
-    this.errorMessage,
-    this.successMessage,
-    this.permissionMessage,
+    this.messages = DiagnosticFormMessages.empty,
     this.hasLoadedEvidence = false,
   });
 
@@ -125,9 +159,12 @@ $photosInfo
       isPermissionGranted: isPermissionGranted ?? this.isPermissionGranted,
       isUploadingPhoto: isUploadingPhoto ?? this.isUploadingPhoto,
       isSubmitting: isSubmitting ?? this.isSubmitting,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      successMessage: successMessage,
-      permissionMessage: permissionMessage,
+      messages: messages.copyWith(
+        errorMessage: errorMessage,
+        successMessage: successMessage,
+        permissionMessage: permissionMessage,
+        clearError: clearError,
+      ),
       hasLoadedEvidence: hasLoadedEvidence ?? this.hasLoadedEvidence,
     );
   }
@@ -144,9 +181,7 @@ $photosInfo
     isPermissionGranted,
     isUploadingPhoto,
     isSubmitting,
-    errorMessage,
-    successMessage,
-    permissionMessage,
+    messages,
     hasLoadedEvidence,
   ];
 }

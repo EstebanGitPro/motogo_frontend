@@ -13,8 +13,9 @@ class EditBranchLoading extends EditBranchState {}
 /// State when update succeeds.
 class EditBranchSuccess extends EditBranchState {
   final BranchEntity updatedBranch;
+  final String message;
 
-  EditBranchSuccess({required this.updatedBranch});
+  EditBranchSuccess({required this.updatedBranch, required this.message});
 }
 
 /// State when update fails.

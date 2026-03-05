@@ -22,4 +22,16 @@ class PersonConstants {
 
   // Menu
   static const String deleteAccountMenuTitle = deleteAccountLabel;
+
+  // Email verification page
+  static const String verificationTitle = 'Revisa tu correo electrónico';
+  static const String verificationSentMessage =
+      'Enviamos un enlace de verificación a:';
+  static const String verificationSpamNote =
+      'El correo puede tardar unos minutos en llegar. '
+      'Revisa tu carpeta de spam si no lo ves.';
+  static const String redirectingCountdownPrefix = 'Redirigiendo al login en ';
+  static const String redirectingCountdownSuffix = ' segundos...';
+  static const String redirecting = 'Redirigiendo...';
+  static const String goToLoginNow = 'Ir al login ahora';
 }

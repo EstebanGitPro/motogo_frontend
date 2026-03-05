@@ -3,11 +3,15 @@ import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/config/config.dart';
 import 'package:motogo_frontend/src/core/network/auth_interceptor.dart';
 
+import 'dio_client_stub.dart'
+    if (dart.library.html) 'dio_client_web.dart'
+    as web_adapter;
+
 /// Centralized Dio HTTP client with authentication interceptor.
 ///
 /// This client should be used for all authenticated API calls.
 /// It automatically:
-/// - Adds Authorization header to requests
+/// - Adds Authorization header to requests (mobile) or sends HttpOnly cookies (web)
 /// - Handles 401 errors with token refresh
 /// - Retries failed requests after successful refresh
 ///
@@ -27,23 +31,17 @@ class DioClient {
         receiveTimeout: const Duration(seconds: 30),
         sendTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json'},
+        extra: kIsWeb ? {'withCredentials': true} : {},
       ),
     );
 
+    // Configure BrowserHttpClientAdapter for Web cookie support
+    if (kIsWeb) {
+      web_adapter.configureWebCredentials(dio);
+    }
+
     // Add auth interceptor for token management
     dio.interceptors.add(authInterceptor);
-
-    // Add logging interceptor in debug mode
-    if (kDebugMode) {
-      dio.interceptors.add(
-        LogInterceptor(
-          requestBody: true,
-          responseBody: true,
-          error: true,
-          logPrint: (obj) => debugPrint('🌐 $obj'),
-        ),
-      );
-    }
   }
 
   // ============ CONVENIENCE METHODS ============

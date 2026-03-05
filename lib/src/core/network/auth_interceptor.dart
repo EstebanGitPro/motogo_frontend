@@ -1,11 +1,16 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:motogo_frontend/src/core/constants/debug_messages.dart';
 import 'package:motogo_frontend/src/core/network/refresh_token_data_source.dart';
 import 'package:motogo_frontend/src/core/services/navigation_service.dart';
 import 'package:motogo_frontend/src/core/user/user_session_manager.dart';
 import 'package:motogo_frontend/src/core/utils/app_logger.dart';
+
+import 'dio_client_stub.dart'
+    if (dart.library.html) 'dio_client_web.dart'
+    as web_adapter;
 
 /// Dio interceptor that handles authentication and token refresh.
 ///
@@ -28,10 +33,13 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Add access token to request headers
-    final token = await UserSessionManager.instance.getAccessToken();
-    if (token != null) {
-      options.headers['Authorization'] = 'Bearer $token';
+    // On Web, cookies handle auth automatically (HttpOnly cookies).
+    // On mobile, add Authorization header manually.
+    if (!kIsWeb) {
+      final token = await UserSessionManager.instance.getAccessToken();
+      if (token != null) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     handler.next(options);
   }
@@ -61,6 +69,18 @@ class AuthInterceptor extends Interceptor {
         return handler.resolve(retryResponse);
       } catch (retryError) {
         AppLogger.error(DebugMessages.retryFailed, retryError);
+
+        // If retry also fails with 401, the session is truly expired
+        // (e.g. role claims missing, Keycloak session invalidated).
+        // Clear session and redirect to login instead of showing
+        // a confusing backend error to the user.
+        final is401Retry =
+            retryError is DioException &&
+            retryError.response?.statusCode == 401;
+        if (is401Retry) {
+          AppLogger.auth(DebugMessages.redirectingToLogin);
+          await _handleSessionExpired();
+        }
         return handler.next(err);
       }
     } else {
@@ -130,15 +150,24 @@ class AuthInterceptor extends Interceptor {
 
   /// Retries the original request with the new access token.
   Future<Response<dynamic>> _retryRequest(RequestOptions requestOptions) async {
-    final newToken = await UserSessionManager.instance.getAccessToken();
-
     // Create a new Dio instance for the retry to avoid interceptor loops
-    final retryDio = Dio();
-
-    final options = Options(
-      method: requestOptions.method,
-      headers: {...requestOptions.headers, 'Authorization': 'Bearer $newToken'},
+    final retryDio = Dio(
+      BaseOptions(extra: kIsWeb ? {'withCredentials': true} : {}),
     );
+
+    // Configure BrowserHttpClientAdapter for Web cookie support
+    if (kIsWeb) {
+      web_adapter.configureWebCredentials(retryDio);
+    }
+
+    // On mobile, add Authorization header. On Web, cookies handle auth.
+    final Map<String, dynamic> headers = {...requestOptions.headers};
+    if (!kIsWeb) {
+      final newToken = await UserSessionManager.instance.getAccessToken();
+      headers['Authorization'] = 'Bearer $newToken';
+    }
+
+    final options = Options(method: requestOptions.method, headers: headers);
 
     return retryDio.request(
       requestOptions.path.startsWith('http')

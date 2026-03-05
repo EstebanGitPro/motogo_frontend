@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:motogo_frontend/src/features/completed_services/data/model/completed_service_item_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/data/model/completed_service_model.dart';
 import 'package:motogo_frontend/src/features/completed_services/domain/entities/completed_service_entity.dart';
 
@@ -16,8 +17,19 @@ void main() {
       'final_price': 175000,
       'representative_notes': 'Cambio de aceite',
       'services': [
-        {'service_id': 'svc-a', 'service_name': 'Cambio de aceite'},
-        {'service_id': 'svc-b', 'service_name': 'Revisión de frenos'},
+        {
+          'id': 'item-1',
+          'service_id': 'svc-a',
+          'service_name': 'Cambio de aceite',
+          'rating': 5,
+          'comment': 'Excelente',
+          'rated_at': '2026-02-16T12:00:00Z',
+        },
+        {
+          'id': 'item-2',
+          'service_id': 'svc-b',
+          'service_name': 'Revisión de frenos',
+        },
       ],
     };
 
@@ -35,8 +47,13 @@ void main() {
         expect(model.quotedPrice, 185000);
         expect(model.finalPrice, 175000);
         expect(model.representativeNotes, 'Cambio de aceite');
-        expect(model.serviceIds, ['svc-a', 'svc-b']);
-        expect(model.serviceNames, ['Cambio de aceite', 'Revisión de frenos']);
+        expect(model.services, hasLength(2));
+        expect(model.services[0], isA<CompletedServiceItemModel>());
+        expect(model.services[0].serviceId, 'svc-a');
+        expect(model.services[0].serviceName, 'Cambio de aceite');
+        expect(model.services[0].rating, 5);
+        expect(model.services[1].serviceId, 'svc-b');
+        expect(model.services[1].rating, isNull);
       });
 
       test('should handle null optional fields', () {
@@ -55,8 +72,7 @@ void main() {
         expect(model.quotedPrice, isNull);
         expect(model.finalPrice, isNull);
         expect(model.representativeNotes, isNull);
-        expect(model.serviceIds, isEmpty);
-        expect(model.serviceNames, isEmpty);
+        expect(model.services, isEmpty);
       });
 
       test('should handle empty services list', () {
@@ -71,28 +87,7 @@ void main() {
 
         final model = CompletedServiceModel.fromJson(json);
 
-        expect(model.serviceIds, isEmpty);
-        expect(model.serviceNames, isEmpty);
-      });
-
-      test('should filter out null service_ids and service_names', () {
-        final json = <String, dynamic>{
-          'id': 'svc-001',
-          'branch_id': 'branch-123',
-          'motorcycle_id': 'moto-456',
-          'status': 'PENDIENTE',
-          'request_date': '2026-02-15T10:00:00Z',
-          'services': [
-            {'service_id': 'svc-a', 'service_name': 'Aceite'},
-            {'service_id': null, 'service_name': null},
-            {'service_id': 'svc-b', 'service_name': 'Frenos'},
-          ],
-        };
-
-        final model = CompletedServiceModel.fromJson(json);
-
-        expect(model.serviceIds, ['svc-a', 'svc-b']);
-        expect(model.serviceNames, ['Aceite', 'Frenos']);
+        expect(model.services, isEmpty);
       });
 
       test('should handle integer prices via num conversion', () {
@@ -129,8 +124,9 @@ void main() {
         expect(entity.quotedPrice, model.quotedPrice);
         expect(entity.finalPrice, model.finalPrice);
         expect(entity.representativeNotes, model.representativeNotes);
-        expect(entity.serviceIds, model.serviceIds);
-        expect(entity.serviceNames, model.serviceNames);
+        expect(entity.services, hasLength(2));
+        expect(entity.services[0].serviceId, 'svc-a');
+        expect(entity.services[1].serviceId, 'svc-b');
       });
 
       test('should map null optional fields to entity', () {
@@ -149,8 +145,7 @@ void main() {
         expect(entity.quotedPrice, isNull);
         expect(entity.finalPrice, isNull);
         expect(entity.representativeNotes, isNull);
-        expect(entity.serviceIds, isEmpty);
-        expect(entity.serviceNames, isEmpty);
+        expect(entity.services, isEmpty);
       });
     });
   });

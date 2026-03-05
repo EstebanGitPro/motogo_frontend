@@ -647,5 +647,192 @@ void main() {
         expect(result.left, isA<ErrorModel>());
       });
     });
+
+    // ─── updateServiceStatus with finalPrice ─────────────────────────
+
+    group('updateServiceStatus with finalPrice', () {
+      const testServiceId = 'service-123';
+      const testNewStatus = 'FINALIZADO';
+      const testFinalPrice = 175000.0;
+
+      test('should include final_price in request when provided', () async {
+        final responseData = {
+          'success': true,
+          'message': 'Estado actualizado exitosamente',
+        };
+
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId/status',
+            data: anyNamed('data'),
+          ),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.updateServiceStatus(
+          testServiceId,
+          testNewStatus,
+          finalPrice: testFinalPrice,
+        );
+
+        expect(result.isRight, isTrue);
+        verify(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId/status',
+            data: {'status': testNewStatus, 'final_price': testFinalPrice},
+          ),
+        ).called(1);
+      });
+    });
+
+    // ─── updateServiceDetails ────────────────────────────────────────
+
+    group('updateServiceDetails', () {
+      const testServiceId = 'service-456';
+
+      test('should return success message on success', () async {
+        final responseData = {
+          'success': true,
+          'message': 'Detalles actualizados',
+        };
+
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: anyNamed('data'),
+          ),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.updateServiceDetails(
+          testServiceId,
+          quotedPrice: 100000,
+          finalPrice: 95000,
+          representativeNotes: 'Nota actualizada',
+        );
+
+        expect(result.isRight, isTrue);
+        expect(result.right, 'Detalles actualizados');
+        verify(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: {
+              'quoted_price': 100000.0,
+              'final_price': 95000.0,
+              'representative_notes': 'Nota actualizada',
+            },
+          ),
+        ).called(1);
+      });
+
+      test('should only include non-null fields in request', () async {
+        final responseData = {
+          'success': true,
+          'message': 'Detalles actualizados',
+        };
+
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: anyNamed('data'),
+          ),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.updateServiceDetails(
+          testServiceId,
+          quotedPrice: 120000,
+        );
+
+        expect(result.isRight, isTrue);
+        verify(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: {'quoted_price': 120000.0},
+          ),
+        ).called(1);
+      });
+
+      test(
+        'should return default message when no message in response',
+        () async {
+          final responseData = {'success': true};
+
+          when(
+            mockDioClient.patch(
+              '/completed-services/$testServiceId',
+              data: anyNamed('data'),
+            ),
+          ).thenAnswer((_) async => createResponse(responseData));
+
+          final result = await dataSource.updateServiceDetails(
+            testServiceId,
+            finalPrice: 80000,
+          );
+
+          expect(result.isRight, isTrue);
+          expect(result.right, 'Detalles actualizados exitosamente');
+        },
+      );
+
+      test('should return ErrorModel when success is false', () async {
+        final responseData = {
+          'success': false,
+          'code': 'ERR_CS_003',
+          'message': 'No se pudo actualizar',
+        };
+
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: anyNamed('data'),
+          ),
+        ).thenAnswer((_) async => createResponse(responseData));
+
+        final result = await dataSource.updateServiceDetails(
+          testServiceId,
+          representativeNotes: 'Nota',
+        );
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return ErrorModel on DioException', () async {
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: anyNamed('data'),
+          ),
+        ).thenThrow(
+          DioException(
+            type: DioExceptionType.connectionTimeout,
+            requestOptions: RequestOptions(path: ''),
+          ),
+        );
+
+        final result = await dataSource.updateServiceDetails(
+          testServiceId,
+          quotedPrice: 100000,
+        );
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+
+      test('should return ErrorModel on generic exception', () async {
+        when(
+          mockDioClient.patch(
+            '/completed-services/$testServiceId',
+            data: anyNamed('data'),
+          ),
+        ).thenThrow(Exception('Network error'));
+
+        final result = await dataSource.updateServiceDetails(
+          testServiceId,
+          finalPrice: 50000,
+        );
+
+        expect(result.isLeft, isTrue);
+        expect(result.left, isA<ErrorModel>());
+      });
+    });
   });
 }

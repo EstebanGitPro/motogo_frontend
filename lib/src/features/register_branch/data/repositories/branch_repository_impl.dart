@@ -20,7 +20,7 @@ class BranchRepositoryImpl implements BranchRepository {
   }
 
   @override
-  Future<Either<ErrorModel, BranchEntity>> updateBranch(
+  Future<Either<ErrorModel, (BranchEntity, String)>> updateBranch(
     String id,
     BranchEntity branch,
   ) async {

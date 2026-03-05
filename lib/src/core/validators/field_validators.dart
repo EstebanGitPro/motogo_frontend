@@ -3,18 +3,19 @@ import 'package:motogo_frontend/src/core/validators/base_validator.dart';
 
 /// Validador para correos electrónicos
 class EmailValidator extends BaseValidator {
-  static final RegExp _emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  static final RegExp _emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
   const EmailValidator({super.customMessage});
 
   @override
   String? validate(String? value) {
-    final requiredResult = const RequiredValidator().validate(value);
+    final trimmed = value?.trim();
+    final requiredResult = const RequiredValidator().validate(trimmed);
     if (requiredResult != null) {
       return getMessage(ValidationMessages.emailRequired);
     }
 
-    if (!_emailRegex.hasMatch(value!)) {
+    if (!_emailRegex.hasMatch(trimmed!)) {
       return getMessage(ValidationMessages.invalidEmail);
     }
 
@@ -105,21 +106,22 @@ class NameValidator extends BaseValidator {
 
   @override
   String? validate(String? value) {
-    final requiredResult = const RequiredValidator().validate(value);
+    final trimmed = value?.trim();
+    final requiredResult = const RequiredValidator().validate(trimmed);
     if (requiredResult != null) {
       return getMessage(ValidationMessages.nameRequired);
     }
 
-    if (value!.length < minLength) {
+    if (trimmed!.length < minLength) {
       return getMessage(ValidationMessages.minLengthWithValue(minLength));
     }
 
-    if (value.length > maxLength) {
+    if (trimmed.length > maxLength) {
       return getMessage(ValidationMessages.maxLengthWithValue(maxLength));
     }
 
     // Validar que solo contenga letras y espacios
-    if (!RegExp(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$').hasMatch(value)) {
+    if (!RegExp(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$').hasMatch(trimmed)) {
       return getMessage(ValidationMessages.nameInvalid);
     }
 
@@ -140,21 +142,22 @@ class IdentityValidator extends BaseValidator {
 
   @override
   String? validate(String? value) {
-    final requiredResult = const RequiredValidator().validate(value);
+    final trimmed = value?.trim();
+    final requiredResult = const RequiredValidator().validate(trimmed);
     if (requiredResult != null) {
       return getMessage(ValidationMessages.identityRequired);
     }
 
     // Validar que sea un número válido
-    if (int.tryParse(value!) == null) {
+    if (int.tryParse(trimmed!) == null) {
       return getMessage(ValidationMessages.identityInvalid);
     }
 
-    if (value.length < minLength) {
+    if (trimmed.length < minLength) {
       return getMessage(ValidationMessages.minLengthWithValue(minLength));
     }
 
-    if (value.length > maxLength) {
+    if (trimmed.length > maxLength) {
       return getMessage(ValidationMessages.maxLengthWithValue(maxLength));
     }
 
@@ -170,12 +173,13 @@ class PhoneValidator extends BaseValidator {
 
   @override
   String? validate(String? value) {
-    final requiredResult = const RequiredValidator().validate(value);
+    final trimmed = value?.trim();
+    final requiredResult = const RequiredValidator().validate(trimmed);
     if (requiredResult != null) {
       return getMessage(ValidationMessages.phoneRequired);
     }
 
-    if (!_phoneRegex.hasMatch(value!)) {
+    if (!_phoneRegex.hasMatch(trimmed!)) {
       return getMessage(ValidationMessages.phoneInvalid);
     }
 

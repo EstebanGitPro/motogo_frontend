@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kiwi/kiwi.dart';
 import 'package:motogo_frontend/src/core/constants/branch_detail_constants.dart';
 import 'package:motogo_frontend/src/features/branch_services/domain/entities/branch_service_entity.dart';
+import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/service_reviews_bloc.dart';
 import 'package:motogo_frontend/src/features/service_ratings/presentation/pages/service_reviews_page.dart';
 
 /// Reusable service card widget used on both client and representative views.
@@ -77,17 +80,7 @@ class ServiceCardWidget extends StatelessWidget {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ServiceReviewsPage(
-                              serviceId: service.id,
-                              serviceName: service.name,
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () => _navigateToReviews(context),
                       child: Text(
                         BranchDetailConstants.viewReviews,
                         style: TextStyle(color: Colors.blue[600], fontSize: 12),
@@ -117,6 +110,23 @@ class ServiceCardWidget extends StatelessWidget {
             style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToReviews(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) =>
+              KiwiContainer().resolve<ServiceReviewsBloc>()
+                ..add(FetchServiceReviews(serviceId: service.id)),
+          child: ServiceReviewsPage(
+            serviceId: service.id,
+            serviceName: service.name,
+          ),
+        ),
       ),
     );
   }

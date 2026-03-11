@@ -17,8 +17,9 @@ abstract class ServiceRatingDataSource {
     RateServiceRequest request,
   );
 
-  /// Fetches all reviews for a specific service type.
+  /// Fetches all reviews for a specific service type scoped by branch.
   Future<Either<ErrorModel, ServiceReviewSummaryEntity>> getServiceReviews(
+    String branchId,
     String serviceId,
   );
 }
@@ -47,10 +48,11 @@ class ServiceRatingDataSourceImpl
 
   @override
   Future<Either<ErrorModel, ServiceReviewSummaryEntity>> getServiceReviews(
+    String branchId,
     String serviceId,
   ) {
     return handleDataResponse(
-      () => _dioClient.get('/services/$serviceId/reviews'),
+      () => _dioClient.get('/branches/$branchId/services/$serviceId/reviews'),
       ServiceReviewSummaryModel.fromJson,
     );
   }

@@ -12,8 +12,9 @@ abstract class ServiceRatingRepository {
     RateServiceRequest request,
   );
 
-  /// Fetches all reviews for a specific service type.
+  /// Fetches all reviews for a specific service type scoped by branch.
   Future<Either<ErrorModel, ServiceReviewSummaryEntity>> getServiceReviews(
+    String branchId,
     String serviceId,
   );
 }

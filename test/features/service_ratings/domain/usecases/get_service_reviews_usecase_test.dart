@@ -32,6 +32,7 @@ void main() {
   });
 
   group('GetServiceReviewsUseCase', () {
+    const branchId = 'branch-abc';
     const serviceId = 'svc-123';
 
     test('should delegate to repository and return Right on success', () async {
@@ -45,15 +46,15 @@ void main() {
       );
 
       when(
-        mockRepository.getServiceReviews(serviceId),
+        mockRepository.getServiceReviews(branchId, serviceId),
       ).thenAnswer((_) async => const Right(summary));
 
-      final result = await useCase(serviceId);
+      final result = await useCase(branchId, serviceId);
 
       expect(result.isRight, isTrue);
       expect(result.right.serviceId, 'svc-123');
       expect(result.right.averageRating, 4.5);
-      verify(mockRepository.getServiceReviews(serviceId)).called(1);
+      verify(mockRepository.getServiceReviews(branchId, serviceId)).called(1);
     });
 
     test('should delegate to repository and return Left on error', () async {
@@ -63,10 +64,10 @@ void main() {
       );
 
       when(
-        mockRepository.getServiceReviews(serviceId),
+        mockRepository.getServiceReviews(branchId, serviceId),
       ).thenAnswer((_) async => Left(error));
 
-      final result = await useCase(serviceId);
+      final result = await useCase(branchId, serviceId);
 
       expect(result.isLeft, isTrue);
       expect(result.left.message, 'Error al obtener reseñas');

@@ -56,11 +56,13 @@ void main() {
       'emits [Loading, Loaded] when FetchServiceReviews succeeds',
       build: () {
         when(
-          mockGetServiceReviewsUseCase.call(any),
+          mockGetServiceReviewsUseCase.call(any, any),
         ).thenAnswer((_) async => Right(testSummary));
         return bloc;
       },
-      act: (bloc) => bloc.add(FetchServiceReviews(serviceId: 'svc-1')),
+      act: (bloc) => bloc.add(
+        FetchServiceReviews(branchId: 'branch-abc', serviceId: 'svc-1'),
+      ),
       expect: () => [
         isA<ServiceReviewsLoading>(),
         isA<ServiceReviewsLoaded>()
@@ -69,21 +71,25 @@ void main() {
             .having((s) => s.summary.reviews.length, 'reviews count', 1),
       ],
       verify: (_) {
-        verify(mockGetServiceReviewsUseCase.call('svc-1')).called(1);
+        verify(
+          mockGetServiceReviewsUseCase.call('branch-abc', 'svc-1'),
+        ).called(1);
       },
     );
 
     blocTest<ServiceReviewsBloc, ServiceReviewsState>(
       'emits [Loading, Error] when FetchServiceReviews fails',
       build: () {
-        when(mockGetServiceReviewsUseCase.call(any)).thenAnswer(
+        when(mockGetServiceReviewsUseCase.call(any, any)).thenAnswer(
           (_) async => Left(
             ErrorModel(errorCode: 'ERR_001', message: 'Servicio no encontrado'),
           ),
         );
         return bloc;
       },
-      act: (bloc) => bloc.add(FetchServiceReviews(serviceId: 'svc-999')),
+      act: (bloc) => bloc.add(
+        FetchServiceReviews(branchId: 'branch-abc', serviceId: 'svc-999'),
+      ),
       expect: () => [
         isA<ServiceReviewsLoading>(),
         isA<ServiceReviewsError>().having(

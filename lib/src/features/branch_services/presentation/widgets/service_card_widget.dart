@@ -13,11 +13,17 @@ import 'package:motogo_frontend/src/features/service_ratings/presentation/pages/
 /// - Representative side: shows "Ver Reseñas" only ([onRate] is null)
 class ServiceCardWidget extends StatelessWidget {
   final BranchServiceEntity service;
+  final String branchId;
 
   /// If non-null, shows the "Calificar" link and calls this when tapped.
   final VoidCallback? onRate;
 
-  const ServiceCardWidget({super.key, required this.service, this.onRate});
+  const ServiceCardWidget({
+    super.key,
+    required this.service,
+    required this.branchId,
+    this.onRate,
+  });
 
   bool get _canRate => onRate != null;
 
@@ -119,10 +125,12 @@ class ServiceCardWidget extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
-          create: (_) =>
-              KiwiContainer().resolve<ServiceReviewsBloc>()
-                ..add(FetchServiceReviews(serviceId: service.id)),
+          create: (_) => KiwiContainer().resolve<ServiceReviewsBloc>()
+            ..add(
+              FetchServiceReviews(branchId: branchId, serviceId: service.id),
+            ),
           child: ServiceReviewsPage(
+            branchId: branchId,
             serviceId: service.id,
             serviceName: service.name,
           ),

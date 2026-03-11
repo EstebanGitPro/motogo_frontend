@@ -30,15 +30,16 @@ class BranchDetailPage extends StatelessWidget {
       create: (_) =>
           InjectorApp.resolve<BranchDetailBloc>()
             ..add(LoadBranchDetail(branchId)),
-      child: _BranchDetailView(branchName: branchName),
+      child: _BranchDetailView(branchId: branchId, branchName: branchName),
     );
   }
 }
 
 class _BranchDetailView extends StatelessWidget {
+  final String branchId;
   final String branchName;
 
-  const _BranchDetailView({required this.branchName});
+  const _BranchDetailView({required this.branchId, required this.branchName});
 
   @override
   Widget build(BuildContext context) {
@@ -401,7 +402,10 @@ class _BranchDetailView extends StatelessWidget {
               ),
             )
           else
-            ...services.map((service) => ServiceCardWidget(service: service)),
+            ...services.map(
+              (service) =>
+                  ServiceCardWidget(service: service, branchId: branchId),
+            ),
         ],
       ),
     );

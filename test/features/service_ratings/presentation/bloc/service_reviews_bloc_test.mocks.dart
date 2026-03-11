@@ -38,17 +38,18 @@ class MockGetServiceReviewsUseCase extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, _i6.ServiceReviewSummaryEntity>> call(
+    String? branchId,
     String? serviceId,
   ) =>
       (super.noSuchMethod(
-            Invocation.method(#call, [serviceId]),
+            Invocation.method(#call, [branchId, serviceId]),
             returnValue:
                 _i3.Future<
                   _i4.Either<_i5.ErrorModel, _i6.ServiceReviewSummaryEntity>
                 >.value(
                   _i7.dummyValue<
                     _i4.Either<_i5.ErrorModel, _i6.ServiceReviewSummaryEntity>
-                  >(this, Invocation.method(#call, [serviceId])),
+                  >(this, Invocation.method(#call, [branchId, serviceId])),
                 ),
           )
           as _i3.Future<

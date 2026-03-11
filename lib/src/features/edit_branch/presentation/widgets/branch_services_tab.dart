@@ -225,7 +225,10 @@ class _BranchServicesTabState extends State<BranchServicesTab> {
 
     return Column(
       children: _services
-          .map((service) => ServiceCardWidget(service: service))
+          .map(
+            (service) =>
+                ServiceCardWidget(service: service, branchId: widget.branchId),
+          )
           .toList(),
     );
   }

@@ -10,11 +10,11 @@ A diferencia de los **unit tests** y **widget tests** (que ya tienes en `test/`)
 
 ## Comparación de tipos de test
 
-| Tipo              | Velocidad | Confiabilidad | ¿Qué prueba?                    |
-|-------------------|-----------|---------------|----------------------------------|
-| **Unit Test**     | ⚡ Rápido  | Media         | Lógica pura (BLoC, Use Cases)    |
-| **Widget Test**   | ⚡ Rápido  | Alta          | UI de widgets individuales       |
-| **Integration**   | 🐌 Lento   | Muy Alta      | Flujo completo del usuario       |
+| Tipo            | Velocidad | Confiabilidad | ¿Qué prueba?                  |
+| --------------- | --------- | ------------- | ----------------------------- |
+| **Unit Test**   | ⚡ Rápido  | Media         | Lógica pura (BLoC, Use Cases) |
+| **Widget Test** | ⚡ Rápido  | Alta          | UI de widgets individuales    |
+| **Integration** | 🐌 Lento  | Muy Alta      | Flujo completo del usuario    |
 
 ---
 

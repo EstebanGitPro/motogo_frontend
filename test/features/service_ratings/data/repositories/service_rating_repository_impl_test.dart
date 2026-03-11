@@ -82,6 +82,7 @@ void main() {
     });
 
     group('getServiceReviews', () {
+      const branchId = 'branch-abc';
       const serviceId = 'svc-789';
 
       test(
@@ -97,14 +98,19 @@ void main() {
           );
 
           when(
-            mockDataSource.getServiceReviews(serviceId),
+            mockDataSource.getServiceReviews(branchId, serviceId),
           ).thenAnswer((_) async => const Right(summary));
 
-          final result = await repository.getServiceReviews(serviceId);
+          final result = await repository.getServiceReviews(
+            branchId,
+            serviceId,
+          );
 
           expect(result.isRight, isTrue);
           expect(result.right.serviceId, 'svc-789');
-          verify(mockDataSource.getServiceReviews(serviceId)).called(1);
+          verify(
+            mockDataSource.getServiceReviews(branchId, serviceId),
+          ).called(1);
         },
       );
 
@@ -115,10 +121,10 @@ void main() {
         );
 
         when(
-          mockDataSource.getServiceReviews(serviceId),
+          mockDataSource.getServiceReviews(branchId, serviceId),
         ).thenAnswer((_) async => Left(error));
 
-        final result = await repository.getServiceReviews(serviceId);
+        final result = await repository.getServiceReviews(branchId, serviceId);
 
         expect(result.isLeft, isTrue);
         expect(result.left.message, 'Error al obtener reseñas');

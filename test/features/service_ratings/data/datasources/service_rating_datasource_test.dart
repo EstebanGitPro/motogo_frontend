@@ -154,6 +154,7 @@ void main() {
     });
 
     group('getServiceReviews', () {
+      const branchId = 'branch-abc';
       const serviceId = 'svc-789';
 
       test('should return ServiceReviewSummaryEntity on success', () async {
@@ -178,16 +179,18 @@ void main() {
         };
 
         when(
-          mockDioClient.get('/services/$serviceId/reviews'),
+          mockDioClient.get('/branches/$branchId/services/$serviceId/reviews'),
         ).thenAnswer((_) async => createResponse(responseData));
 
-        final result = await dataSource.getServiceReviews(serviceId);
+        final result = await dataSource.getServiceReviews(branchId, serviceId);
 
         expect(result.isRight, isTrue);
         expect(result.right.serviceId, serviceId);
         expect(result.right.averageRating, 4.5);
         expect(result.right.reviews.length, 1);
-        verify(mockDioClient.get('/services/$serviceId/reviews')).called(1);
+        verify(
+          mockDioClient.get('/branches/$branchId/services/$serviceId/reviews'),
+        ).called(1);
       });
 
       test('should return ErrorModel when success is false', () async {
@@ -198,24 +201,26 @@ void main() {
         };
 
         when(
-          mockDioClient.get('/services/$serviceId/reviews'),
+          mockDioClient.get('/branches/$branchId/services/$serviceId/reviews'),
         ).thenAnswer((_) async => createResponse(responseData));
 
-        final result = await dataSource.getServiceReviews(serviceId);
+        final result = await dataSource.getServiceReviews(branchId, serviceId);
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());
       });
 
       test('should return ErrorModel on DioException', () async {
-        when(mockDioClient.get('/services/$serviceId/reviews')).thenThrow(
+        when(
+          mockDioClient.get('/branches/$branchId/services/$serviceId/reviews'),
+        ).thenThrow(
           DioException(
             type: DioExceptionType.connectionTimeout,
             requestOptions: RequestOptions(path: ''),
           ),
         );
 
-        final result = await dataSource.getServiceReviews(serviceId);
+        final result = await dataSource.getServiceReviews(branchId, serviceId);
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());
@@ -223,10 +228,10 @@ void main() {
 
       test('should return ErrorModel on generic exception', () async {
         when(
-          mockDioClient.get('/services/$serviceId/reviews'),
+          mockDioClient.get('/branches/$branchId/services/$serviceId/reviews'),
         ).thenThrow(Exception('Network error'));
 
-        final result = await dataSource.getServiceReviews(serviceId);
+        final result = await dataSource.getServiceReviews(branchId, serviceId);
 
         expect(result.isLeft, isTrue);
         expect(result.left, isA<ErrorModel>());

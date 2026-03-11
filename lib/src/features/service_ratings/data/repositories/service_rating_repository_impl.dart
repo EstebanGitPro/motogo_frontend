@@ -24,8 +24,9 @@ class ServiceRatingRepositoryImpl implements ServiceRatingRepository {
 
   @override
   Future<Either<ErrorModel, ServiceReviewSummaryEntity>> getServiceReviews(
+    String branchId,
     String serviceId,
   ) {
-    return _dataSource.getServiceReviews(serviceId);
+    return _dataSource.getServiceReviews(branchId, serviceId);
   }
 }

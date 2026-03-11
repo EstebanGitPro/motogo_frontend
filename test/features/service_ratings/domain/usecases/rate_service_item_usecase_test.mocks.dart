@@ -65,16 +65,22 @@ class MockServiceRatingRepository extends _i1.Mock
 
   @override
   _i3.Future<_i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>>
-  getServiceReviews(String? serviceId) =>
+  getServiceReviews(String? branchId, String? serviceId) =>
       (super.noSuchMethod(
-            Invocation.method(#getServiceReviews, [serviceId]),
+            Invocation.method(#getServiceReviews, [branchId, serviceId]),
             returnValue:
                 _i3.Future<
                   _i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>
                 >.value(
                   _i7.dummyValue<
                     _i4.Either<_i5.ErrorModel, _i8.ServiceReviewSummaryEntity>
-                  >(this, Invocation.method(#getServiceReviews, [serviceId])),
+                  >(
+                    this,
+                    Invocation.method(#getServiceReviews, [
+                      branchId,
+                      serviceId,
+                    ]),
+                  ),
                 ),
           )
           as _i3.Future<

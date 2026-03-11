@@ -7,8 +7,9 @@ import 'package:motogo_frontend/src/features/service_ratings/domain/usecases/get
 abstract class ServiceReviewsEvent {}
 
 class FetchServiceReviews extends ServiceReviewsEvent {
+  final String branchId;
   final String serviceId;
-  FetchServiceReviews({required this.serviceId});
+  FetchServiceReviews({required this.branchId, required this.serviceId});
 }
 
 // ─── States ──────────────────────────────────────────────────────────
@@ -49,7 +50,10 @@ class ServiceReviewsBloc
   ) async {
     emit(ServiceReviewsLoading());
 
-    final result = await _getServiceReviewsUseCase(event.serviceId);
+    final result = await _getServiceReviewsUseCase(
+      event.branchId,
+      event.serviceId,
+    );
 
     result.fold(
       (error) => emit(ServiceReviewsError(message: error.message)),

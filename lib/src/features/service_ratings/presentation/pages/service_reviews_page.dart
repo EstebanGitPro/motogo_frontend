@@ -11,11 +11,13 @@ import 'package:motogo_frontend/src/features/service_ratings/presentation/bloc/s
 /// Shows average rating summary, rating breakdown by star,
 /// and individual review cards with reviewer info.
 class ServiceReviewsPage extends StatelessWidget {
+  final String branchId;
   final String serviceId;
   final String serviceName;
 
   const ServiceReviewsPage({
     super.key,
+    required this.branchId,
     required this.serviceId,
     required this.serviceName,
   });
@@ -64,7 +66,7 @@ class ServiceReviewsPage extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => context.read<ServiceReviewsBloc>().add(
-                FetchServiceReviews(serviceId: serviceId),
+                FetchServiceReviews(branchId: branchId, serviceId: serviceId),
               ),
               child: const Text(CommonConstants.retry),
             ),

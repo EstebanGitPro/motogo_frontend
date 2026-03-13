@@ -21,6 +21,7 @@
 - [Comandos Disponibles](#-comandos-disponibles)
 - [Testing](#-testing)
 - [Build & Release](#-build--release)
+- [Documentación del Proyecto](#-documentación-del-proyecto)
 - [Contribución](#-contribución)
 - [Créditos](#-créditos)
 - [Licencia](#-licencia)
@@ -319,6 +320,19 @@ flutter build apk --debug
 ./scripts/build_release.sh appbundle
 # Output: build/app/outputs/bundle/release/app-release.aab
 ```
+
+---
+
+## 📄 Documentación del Proyecto
+
+La documentación de artefactos del proyecto se encuentra en la carpeta `docs/motogo/`:
+
+| Carpeta | Contenido |
+|---------|-----------|
+| **1. Artefactos proyecto** | Artefactos estratégicos, técnicos, construcción y documentos metodológicos |
+| **2. Gestión administrativa** | Plan de trabajo y seguimiento administrativo |
+| **3. Informe** | Informe del proyecto de grado |
+| **Recordings** | Grabaciones de reuniones |
 
 ---
 

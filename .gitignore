@@ -1,5 +1,5 @@
 
-/docs
+/documents_motogo
 # --- FLUTTER / DART ---
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -70,8 +70,10 @@ package-lock.json
 migrate_working_dir/
 app.*.symbols
 app.*.map.json
-docs/*.md
+documents_motogo/*.md
 icov.info
+*.mp4
+*.apk
 
 # Agent Skills & Workflows (local AI tools)
 .github/skills/

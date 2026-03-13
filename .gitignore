@@ -73,7 +73,6 @@ app.*.map.json
 documents_motogo/*.md
 icov.info
 *.mp4
-*.apk
 
 # Agent Skills & Workflows (local AI tools)
 .github/skills/

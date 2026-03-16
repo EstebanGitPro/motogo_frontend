@@ -148,6 +148,8 @@ class _RegisterFormState extends State<RegisterForm> {
     IconData? prefixIcon,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    String? helperText,
+    int? helperMaxLines,
   }) {
     final isMobile = MediaQuery.of(context).size.width < 600;
     return TextFormField(
@@ -166,6 +168,8 @@ class _RegisterFormState extends State<RegisterForm> {
             ? Icon(prefixIcon, color: Colors.grey[600], size: 22)
             : null,
         suffixIcon: suffixIcon,
+        helperText: helperText,
+        helperMaxLines: helperMaxLines,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.grey[300]!),
@@ -404,6 +408,9 @@ class _RegisterFormState extends State<RegisterForm> {
                   () => setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 validator: _validatePassword,
+                helperText:
+                    'Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial',
+                helperMaxLines: 2,
               ),
             ),
             const SizedBox(width: 16),
@@ -486,6 +493,9 @@ class _RegisterFormState extends State<RegisterForm> {
             () => setState(() => _obscurePassword = !_obscurePassword),
           ),
           validator: _validatePassword,
+          helperText:
+              'Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial',
+          helperMaxLines: 2,
         ),
         const SizedBox(height: 16),
         _buildTextField(

@@ -35,7 +35,7 @@ void main() {
 
       test('should validate strong password', () {
         final validator = ValidatorUtils.password();
-        expect(validator.validate('Password1'), isNull);
+        expect(validator.validate('Password1!'), isNull);
       });
 
       test('should reject weak password', () {
@@ -45,7 +45,7 @@ void main() {
 
       test('should respect custom minLength', () {
         final validator = ValidatorUtils.password(minLength: 4);
-        expect(validator.validate('Pass1'), isNull);
+        expect(validator.validate('Pass1!'), isNull);
       });
     });
 

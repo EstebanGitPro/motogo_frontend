@@ -36,7 +36,7 @@ class PasswordValidator extends BaseValidator {
     this.requireUppercase = true,
     this.requireLowercase = true,
     this.requireNumber = true,
-    this.requireSpecialChar = false,
+    this.requireSpecialChar = true,
     super.customMessage,
   });
 

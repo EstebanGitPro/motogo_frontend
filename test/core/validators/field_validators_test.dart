@@ -47,7 +47,7 @@ void main() {
     });
 
     test('should return null for valid password', () {
-      expect(validator.validate('Password123'), isNull);
+      expect(validator.validate('Password123!'), isNull);
     });
 
     test('should return error for empty password', () {
@@ -77,7 +77,17 @@ void main() {
     });
 
     test('should return error for missing number', () {
-      expect(validator.validate('Password'), ValidationMessages.passwordNumber);
+      expect(
+        validator.validate('Password!'),
+        ValidationMessages.passwordNumber,
+      );
+    });
+
+    test('should return error for missing special character', () {
+      expect(
+        validator.validate('Password123'),
+        ValidationMessages.passwordSpecialChar,
+      );
     });
 
     test('should validate with custom requirements', () {
@@ -86,6 +96,7 @@ void main() {
         requireUppercase: false,
         requireLowercase: false,
         requireNumber: false,
+        requireSpecialChar: false,
       );
       expect(
         customValidator.validate('pass'),

@@ -14,7 +14,7 @@ class ValidatorUtils {
     bool requireUppercase = true,
     bool requireLowercase = true,
     bool requireNumber = true,
-    bool requireSpecialChar = false,
+    bool requireSpecialChar = true,
     String? customMessage,
   }) {
     return PasswordValidator(

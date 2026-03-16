@@ -152,7 +152,9 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         if (value.length < 8) {
           return ChangePasswordConstants.passwordMinLength;
         }
-        if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$').hasMatch(value)) {
+        if (!RegExp(
+          r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$',
+        ).hasMatch(value)) {
           return ChangePasswordConstants.passwordRequirements;
         }
         return null;

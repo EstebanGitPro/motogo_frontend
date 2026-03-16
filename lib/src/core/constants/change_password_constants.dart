@@ -14,7 +14,7 @@ abstract class ChangePasswordConstants {
 
   // Helper text
   static const String passwordRequirementsHelper =
-      'Mínimo 8 caracteres, una mayúscula, una minúscula y un número';
+      'Mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (!@#%)';
 
   // Mensajes de validación
   static const String currentPasswordRequired =
@@ -24,7 +24,7 @@ abstract class ChangePasswordConstants {
   static const String passwordMinLength =
       'La contraseña debe tener al menos 8 caracteres';
   static const String passwordRequirements =
-      'Debe incluir mayúscula, minúscula y número';
+      'Debe incluir mayúscula, minúscula, número y carácter especial';
   static const String confirmPasswordRequired =
       'Por favor confirma tu nueva contraseña';
   static const String passwordsDoNotMatch = 'Las contraseñas no coinciden';

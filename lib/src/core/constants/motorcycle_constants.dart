@@ -5,7 +5,7 @@ import 'person_constants.dart';
 /// Use these constants instead of hardcoded strings for better maintainability.
 class MotorcycleConstants {
   // Page titles
-  static const String userHomeTitle = 'MotoGo';
+  static const String userHomeTitle = 'MotosGo';
   static const String registerMotorcycleTitle = 'Registrar Motocicleta';
   static const String myMotorcyclesTitle = 'Mis Motocicletas';
 

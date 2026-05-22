@@ -52,7 +52,7 @@ Año: $year
 Problema: $problemDescription
 Tipo de servicio: $serviceLabels
 
-Fotos adjuntadas en la app MotoGo.
+Fotos adjuntadas en la app MotosGo.
 ''';
   }
 

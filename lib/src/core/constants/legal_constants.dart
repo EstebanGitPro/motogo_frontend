@@ -4,7 +4,7 @@
 /// and the full Terms & Conditions document adapted for MotoGo.
 class LegalConstants {
   // ── App identity ───────────────────────────────────────────────────────
-  static const String appName = 'MotoGo';
+  static const String appName = 'MotosGo';
   static const String appSlogan = 'Tu compañero de ruta';
   static const String documentVersion = '1.0';
   static const String lastUpdated = 'Última actualización: febrero de 2026';
@@ -28,7 +28,7 @@ class LegalConstants {
 
   // ── Section bodies ─────────────────────────────────────────────────────
   static const String aboutBody =
-      'MotoGo es una plataforma digital que conecta motociclistas con '
+      'MotosGo es una plataforma digital que conecta motociclistas con '
       'talleres de servicio, permitiendo localizar sedes cercanas, '
       'consultar servicios disponibles, calificar experiencias y '
       'gestionar el historial de sus motocicletas.';
@@ -47,13 +47,13 @@ class LegalConstants {
   static const String tcDefiniciones = '''
 Para efectos de estos Términos y Condiciones, se entiende por:
 
-• "Aplicación" o "App": El software móvil MotoGo disponible para dispositivos Android/iOS.
+• "Aplicación" o "App": El software móvil MotosGo disponible para dispositivos Android/iOS.
 • "Usuario" o "Titular": Persona natural que se registra y utiliza la Aplicación.
 • "Taller" o "Prestador": Establecimiento de servicios para motocicletas afiliado a la plataforma.
 • "Contenido": Calificaciones, reseñas, comentarios, fotos y cualquier información publicada por el Usuario.
 • "Datos Personales": Información vinculada o asociable a una persona natural.
 • "Datos Sensibles": Datos que afectan la intimidad o cuyo uso indebido puede generar discriminación, incluyendo: documento de identidad, datos biométricos y ubicación geográfica precisa.
-• "Responsable del Tratamiento": El equipo de desarrollo de MotoGo, quien decide sobre el tratamiento de los datos.
+• "Responsable del Tratamiento": El equipo de desarrollo de MotosGo, quien decide sobre el tratamiento de los datos.
 • "Encargado del Tratamiento": Terceros que realizan tratamiento de datos por cuenta del Responsable.''';
 
   static const String tcObjeto = '''

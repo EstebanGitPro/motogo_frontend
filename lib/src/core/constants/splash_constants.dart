@@ -6,7 +6,7 @@ class SplashConstants {
   static const String loadingText = 'Cargando...';
 
   // Branding
-  static const String appName = 'MOTOGO';
+  static const String appName = 'MOTOSGO';
 
   // Asset paths
   static const String logoAsset = 'assets/icons/motogo_logo.png';

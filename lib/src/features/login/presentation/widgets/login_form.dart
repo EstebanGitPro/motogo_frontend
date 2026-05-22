@@ -66,7 +66,7 @@ class _LoginFormState extends State<LoginForm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text(
-                    'MotoGo',
+                    'MotosGo',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,

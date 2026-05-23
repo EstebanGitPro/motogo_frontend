@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.3] - 2026-05-22
+
+### Changed
+- Brand rename **MotoGo → MotosGo** across constants, UI labels, login form, and localized Spanish strings
+- Comment out `kiwi_generator` in `pubspec.yaml` due to analyzer SDK conflict with Flutter 3.41 (`injector.g.dart` already committed, generator no longer required at install time)
+
+### Security
+- Remove revoked Mapbox access token from `secrets.dart` `defaultValue`; token must now come from `--dart-define=MAPBOX_ACCESS_TOKEN=...` or `.env` via `scripts/run_dev.sh`
+
+### Fixed
+- `splash_page_test` aligned with new brand text (`MOTOSGO`)
+- `secrets_test` rewritten to validate the new "no embedded default" contract
+
 ## [0.14.0] - 2026-02-20
 
 ### Added

@@ -32,7 +32,7 @@ class AdminConstants {
   // Welcome header
   static const String welcomeTitle = '¡Bienvenido, Administrador!';
   static const String welcomeSubtitle =
-      'Gestiona el catálogo de servicios de MotoGo';
+      'Gestiona el catálogo de servicios de MotosGo';
 
   // Service catalog
   static const String searchServicesPlaceholder = 'Buscar servicio...';

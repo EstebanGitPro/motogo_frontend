@@ -35,7 +35,7 @@ class CommonConstants {
       'La navegación proporcionada es solo una referencia. '
       'El mapa puede contener errores o información desactualizada. '
       'Siempre respeta las señales de tránsito, semáforos y normas viales. '
-      'MotoGo no se hace responsable por infracciones de tránsito.';
+      'MotosGo no se hace responsable por infracciones de tránsito.';
   static const String navigationDisclaimerAccept = 'Entendido';
 
   // Image picker

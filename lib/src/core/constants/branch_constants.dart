@@ -5,7 +5,7 @@ class BranchConstants {
   // Form labels
   static const String establishmentTypeLabel = 'Tipo de Establecimiento';
   static const String branchNameLabel = 'Nombre de la Sede';
-  static const String branchNameHint = 'Ej: MotoGo Centro';
+  static const String branchNameHint = 'Ej: MotosGo Centro';
   static const String addressLabel = 'Dirección';
   static const String addressHint = 'Ej: Calle 123 #45-67';
   static const String searchPlaceholder = 'Buscar sedes';

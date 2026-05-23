@@ -3,16 +3,15 @@ import 'package:motogo_frontend/src/core/config/secrets.dart';
 
 void main() {
   group('Secrets', () {
-    test('mapboxAccessToken should not be empty (embedded default)', () {
-      expect(Secrets.mapboxAccessToken, isNotEmpty);
-    });
+    test(
+      'mapboxAccessToken is empty when MAPBOX_ACCESS_TOKEN is not provided via --dart-define',
+      () {
+        expect(Secrets.mapboxAccessToken, isEmpty);
+      },
+    );
 
-    test('mapboxAccessToken should start with pk. prefix', () {
-      expect(Secrets.mapboxAccessToken, startsWith('pk.'));
-    });
-
-    test('isMapboxConfigured should return true when token is set', () {
-      expect(Secrets.isMapboxConfigured, isTrue);
+    test('isMapboxConfigured returns false when token is empty', () {
+      expect(Secrets.isMapboxConfigured, isFalse);
     });
   });
 }

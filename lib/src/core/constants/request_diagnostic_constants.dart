@@ -48,7 +48,7 @@ class RequestDiagnosticConstants {
   static const String msgPlate = 'Placa:';
   static const String msgYear = 'Año:';
   static const String msgProblem = 'Problema:';
-  static const String msgPhotosAttached = 'foto(s) adjuntadas en MotoGo.';
+  static const String msgPhotosAttached = 'foto(s) adjuntadas en MotosGo.';
   static const String msgProblemPlaceholder =
       '[Aquí aparecerá la descripción del problema]';
   static const String msgNotApplicable = 'N/A';

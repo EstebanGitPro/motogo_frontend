@@ -27,7 +27,7 @@ void main() {
 
       // Verify the splash screen elements are visible
       // The MotoGo logo and text should appear
-      expect(find.text('MotoGo'), findsOneWidget);
+      expect(find.text('MotosGo'), findsOneWidget);
     });
   });
 

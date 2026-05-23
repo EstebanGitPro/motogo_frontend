@@ -82,7 +82,7 @@ void main() {
 
   group('SplashPage', () {
     group('UI rendering', () {
-      testWidgets('should display the MOTOGO text', (tester) async {
+      testWidgets('should display the MOTOSGO text', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: const SplashPage(),
@@ -94,7 +94,7 @@ void main() {
         // Pump enough frames for animation to reveal text
         await tester.pump(const Duration(milliseconds: 1200));
 
-        expect(find.text('MOTOGO'), findsOneWidget);
+        expect(find.text('MOTOSGO'), findsOneWidget);
 
         // Pump past remaining delays to avoid pending timer errors
         await tester.pump(const Duration(milliseconds: 2000));
